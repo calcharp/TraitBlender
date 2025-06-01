@@ -16,15 +16,12 @@ license = [
 website = "https://github.com/Imageomics/TraitBlender"
 
 wheels = [
-  "./wheels/fsspec-2025.3.2-py3-none-any.whl",
-  "./wheels/numpy-2.2.5-cp311-cp311-win_amd64.whl",
   "./wheels/pandas-2.2.3-cp311-cp311-win_amd64.whl",
-  "./wheels/pillow-11.2.1-cp311-cp311-win_amd64.whl",
+  "./wheels/numpy-2.2.6-cp311-cp311-win_amd64.whl",
   "./wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
   "./wheels/pytz-2025.2-py2.py3-none-any.whl",
-  "./wheels/scipy-1.15.3-cp311-cp311-win_amd64.whl",
+  "./wheels/tzdata-2025.2-py2.py3-none-any.whl",
   "./wheels/six-1.17.0-py2.py3-none-any.whl",
-  "./wheels/tzdata-2025.2-py2.py3-none-any.whl"
 ]
 
 
