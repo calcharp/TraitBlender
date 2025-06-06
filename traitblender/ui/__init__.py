@@ -4,11 +4,10 @@ TraitBlender UI Module
 Contains all user interface components including operators and panels.
 """
 
-# Import all UI components
-from . import operators
-from . import panels
+# Don't import submodules explicitly to avoid exposing them globally
+# Import specific classes only when needed
+from .operators import TRAITBLENDER_OT_setup_scene
 
 __all__ = [
-    "operators",
-    "panels",
+    "TRAITBLENDER_OT_setup_scene",
 ]

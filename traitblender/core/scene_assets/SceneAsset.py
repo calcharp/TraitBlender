@@ -376,12 +376,3 @@ class SurfaceAsset(SceneAsset):
             obj.select_set(True)
         bpy.context.view_layer.objects.active = current_active
 
-
-
-
-# Example of using SurfaceAsset
-table = SurfaceAsset("Cube")  # The flat rectangular surface
-suzanne = GenericAsset("Suzanne")  # The monkey head mesh
-
-# Place Suzanne on the surface
-table.place(suzanne, (0,0))  # Place Suzanne in the back left quadrant
