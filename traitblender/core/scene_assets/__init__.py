@@ -1,14 +1,22 @@
 """
 TraitBlender Scene Assets
 
-Contains classes for managing scene objects and assets.
+Scene asset management system for Blender objects with enhanced transformation capabilities.
 """
 
-# Import all scene asset classes
-from .SceneAsset import SceneAsset, GenericAsset, SurfaceAsset
+# Import core classes
+from .scene_asset import SceneAsset, GenericAsset, SurfaceAsset
+
+# Import context managers
+from .context_managers import (
+    scene_asset,
+)
 
 __all__ = [
+    # Core classes
     "SceneAsset",
     "GenericAsset", 
     "SurfaceAsset",
+    # Context managers
+    "scene_asset",
 ] 

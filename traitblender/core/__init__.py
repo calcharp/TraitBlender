@@ -5,14 +5,13 @@ Contains the core functionality including configuration, datasets, morphospaces,
 transforms, scene assets, and helper functions.
 
 Import everything you need from here:
-    from TraitBlender.core import get_asset_path, set_textures, SceneAsset, etc.
+    from TraitBlender.core import get_asset_path, SceneAsset, etc.
 """
 
 # Helper functions and utilities
 from .helpers import (
     get_asset_path,
     apply_material,
-    set_textures,  # Backward compatibility
     get_texture_info,
     VALID_TEXTURES,
 )
@@ -22,12 +21,11 @@ from .scene_assets import (
     SceneAsset,
     GenericAsset, 
     SurfaceAsset,
+    scene_asset,
 )
 
 # Transforms
 from .transforms import (
-    TransformFactory,
-    transform_factory,
     register_transform,
     clear_scene,
     lighting_setup,
@@ -42,7 +40,6 @@ __all__ = [
     # Helper functions
     "get_asset_path",
     "apply_material",
-    "set_textures",  # Backward compatibility
     "get_texture_info",
     "VALID_TEXTURES",
     
@@ -50,10 +47,9 @@ __all__ = [
     "SceneAsset",
     "GenericAsset", 
     "SurfaceAsset",
+    "scene_asset",
     
     # Transforms
-    "TransformFactory",
-    "transform_factory", 
     "register_transform",
     "clear_scene",
     "lighting_setup",
