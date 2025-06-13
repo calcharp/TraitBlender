@@ -5,19 +5,12 @@ Utility functions and helpers for the TraitBlender add-on.
 """
 
 import os
-from .import_texture import apply_material, get_texture_info, VALID_TEXTURES
+from .import_texture import apply_material, get_texture_info, VALID_TEXTURES, set_textures
 from .object_validator import (
-    require_objects, 
-    ObjectNotFoundError, 
-    get_object_safely, 
-    list_scene_objects, 
-    validate_objects_exist
-)
-from .selection_manager import (
-    with_active_object,
-    with_selected_objects,
-    SelectionContext
-)
+    ObjectNotFoundError,
+    must_exist,
+    check_object_exists,
+)   
 
 def get_asset_path(*path_parts):
     """
@@ -42,14 +35,9 @@ __all__ = [
     "apply_material",
     "get_texture_info",
     "VALID_TEXTURES",
+    "set_textures",
     # Object validation utilities
-    "require_objects",
     "ObjectNotFoundError",
-    "get_object_safely",
-    "list_scene_objects",
-    "validate_objects_exist",
-    # Selection management utilities
-    "with_active_object",
-    "with_selected_objects",
-    "SelectionContext",
+    "must_exist",
+    "check_object_exists",
 ] 

@@ -3,7 +3,7 @@ import bpy
 from mathutils import Vector, Euler
 import math
 import numpy as np
-from ..helpers import get_object_safely, validate_objects_exist, ObjectNotFoundError
+from ..helpers.object_validator import ObjectNotFoundError, check_object_exists
 
 class SceneAsset(ABC): 
     """
@@ -42,14 +42,8 @@ class SceneAsset(ABC):
     @property
     def object(self):
         """Returns the Blender object with the same name as this asset"""
-        obj = get_object_safely(self.name)
-        if obj is None:
-            # Provide more detailed error information
-            existing, missing = validate_objects_exist(self.name)
-            if self.name in bpy.data.objects:
-                raise ObjectNotFoundError(f"Object '{self.name}' exists in Blender data but is not in the current scene")
-            else:
-                raise ObjectNotFoundError(f"Object '{self.name}' does not exist. Available objects: {existing}")
+        check_object_exists(self.name)
+        obj = bpy.data.objects.get(self.name)
         return obj
 
     @property
@@ -78,7 +72,12 @@ class SceneAsset(ABC):
         if isinstance(transform_value, tuple):
             transform_value = Vector(transform_value)
             
-        # Store original origin type
+        # If we're already at the desired origin, just set location directly
+        if self._current_origin_type == origin_type:
+            self.object.location = transform_value
+            return
+            
+        # Store original origin type and current world location
         original_origin = self._current_origin_type
         
         # Set to desired origin for transform
@@ -88,8 +87,7 @@ class SceneAsset(ABC):
         self.object.location = transform_value
         
         # Restore original origin
-        if original_origin != origin_type:
-            self.origin_set(type=original_origin)
+        self.origin_set(type=original_origin)
 
     @property
     def rotation_euler(self) -> Euler:
@@ -196,15 +194,10 @@ class SceneAsset(ABC):
         Raises:
             ObjectNotFoundError: If the object doesn't exist or is not a mesh
         """
-        # Validate object exists before proceeding
-        existing, missing = validate_objects_exist(self.name)
-        if missing:
-            raise ObjectNotFoundError(f"Cannot set origin: object '{self.name}' not found in scene")
-        
+        check_object_exists(self.name)
         if not self.object or not self.object.data or not isinstance(self.object.data, bpy.types.Mesh):
             raise ObjectNotFoundError(f"Object '{self.name}' is not a valid mesh object for origin setting")
         
-
         # Store current selection and active object
         current_selected = [obj for obj in bpy.context.selected_objects]
         current_active = bpy.context.active_object
@@ -266,163 +259,9 @@ class GenericAsset(SceneAsset):
     """A concrete implementation of SceneAsset that can be instantiated directly."""
     pass
 
-class SurfaceAsset(SceneAsset):
-    """
-    A SceneAsset that provides a surface interface for placing other objects.
-    The surface is defined by the upper square of the bounding box, with a -1 to 1 coordinate grid.
-    """
-    
-    @property
-    def surface(self) -> tuple[Vector, Vector, Vector, Vector]:
-        """
-        Returns the four corners of the surface in world space, ordered:
-        [min_x,min_y, min_x,max_y, max_x,max_y, max_x,min_y]
-        
-        Raises:
-            ObjectNotFoundError: If the surface object doesn't exist
-        """
-        # Validate object exists
-        existing, missing = validate_objects_exist(self.name)
-        if missing:
-            raise ObjectNotFoundError(f"Surface object '{self.name}' not found in scene")
-            
-        # Get mesh data and world matrix
-        mesh = self.object.data
-        matrix_world = self.object.matrix_world
-        
-        # Get all vertex coordinates in world space
-        world_verts = [matrix_world @ vert.co for vert in mesh.vertices]
-        
-        # Find bounds
-        min_x = min(v.x for v in world_verts)
-        max_x = max(v.x for v in world_verts)
-        min_y = min(v.y for v in world_verts)
-        max_y = max(v.y for v in world_verts)
-        max_z = max(v.z for v in world_verts)  # We want the upper surface
-        
-        # Create the four corners in world space
-        return (
-            Vector((min_x, min_y, max_z)),  # Bottom left
-            Vector((min_x, max_y, max_z)),  # Top left
-            Vector((max_x, max_y, max_z)),  # Top right
-            Vector((max_x, min_y, max_z)),  # Bottom right
-        )
-    
-    @property
-    def surface_normal(self) -> Vector:
-        """Returns the normal vector of the surface in world space"""
-        corners = self.surface
-        edge1 = corners[1] - corners[0]  # Top left - Bottom left
-        edge2 = corners[3] - corners[0]  # Bottom right - Bottom left
-        normal = edge1.cross(edge2)
-        return normal.normalized()
-    
-    def surface_to_world(self, coords: tuple[float, float]) -> Vector:
-        """
-        Convert surface coordinates (-1 to 1) to world position
-        
-        Args:
-            coords: (x, y) coordinates in surface space, each from -1 to 1
-        Returns:
-            World space position on the surface
-        """
-        x, y = coords
-        if not (-1 <= x <= 1 and -1 <= y <= 1):
-            raise ValueError("Surface coordinates must be between -1 and 1")
-            
-        corners = self.surface
-        
-        # Convert from -1,1 space to 0,1 space
-        x = (x + 1) / 2
-        y = (y + 1) / 2
-        
-        # Bilinear interpolation between corners
-        bottom = corners[0].lerp(corners[3], x)  # Interpolate along bottom edge
-        top = corners[1].lerp(corners[2], x)     # Interpolate along top edge
-        position = bottom.lerp(top, y)           # Interpolate between bottom and top
-        
-        return position
-    
-    def place(self, asset: SceneAsset, coords: tuple[float, float]):
-        """
-        Place an asset on the surface at the given coordinates.
-        The asset will be positioned with its bottom center at the specified point,
-        rotated to align with the surface normal, and parented to this surface.
-        
-        Args:
-            asset: The SceneAsset to place
-            coords: (x, y) coordinates in surface space, each from -1 to 1
-            
-        Raises:
-            ObjectNotFoundError: If either the surface object or asset object doesn't exist
-        """
-        # Validate both objects exist
-        objects_to_check = [self.name, asset.name]
-        existing, missing = validate_objects_exist(objects_to_check)
-        if missing:
-            raise ObjectNotFoundError(f"Cannot place asset: missing objects {missing}")
-        
-        # Ensure we're working with bottom center origin
-        asset.origin_set(type="BOTTOM_CENTER")
-        
-        # Get world position and normal
-        position = self.surface_to_world(coords)
-        normal = self.surface_normal
-        
-        # Set location
-        asset.location = position
-        
-        # Calculate rotation to align with normal
-        # Get the object's current up vector in world space
-        obj_matrix = asset.object.matrix_world
-        current_up = obj_matrix.to_3x3() @ Vector((0, 0, 1))
-        current_up.normalize()
-        
-        # Calculate rotation to align current up with surface normal
-        rotation = current_up.rotation_difference(normal)
-        
-        # Apply the rotation in world space
-        current_rot = asset.object.rotation_euler.copy()
-        new_rot = (rotation.to_matrix().to_4x4() @ obj_matrix).to_euler()
-        asset.rotation_euler = new_rot
-        
-        # Store current selection and active object
-        current_selected = [obj for obj in bpy.context.selected_objects]
-        current_active = bpy.context.active_object
-        
-        # Select both objects and make child active
-        bpy.ops.object.select_all(action='DESELECT')
-        asset.object.select_set(True)
-        self.object.select_set(True)
-        bpy.context.view_layer.objects.active = self.object
-        
-        # Parent with transforms preserved
-        bpy.ops.object.parent_set(type='OBJECT', keep_transform=True)
-        
-        # Restore selection
-        bpy.ops.object.select_all(action='DESELECT')
-        for obj in current_selected:
-            obj.select_set(True)
-        bpy.context.view_layer.objects.active = current_active
 
-# Example usage with enhanced error handling:
-"""
-Example usage:
-
-try:
-    # Create assets
-    table = SurfaceAsset("Table")
-    specimen = GenericAsset("Specimen")
-    
-    # Place specimen on table - will validate both objects exist
-    table.place(specimen, (0.5, 0.5))
-    
-    # Transform operations - will validate object exists
-    specimen.location = (0, 0, 5)
-    specimen.rotation_euler = (0, 0, math.pi/4)
-    
-except ObjectNotFoundError as e:
-    print(f"Object validation error: {e}")
-    # Handle missing objects gracefully
-"""
+# Dictionary mapping asset names to their corresponding asset types
+ASSET_TYPES = {
+    "GenericAsset": GenericAsset
+}
 

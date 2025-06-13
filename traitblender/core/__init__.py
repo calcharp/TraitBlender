@@ -20,15 +20,13 @@ from .helpers import (
 from .scene_assets import (
     SceneAsset,
     GenericAsset, 
-    SurfaceAsset,
     scene_asset,
+    with_scene_asset,
 )
 
 # Transforms
 from .transforms import (
-    register_transform,
-    clear_scene,
-    lighting_setup,
+    Transform,
 )
 
 # Config, morphospaces, and datasets (placeholder for future development)
@@ -46,11 +44,9 @@ __all__ = [
     # Scene Assets
     "SceneAsset",
     "GenericAsset", 
-    "SurfaceAsset",
     "scene_asset",
+    "with_scene_asset",
     
     # Transforms
-    "register_transform",
-    "clear_scene",
-    "lighting_setup",
+    "Transform",
 ]
