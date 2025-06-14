@@ -23,6 +23,7 @@ wheels = [
   "./wheels/pytz-2025.2-py2.py3-none-any.whl",
   "./wheels/tzdata-2025.2-py2.py3-none-any.whl",
   "./wheels/six-1.17.0-py2.py3-none-any.whl",
+  "./wheels/PyYAML-6.0.2-cp311-cp311-win_amd64.whl",
 ]
 
 

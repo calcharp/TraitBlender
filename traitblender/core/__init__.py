@@ -29,6 +29,9 @@ from .transforms import (
     TRANSFORMS,
 )
 
+# Config
+from .config import CONFIG, register_config
+
 # Config, morphospaces, and datasets (placeholder for future development)
 # from .config import *
 # from .morphospaces import *
@@ -49,4 +52,7 @@ __all__ = [
     
     # Transforms
     "TRANSFORMS",
+    # Config
+    "CONFIG",
+    "register_config",
 ]
