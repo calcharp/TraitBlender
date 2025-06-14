@@ -8,7 +8,20 @@ import bpy
 from bpy.types import Operator
 import os
 from ...core.helpers import get_asset_path
+from bpy.app.handlers import persistent
 
+@persistent
+def set_rendered_view(dummy):
+    # Remove the handler so it only runs once
+    if set_rendered_view in bpy.app.handlers.load_post:
+        bpy.app.handlers.load_post.remove(set_rendered_view)
+    # Set all 3D viewports to rendered
+    for window in bpy.context.window_manager.windows:
+        for area in window.screen.areas:
+            if area.type == 'VIEW_3D':
+                for space in area.spaces:
+                    if space.type == 'VIEW_3D':
+                        space.shading.type = 'RENDERED'
 
 class TRAITBLENDER_OT_setup_scene(Operator):
     """Load the TraitBlender museum scene for morphological imaging"""
@@ -26,6 +39,9 @@ class TRAITBLENDER_OT_setup_scene(Operator):
         
         if os.path.exists(museum_scene_path):
             try:
+                # Register the handler before loading the file
+                if set_rendered_view not in bpy.app.handlers.load_post:
+                    bpy.app.handlers.load_post.append(set_rendered_view)
                 # Open the museum scene blend file
                 bpy.ops.wm.open_mainfile(filepath=museum_scene_path)
                 self.report({'INFO'}, "Museum scene loaded successfully from TraitBlender assets.")
