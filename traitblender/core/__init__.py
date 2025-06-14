@@ -26,7 +26,7 @@ from .scene_assets import (
 
 # Transforms
 from .transforms import (
-    Transform,
+    TRANSFORMS,
 )
 
 # Config, morphospaces, and datasets (placeholder for future development)
@@ -48,5 +48,5 @@ __all__ = [
     "with_scene_asset",
     
     # Transforms
-    "Transform",
+    "TRANSFORMS",
 ]

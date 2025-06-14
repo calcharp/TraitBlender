@@ -5,9 +5,11 @@ Transform factory system for morphological operations.
 """
 
 from .transforms import (
-    Transform
+    Transform,
+    TRANSFORMS
 )
 
 __all__ = [
-    "Transform"
+    "Transform",
+    "TRANSFORMS"
 ] 
