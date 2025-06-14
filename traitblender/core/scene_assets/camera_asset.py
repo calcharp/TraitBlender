@@ -1,5 +1,7 @@
 from .scene_asset import SceneAsset
 import bpy
+from ..config import CONFIG
+import os
 
 class CameraAsset(SceneAsset):
     """
@@ -84,3 +86,26 @@ class CameraAsset(SceneAsset):
     @sensor_width.setter
     def sensor_width(self, value):
         self.camera.sensor_width = value
+
+    def render(self, filename=None, extension='png'):
+        """
+        Set this camera as the active scene camera and render an image.
+        Uses the output render_dir from the global CONFIG dict, with optional filename and extension.
+        If filename is not specified, uses Blender's default name. Default extension is 'png'.
+        The full path is constructed and normalized for cross-platform compatibility.
+        Raises FileNotFoundError if the render_dir does not exist.
+        """
+        scene = bpy.context.scene
+        scene.camera = self.object
+        render_dir = CONFIG.get('render_dir')
+        if not render_dir or not os.path.exists(render_dir):
+            raise FileNotFoundError(f"Render directory does not exist: {render_dir}")
+        if filename is None:
+            # Use Blender's default name for the scene
+            filename = bpy.path.clean_name(scene.name)
+        if not extension.startswith('.'):
+            extension = '.' + extension
+        full_path = os.path.normpath(os.path.join(render_dir, filename + extension))
+        scene.render.filepath = full_path
+        scene.render.image_settings.file_format = extension.lstrip('.').upper()
+        bpy.ops.render.render(write_still=True)
