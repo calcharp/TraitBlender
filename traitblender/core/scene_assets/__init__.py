@@ -5,7 +5,7 @@ Scene asset management system for Blender objects with enhanced transformation c
 """
 
 # Import core classes and variables
-from .scene_asset import SceneAsset, GenericAsset, ASSET_TYPES
+from .asset_types import ASSET_TYPES
 
 # Import context managers
 from .asset_helpers import (
@@ -15,8 +15,6 @@ from .asset_helpers import (
 
 __all__ = [
     # Core classes
-    "SceneAsset",
-    "GenericAsset",
     "ASSET_TYPES",
     # Context managers
     "scene_asset",

@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from .scene_asset import ASSET_TYPES
+from .asset_types import ASSET_TYPES
 from functools import wraps
 from ..helpers import check_object_exists
 

@@ -5,13 +5,14 @@ Main add-on initialization file.
 """
 
 import bpy
-from .ui import TRAITBLENDER_OT_setup_scene
+from .ui import TRAITBLENDER_OT_setup_scene, TRAITBLENDER_PT_main_panel
 import os
 
 
 # List of all classes to register
 classes = [
     TRAITBLENDER_OT_setup_scene,
+    TRAITBLENDER_PT_main_panel,
 ]
 
 

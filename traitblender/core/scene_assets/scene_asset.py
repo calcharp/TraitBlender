@@ -259,9 +259,3 @@ class GenericAsset(SceneAsset):
     """A concrete implementation of SceneAsset that can be instantiated directly."""
     pass
 
-
-# Dictionary mapping asset names to their corresponding asset types
-ASSET_TYPES = {
-    "GenericAsset": GenericAsset
-}
-

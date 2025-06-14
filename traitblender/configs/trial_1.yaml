@@ -1,24 +1,16 @@
-blender_preferences:
-  use_online_access: True
 
-morphospace: 
-  name: ContrerasMorphospace
-  path: ...
 
-dataset:
 
-rendering:
-  render_engine: Cycles
-  compute_device_type: CUDA 
-
-imaging:
-  output_path: C://Users/caleb/Downloads/trial_1
-  images_per_specimen: 1
-  images_per_view: 1
-  views:
-    - bottom
-    - apex
-    - aperture
+Camera: 
+  type: 'PERSP'           # 'PERSP', 'ORTHO', or 'PANO'
+  lens: 50                # Focal length in mm
+  lens_unit: 'MILLIMETERS' # 'MILLIMETERS' or 'FOV'
+  shift_x: 0.0
+  shift_y: 0.0
+  clip_start: 0.1
+  clip_end: 1000.0
+  sensor_fit: 'HORIZONTAL' # 'AUTO', 'HORIZONTAL', or 'VERTICAL'
+  sensor_width: 36.0
 
 transforms:
   - GaussianCameraRotation

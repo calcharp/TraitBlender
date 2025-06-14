@@ -6,10 +6,8 @@ Panels define the user interface layout and elements.
 """
 
 # Import all panel classes here
-# Example:
-# from .main_panel import TraitBlenderMainPanel
+from .main_panel import TRAITBLENDER_PT_main_panel
 
 __all__ = [
-    # List all panel classes to export
-    # "TraitBlenderMainPanel",
+    "TRAITBLENDER_PT_main_panel",
 ] 

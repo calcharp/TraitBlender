@@ -18,8 +18,7 @@ from .helpers import (
 
 # Scene Assets
 from .scene_assets import (
-    SceneAsset,
-    GenericAsset, 
+    ASSET_TYPES,
     scene_asset,
     with_scene_asset,
 )
@@ -45,8 +44,7 @@ __all__ = [
     "VALID_TEXTURES",
     
     # Scene Assets
-    "SceneAsset",
-    "GenericAsset", 
+    "ASSET_TYPES",
     "scene_asset",
     "with_scene_asset",
     
