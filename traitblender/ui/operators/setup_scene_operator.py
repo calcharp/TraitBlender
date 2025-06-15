@@ -39,14 +39,33 @@ class TRAITBLENDER_OT_setup_scene(Operator):
         
         if os.path.exists(museum_scene_path):
             try:
-                # Register the handler before loading the file
-                if set_rendered_view not in bpy.app.handlers.load_post:
-                    bpy.app.handlers.load_post.append(set_rendered_view)
-                # Open the museum scene blend file
-                bpy.ops.wm.open_mainfile(filepath=museum_scene_path)
-                self.report({'INFO'}, "Museum scene loaded successfully from TraitBlender assets.")
+                # Clear existing objects
+                for obj in bpy.data.objects:
+                    bpy.data.objects.remove(obj, do_unlink=True)
+                
+                # Set world to black
+                if not context.scene.world:
+                    context.scene.world = bpy.data.worlds.new("World")
+                context.scene.world.use_nodes = True
+                context.scene.world.node_tree.nodes["Background"].inputs[0].default_value = (0, 0, 0, 1)
+                
+                # Append objects and materials
+                with bpy.data.libraries.load(museum_scene_path) as (data_from, data_to):
+                    # Get all objects and materials
+                    data_to.objects = data_from.objects
+                    data_to.materials = data_from.materials
+                
+                # Link objects to scene
+                for obj in data_to.objects:
+                    if obj is not None:  # Skip None objects
+                        bpy.context.scene.collection.objects.link(obj)
+                
+                # Set rendered view
+                set_rendered_view(None)
+                
+                self.report({'INFO'}, "Museum scene objects and materials appended successfully.")
             except Exception as e:
-                self.report({'ERROR'}, f"Failed to load museum scene: {str(e)}")
+                self.report({'ERROR'}, f"Failed to append museum scene: {str(e)}")
                 return {'CANCELLED'}
         else:
             self.report({'WARNING'}, f"Museum scene not found at: {museum_scene_path}")

@@ -87,6 +87,67 @@ class CameraAsset(SceneAsset):
     def sensor_width(self, value):
         self.camera.sensor_width = value
 
+    @property
+    def output_path(self):
+        return bpy.context.scene.render.filepath
+
+    @output_path.setter
+    def output_path(self, value):
+        bpy.context.scene.render.filepath = value
+
+    @property
+    def file_format(self):
+        return bpy.context.scene.render.image_settings.file_format
+
+    @file_format.setter
+    def file_format(self, value):
+        bpy.context.scene.render.image_settings.file_format = value
+
+    @property
+    def color_mode(self):
+        return bpy.context.scene.render.image_settings.color_mode
+
+    @color_mode.setter
+    def color_mode(self, value):
+        bpy.context.scene.render.image_settings.color_mode = value
+
+    @property
+    def color_depth(self):
+        return bpy.context.scene.render.image_settings.color_depth
+
+    @color_depth.setter
+    def color_depth(self, value):
+        bpy.context.scene.render.image_settings.color_depth = value
+
+    @property
+    def compression(self):
+        return bpy.context.scene.render.image_settings.compression
+
+    @compression.setter
+    def compression(self, value):
+        bpy.context.scene.render.image_settings.compression = value
+
+    @property
+    def overwrite(self):
+        return bpy.context.scene.render.use_overwrite
+
+    @overwrite.setter
+    def overwrite(self, value):
+        bpy.context.scene.render.use_overwrite = value
+
+    @property
+    def metadata(self):
+        # Return a list of enabled metadata keys
+        scene = bpy.context.scene
+        return [k for k, v in scene.render.stamp if v]
+
+    @metadata.setter
+    def metadata(self, value):
+        # value should be a list of strings (metadata keys to enable)
+        scene = bpy.context.scene
+        for k in scene.render.stamp.keys():
+            scene.render.stamp[k] = (k in value)
+
     def render(self, filename=None, extension='png'):
         """
         Set this camera as the active scene camera and render an image.
