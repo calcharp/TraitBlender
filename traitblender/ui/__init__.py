@@ -15,6 +15,7 @@ from .operators import (
     TRAITBLENDER_OT_set_camera_clip,
     TRAITBLENDER_OT_set_camera_sensor,
     TRAITBLENDER_OT_camera_render,
+    TRAITBLENDER_OT_register_config,
 )
 from .panels import (
     TRAITBLENDER_PT_main_panel,
@@ -31,6 +32,7 @@ __all__ = [
     "TRAITBLENDER_OT_set_camera_clip",
     "TRAITBLENDER_OT_set_camera_sensor",
     "TRAITBLENDER_OT_camera_render",
+    "TRAITBLENDER_OT_register_config",
     # Panels
     "TRAITBLENDER_PT_main_panel",
     "TRAITBLENDER_PT_camera_panel",
