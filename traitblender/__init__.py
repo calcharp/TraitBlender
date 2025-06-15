@@ -5,7 +5,19 @@ Main add-on initialization file.
 """
 
 import bpy
-from .ui import TRAITBLENDER_OT_setup_scene, TRAITBLENDER_PT_main_panel
+from .ui import (
+    TRAITBLENDER_OT_setup_scene,
+    TRAITBLENDER_PT_main_panel,
+    TRAITBLENDER_PT_camera_panel,
+    TRAITBLENDER_OT_set_camera_type,
+    TRAITBLENDER_OT_set_camera_lens,
+    TRAITBLENDER_OT_set_camera_lens_unit,
+    TRAITBLENDER_OT_set_camera_shift,
+    TRAITBLENDER_OT_set_camera_clip,
+    TRAITBLENDER_OT_set_camera_sensor,
+    TRAITBLENDER_OT_camera_render,
+)
+from .ui.properties.camera_properties import register_camera_properties, unregister_camera_properties
 import os
 
 
@@ -13,6 +25,14 @@ import os
 classes = [
     TRAITBLENDER_OT_setup_scene,
     TRAITBLENDER_PT_main_panel,
+    TRAITBLENDER_PT_camera_panel,
+    TRAITBLENDER_OT_set_camera_type,
+    TRAITBLENDER_OT_set_camera_lens,
+    TRAITBLENDER_OT_set_camera_lens_unit,
+    TRAITBLENDER_OT_set_camera_shift,
+    TRAITBLENDER_OT_set_camera_clip,
+    TRAITBLENDER_OT_set_camera_sensor,
+    TRAITBLENDER_OT_camera_render,
 ]
 
 
@@ -35,6 +55,8 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
     
+    register_camera_properties()
+    
     # Initialize user directories (no asset copying)
     _init_dir()
 
@@ -53,6 +75,8 @@ def unregister():
     """Unregister all add-on classes"""
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
+    
+    unregister_camera_properties()
 
 
 if __name__ == "__main__":

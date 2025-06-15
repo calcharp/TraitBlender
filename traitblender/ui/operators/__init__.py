@@ -7,7 +7,23 @@ Operators handle user actions and commands.
 
 # Import all operator classes here
 from .setup_scene_operator import TRAITBLENDER_OT_setup_scene
+from .camera_operators import (
+    TRAITBLENDER_OT_set_camera_type,
+    TRAITBLENDER_OT_set_camera_lens,
+    TRAITBLENDER_OT_set_camera_lens_unit,
+    TRAITBLENDER_OT_set_camera_shift,
+    TRAITBLENDER_OT_set_camera_clip,
+    TRAITBLENDER_OT_set_camera_sensor,
+    TRAITBLENDER_OT_camera_render,
+)
 
 __all__ = [
     "TRAITBLENDER_OT_setup_scene",
+    "TRAITBLENDER_OT_set_camera_type",
+    "TRAITBLENDER_OT_set_camera_lens",
+    "TRAITBLENDER_OT_set_camera_lens_unit",
+    "TRAITBLENDER_OT_set_camera_shift",
+    "TRAITBLENDER_OT_set_camera_clip",
+    "TRAITBLENDER_OT_set_camera_sensor",
+    "TRAITBLENDER_OT_camera_render",
 ] 
