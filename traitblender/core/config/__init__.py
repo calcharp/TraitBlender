@@ -3,6 +3,6 @@
 
 CONFIG = {}
 
-from .register_config import register_config
+from .register_config import register, configure_traitblender
 
-__all__ = ["CONFIG", "register_config"]
+__all__ = ["CONFIG", "register", "configure_traitblender"]

@@ -8,18 +8,9 @@ import bpy
 from .ui import (
     TRAITBLENDER_OT_setup_scene,
     TRAITBLENDER_PT_main_panel,
-    TRAITBLENDER_PT_camera_panel,
-    TRAITBLENDER_OT_set_camera_type,
-    TRAITBLENDER_OT_set_camera_lens,
-    TRAITBLENDER_OT_set_camera_lens_unit,
-    TRAITBLENDER_OT_set_camera_shift,
-    TRAITBLENDER_OT_set_camera_clip,
-    TRAITBLENDER_OT_set_camera_sensor,
-    TRAITBLENDER_OT_camera_render,
-    TRAITBLENDER_OT_register_config,
+
 )
-from .ui.panels.main_panel import register_panel_properties, unregister_panel_properties
-from .ui.properties.camera_properties import register_camera_properties, unregister_camera_properties
+
 import os
 
 
@@ -27,15 +18,7 @@ import os
 classes = [
     TRAITBLENDER_OT_setup_scene,
     TRAITBLENDER_PT_main_panel,
-    TRAITBLENDER_PT_camera_panel,
-    TRAITBLENDER_OT_set_camera_type,
-    TRAITBLENDER_OT_set_camera_lens,
-    TRAITBLENDER_OT_set_camera_lens_unit,
-    TRAITBLENDER_OT_set_camera_shift,
-    TRAITBLENDER_OT_set_camera_clip,
-    TRAITBLENDER_OT_set_camera_sensor,
-    TRAITBLENDER_OT_camera_render,
-    TRAITBLENDER_OT_register_config,
+
 ]
 
 
@@ -57,10 +40,10 @@ def register():
     """Register all add-on classes"""
     for cls in classes:
         bpy.utils.register_class(cls)
-    
-    register_camera_properties()
-    register_panel_properties()
-    
+
+    from .core import configure_traitblender
+    configure_traitblender()
+
     # Initialize user directories (no asset copying)
     _init_dir()
 
@@ -80,10 +63,7 @@ def unregister():
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
     
-    unregister_camera_properties()
-    unregister_panel_properties()
-
-
+        
 if __name__ == "__main__":
     import traceback
     try:

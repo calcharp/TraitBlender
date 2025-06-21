@@ -1,15 +1,83 @@
-import yaml
+import bpy
+from bpy.types import PointerProperty
 from . import CONFIG
 
-def register_config(yaml_path):
+
+class TraitBlenderConfig(bpy.types.PropertyGroup):
+    """Base class for all TraitBlender configuration property groups."""
+    
+    def __str__(self):
+        """Recursively display all parameters and their values with pretty formatting."""
+        result = []
+        
+        # Get all properties of this class
+        for i, prop_name in enumerate(self.__class__.__annotations__.keys()):
+            prop_value = getattr(self, prop_name)
+            
+            # If it's another TraitBlenderConfig, recurse
+            if isinstance(prop_value, TraitBlenderConfig):
+                # Add blank line before new section (except for the first one)
+                if i > 0:
+                    result.append("")
+                
+                # Indent the nested config and remove the class name header
+                nested_str = str(prop_value).replace('\n', '\n    ')
+                result.append(f"{prop_name}:")
+                result.append(f"    {nested_str}")
+            else:
+                # Handle different property types
+                if hasattr(prop_value, '__iter__') and not isinstance(prop_value, str):
+                    # For vectors, arrays, etc. - convert to tuple/list
+                    try:
+                        display_value = tuple(prop_value)
+                    except:
+                        display_value = prop_value
+                else:
+                    display_value = prop_value
+                
+                result.append(f"  {prop_name}: {display_value}")
+        
+        return '\n'.join(result)
+
+def register(name: str):
+
     """
-    Loads a YAML file and updates the CONFIG dictionary in the config module.
-    Supports python-specific YAML tags (e.g., !!python/tuple).
+    Decorator to register a class as a property of the CONFIG dictionary. 
+    It will convert the class to inherit from TraitBlenderConfig if it does not already do so.
     """
-    with open(yaml_path, 'r') as f:
-        config_data = yaml.load(f, Loader=yaml.UnsafeLoader)
-        if isinstance(config_data, dict):
-            CONFIG.clear()
-            CONFIG.update(config_data)
-        else:
-            raise ValueError('YAML file must contain a dictionary at the top level.') 
+    def decorator(cls):
+        try:
+            # Convert the class to inherit from TraitBlenderConfig
+            if not issubclass(cls, TraitBlenderConfig):
+                # Create a new class that inherits from TraitBlenderConfig
+                # and has all the same properties as the original class
+                if not issubclass(cls, bpy.types.PropertyGroup):
+                    raise ValueError(f"Class {cls.__name__} does not inherit from bpy.types.PropertyGroup")
+                
+                new_cls = type(
+                    cls.__name__,
+                    (TraitBlenderConfig,),
+                    {
+                        '__module__': cls.__module__,
+                        '__doc__': cls.__doc__,
+                        '__annotations__': cls.__annotations__
+                    }
+                )
+                cls = new_cls
+
+            bpy.utils.register_class(cls)
+            CONFIG[name] = PointerProperty(type=cls)
+        except Exception as e:
+            print(f"Error registering {name}: {e}")
+        return cls
+    return decorator
+
+def configure_traitblender():
+    dyn_class = type(
+        "TraitBlenderConfig",
+        (TraitBlenderConfig,), 
+        {"__annotations__": CONFIG}
+    )
+    bpy.utils.register_class(dyn_class)
+    bpy.types.Scene.traitblender_config = bpy.props.PointerProperty(type=dyn_class)
+    print("TraitBlenderConfig registered")

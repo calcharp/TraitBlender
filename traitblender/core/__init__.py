@@ -14,14 +14,16 @@ from .helpers import (
     apply_material,
     get_texture_info,
     VALID_TEXTURES,
+    set_textures,
+    ObjectNotFoundError,
+    must_exist,
+    check_object_exists,
 )
 
-# Scene Assets
-from .scene_assets import (
-    ASSET_TYPES,
-    scene_asset,
-    with_scene_asset,
-)
+# Scene Assets (currently empty)
+# from .scene_assets import (
+#     # No exports currently available
+# )
 
 # Transforms
 from .transforms import (
@@ -29,7 +31,7 @@ from .transforms import (
 )
 
 # Config
-from .config import CONFIG, register_config
+from .config import CONFIG, register, configure_traitblender
 
 # Config, morphospaces, and datasets (placeholder for future development)
 # from .config import *
@@ -42,15 +44,21 @@ __all__ = [
     "apply_material",
     "get_texture_info",
     "VALID_TEXTURES",
+    "set_textures",
+    "ObjectNotFoundError",
+    "must_exist",
+    "check_object_exists",
     
-    # Scene Assets
-    "ASSET_TYPES",
-    "scene_asset",
-    "with_scene_asset",
+    # Scene Assets (currently empty)
+    # "ASSET_TYPES",
+    # "scene_asset",
+    # "with_scene_asset",
     
     # Transforms
     "TRANSFORMS",
+    
     # Config
     "CONFIG",
-    "register_config",
+    "register",
+    "configure_traitblender",
 ]
