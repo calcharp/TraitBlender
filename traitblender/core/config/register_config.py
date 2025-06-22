@@ -1,5 +1,5 @@
 import bpy
-from bpy.types import PointerProperty
+from bpy.props import PointerProperty
 from . import CONFIG
 
 
@@ -54,21 +54,27 @@ def register(name: str):
                 if not issubclass(cls, bpy.types.PropertyGroup):
                     raise ValueError(f"Class {cls.__name__} does not inherit from bpy.types.PropertyGroup")
                 
-                new_cls = type(
-                    cls.__name__,
-                    (TraitBlenderConfig,),
-                    {
-                        '__module__': cls.__module__,
-                        '__doc__': cls.__doc__,
-                        '__annotations__': cls.__annotations__
-                    }
-                )
-                cls = new_cls
+                try:
+                    new_cls = type(
+                        cls.__name__,
+                        (TraitBlenderConfig,),
+                        {
+                            '__module__': cls.__module__,
+                            '__doc__': cls.__doc__,
+                            '__annotations__': cls.__annotations__
+                        }
+                    )
+                    cls = new_cls
+                    print(f"Class {cls.__name__} converted to {new_cls}")
+                except Exception as e:
+                    print(f"Error creating new class: {e}")
 
             bpy.utils.register_class(cls)
+            print(f"Registered {name} as {cls.__name__}")
             CONFIG[name] = PointerProperty(type=cls)
+            print(f"CONFIG[{name}] = {CONFIG[name]}")
         except Exception as e:
-            print(f"Error registering {name}: {e}")
+            print(f"(decorator exception) Error registering {name}: {e}")
         return cls
     return decorator
 

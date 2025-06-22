@@ -38,6 +38,8 @@ def _init_dir():
 
 def register():
     """Register all add-on classes"""
+
+    from .core import BackgroundConfig, CameraConfig, MatConfig
     for cls in classes:
         bpy.utils.register_class(cls)
 
