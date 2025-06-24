@@ -39,10 +39,8 @@ def _init_dir():
 def register():
     """Register all add-on classes"""
 
-    from .core import BackgroundConfig, CameraConfig, MatConfig
-    for cls in classes:
-        bpy.utils.register_class(cls)
-
+    from .core import configs
+    print(f"configs: {configs}")
     from .core import configure_traitblender
     configure_traitblender()
 

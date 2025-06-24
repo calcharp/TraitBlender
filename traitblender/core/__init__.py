@@ -31,10 +31,9 @@ from .transforms import (
 )
 
 # Config
-from .config import CONFIG, register, BackgroundConfig, CameraConfig, MatConfig, configure_traitblender
+from .config import CONFIG, register, configs, configure_traitblender
 
 # Config, morphospaces, and datasets (placeholder for future development)
-# from .config import *
 # from .morphospaces import *
 # from .datasets import *
 
@@ -61,7 +60,5 @@ __all__ = [
     "CONFIG",
     "register",
     "configure_traitblender",
-    "BackgroundConfig",
-    "CameraConfig",
-    "MatConfig",
+    "configs",
 ]
