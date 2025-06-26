@@ -13,11 +13,18 @@ class TRAITBLENDER_OT_configure_scene(Operator):
     bl_description = "Load and apply configuration from YAML file"
     bl_options = {'REGISTER', 'UNDO'}
     
+    filepath: StringProperty(
+        name="Config File Path",
+        description="Path to the YAML configuration file (optional - uses default if not provided)",
+        default="",
+        subtype='FILE_PATH'
+    )
+    
     def execute(self, context):
         """Execute the configure scene operation"""
         
-        # Get the config file path from the setup properties
-        config_file_path = context.scene.traitblender_setup.config_file
+        # Use provided filepath or default to the stored config file path
+        config_file_path = self.filepath if self.filepath else context.scene.traitblender_setup.config_file
         
         if not config_file_path:
             self.report({'ERROR'}, "No configuration file specified")
@@ -48,38 +55,12 @@ class TRAITBLENDER_OT_configure_scene(Operator):
         except Exception as e:
             self.report({'ERROR'}, f"Error loading configuration: {e}")
             return {'CANCELLED'}
-
-
-class TRAITBLENDER_OT_set_config_file(Operator):
-    """Set the configuration file path"""
-    
-    bl_idname = "traitblender.set_config_file"
-    bl_label = "Set Config File"
-    bl_description = "Set the configuration file path"
-    bl_options = {'REGISTER', 'UNDO'}
-    
-    filepath: StringProperty(   
-        name="Config File Path",
-        description="Path to the YAML configuration file",
-        default="",
-        subtype='FILE_PATH'
-    )
-    
-    def execute(self, context):
-        """Execute the set config file operation"""
-        
-        if not self.filepath:
-            self.report({'ERROR'}, "No file path provided")
-            return {'CANCELLED'}
-        
-        # Set the config file path
-        context.scene.traitblender_setup.config_file = self.filepath
-        
-        self.report({'INFO'}, f"Configuration file path set to: {self.filepath}")
-        return {'FINISHED'}
     
     def invoke(self, context, event):
-        """Invoke file browser"""
-        context.window_manager.fileselect_add(self)
-        return {'RUNNING_MODAL'}
+        """Invoke file browser if no filepath is provided"""
+        if not self.filepath:
+            context.window_manager.fileselect_add(self)
+            return {'RUNNING_MODAL'}
+        else:
+            return self.execute(context)
 

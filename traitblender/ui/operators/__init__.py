@@ -11,15 +11,11 @@ import bpy
 from .setup_scene_operator import TRAITBLENDER_OT_setup_scene
 
 ### Configuration Operators
-from .configure_traitblender import (
-    TRAITBLENDER_OT_configure_scene,
-    TRAITBLENDER_OT_set_config_file
-)
+from .configure_traitblender import TRAITBLENDER_OT_configure_scene
 
 classes = [
     TRAITBLENDER_OT_setup_scene,
     TRAITBLENDER_OT_configure_scene,
-    TRAITBLENDER_OT_set_config_file
 ]
 
 

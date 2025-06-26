@@ -10,29 +10,24 @@ from . import operators
 
 from .panels import (
     TRAITBLENDER_PT_main_panel,
-    register as register_panels,
-    unregister as unregister_panels,
 )
 
 from . import properties
+from . import panels
 
 __all__ = [
     # Operators
     "register",
     "unregister",
-
-    # Panels
-    "TRAITBLENDER_PT_main_panel",
-
 ]
 
 def register():
     properties.register()
     operators.register()
-    register_panels()
+    panels.register()
 
 
 def unregister():
-    unregister_panels()
+    panels.unregister()
     properties.unregister()
     operators.unregister()
