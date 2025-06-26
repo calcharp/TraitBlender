@@ -7,37 +7,126 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
     """Base class for all TraitBlender configuration property groups."""
     
     def __str__(self):
-        """Recursively display all parameters and their values with pretty formatting."""
+        """Recursively display all parameters and their values in YAML format."""
+        return self._to_yaml()
+    
+    def _to_yaml(self, indent_level=0):
+        """Convert the configuration to YAML format with proper indentation."""
         result = []
+        indent = "  " * indent_level
         
         # Get all properties of this class
-        for i, prop_name in enumerate(self.__class__.__annotations__.keys()):
+        for prop_name in self.__class__.__annotations__.keys():
             prop_value = getattr(self, prop_name)
             
             # If it's another TraitBlenderConfig, recurse
             if isinstance(prop_value, TraitBlenderConfig):
-                # Add blank line before new section (except for the first one)
-                if i > 0:
-                    result.append("")
-                
-                # Indent the nested config and remove the class name header
-                nested_str = str(prop_value).replace('\n', '\n    ')
-                result.append(f"{prop_name}:")
-                result.append(f"    {nested_str}")
+                result.append(f"{indent}{prop_name}:")
+                nested_yaml = prop_value._to_yaml(indent_level + 1)
+                if nested_yaml.strip():  # Only add if there's content
+                    result.append(nested_yaml)
             else:
-                # Handle different property types
-                if hasattr(prop_value, '__iter__') and not isinstance(prop_value, str):
-                    # For vectors, arrays, etc. - convert to tuple/list
-                    try:
-                        display_value = tuple(prop_value)
-                    except:
-                        display_value = prop_value
-                else:
-                    display_value = prop_value
-                
-                result.append(f"  {prop_name}: {display_value}")
+                # Handle different property types for YAML
+                yaml_value = self._format_value_for_yaml(prop_value)
+                result.append(f"{indent}{prop_name}: {yaml_value}")
         
         return '\n'.join(result)
+    
+    def _format_value_for_yaml(self, value):
+        """Format a value appropriately for YAML output."""
+        if value is None:
+            return "null"
+        elif isinstance(value, bool):
+            return str(value).lower()
+        elif isinstance(value, (int, float)):
+            return str(value)
+        elif isinstance(value, str):
+            # Quote strings that contain special characters or are empty
+            if not value or any(char in value for char in '":{}[]&*#?|-<>=!%@`,\'\\'):
+                return f'"{value}"'
+            return value
+        elif hasattr(value, '__iter__') and not isinstance(value, str):
+            # Handle lists, tuples, vectors, etc.
+            try:
+                if len(value) == 0:
+                    return "[]"
+                elif len(value) == 1:
+                    return f"[{self._format_value_for_yaml(value[0])}]"
+                else:
+                    items = [self._format_value_for_yaml(item) for item in value]
+                    return f"[{', '.join(items)}]"
+            except (TypeError, IndexError):
+                # Fallback for non-indexable iterables
+                return str(value)
+        else:
+            return str(value)
+    
+    def from_dict(self, data_dict):
+        """
+        Load configuration values from a dictionary.
+        
+        Args:
+            data_dict (dict): Dictionary containing configuration values.
+                             Can contain nested dictionaries for nested TraitBlenderConfig objects.
+        """
+        if not isinstance(data_dict, dict):
+            raise ValueError("Input must be a dictionary")
+        
+        for prop_name, value in data_dict.items():
+            print(f"Property {prop_name} value: {value}")
+            # Check if this property exists in the class annotations
+            if prop_name not in self.__class__.__annotations__:
+                print(f"Warning: Property '{prop_name}' not found in {self.__class__.__name__}")
+                continue
+            
+            # Get the current property value
+            current_prop = getattr(self, prop_name)
+            print(f"Current property {prop_name} value: {current_prop}")
+            
+            # If the current property is a TraitBlenderConfig and the value is a dict, recurse
+            if isinstance(current_prop, TraitBlenderConfig) and isinstance(value, dict):
+                current_prop.from_dict(value)
+                print(f"Current property {prop_name} value: {current_prop}")
+            else:
+                # For simple properties, just set the value directly
+                try:
+                    setattr(self, prop_name, value)
+                    print(f"Property {prop_name} value: {getattr(self, prop_name)}")
+                except Exception as e:
+                    print(f"Warning: Could not set property '{prop_name}' to value '{value}': {e}")
+    
+    def to_dict(self):
+        """
+        Convert the configuration to a dictionary.
+        
+        Returns:
+            dict: Dictionary representation of the configuration.
+        """
+        result = {}
+        
+        for prop_name in self.__class__.__annotations__.keys():
+            prop_value = getattr(self, prop_name)
+            print(f"Property {prop_name} value: {prop_value}")
+            
+            # If it's another TraitBlenderConfig, recurse
+            if isinstance(prop_value, TraitBlenderConfig):
+                result[prop_name] = prop_value.to_dict()
+                print(type(prop_value))
+                print(f"Property {prop_name} value: {result[prop_name]}")
+            else:
+                # For simple properties, convert to a serializable format
+                if hasattr(prop_value, '__iter__') and not isinstance(prop_value, str):
+                    try:
+                        result[prop_name] = list(prop_value)
+                        print(f"Property {prop_name} value: {result[prop_name]}")
+                    except Exception as e:
+                        result[prop_name] = str(prop_value)
+                        print(f"Unable to convert {prop_name} to {prop_value}/ Exception: {e}")
+                else:
+                    result[prop_name] = prop_value
+                    print(f"Property {prop_name} value: {result[prop_name]}")
+        
+        return result
 
 def register(name: str):
 
