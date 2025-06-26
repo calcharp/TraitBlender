@@ -1,32 +1,4 @@
 
 
-
-Camera: 
-  type: 'PERSP'           # 'PERSP', 'ORTHO', or 'PANO'
-  lens: 50                # Focal length in mm
-  lens_unit: 'MILLIMETERS' # 'MILLIMETERS' or 'FOV'
-  shift_x: 0.0
-  shift_y: 0.0
-  clip_start: 0.1
-  clip_end: 1000.0
-  sensor_fit: 'HORIZONTAL' # 'AUTO', 'HORIZONTAL', or 'VERTICAL'
-  sensor_width: 36.0
-
-transforms:
-  - GaussianCameraRotation
-    mu: 0
-    sigma: 0.1
-  - GaussianSpecimenRotation
-    mu: 0
-    sigma: 0.1
-  - GaussianSpecimenTranslation
-    mu: 0
-    sigma: 0.1
-  - RandomizeWorldColor
-  - RandomLampPlacement
-  - GaussianLampRotation
-    mu: 0
-    sigma: 0.1
-  - GaussianLampTranslation
-    mu: 0
-    sigma: 0.1
+background:
+  background_color: [0.1, 0.5, 0.8]

@@ -3,23 +3,8 @@ TraitBlender - Blender Add-on for Generating Museum-Style Morphological Images
 
 Main add-on initialization file.
 """
-
-import bpy
-from .ui import (
-    TRAITBLENDER_OT_setup_scene,
-    TRAITBLENDER_PT_main_panel,
-
-)
-
 import os
-
-
-# List of all classes to register
-classes = [
-    TRAITBLENDER_OT_setup_scene,
-    TRAITBLENDER_PT_main_panel,
-
-]
+import bpy
 
 
 def _init_dir():
@@ -44,6 +29,10 @@ def register():
     from .core import configure_traitblender
     configure_traitblender()
 
+    # Register UI components
+    from .ui import register
+    register()
+
     # Initialize user directories (no asset copying)
     _init_dir()
 
@@ -60,8 +49,9 @@ def register():
 
 def unregister():
     """Unregister all add-on classes"""
-    for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
+    # Unregister UI components
+    from .ui import unregister
+    unregister()
     
         
 if __name__ == "__main__":
