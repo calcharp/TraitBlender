@@ -57,10 +57,75 @@ class TRAITBLENDER_OT_configure_scene(Operator):
             return {'CANCELLED'}
     
     def invoke(self, context, event):
-        """Invoke file browser if no filepath is provided"""
-        if not self.filepath:
+        """Invoke file browser if no filepath is provided and no stored config file"""
+        # If no filepath provided and no stored config file, open file browser
+        if not self.filepath and not context.scene.traitblender_setup.config_file:
             context.window_manager.fileselect_add(self)
             return {'RUNNING_MODAL'}
         else:
             return self.execute(context)
+
+
+class TRAITBLENDER_OT_show_configuration(Operator):
+    """Show current TraitBlender configuration in YAML format"""
+    
+    bl_idname = "traitblender.show_configuration"
+    bl_label = "Show Configuration"
+    bl_description = "Display current configuration in YAML format"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    _old_mouse_pos = None
+
+    def execute(self, context):
+        return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        window = context.window_manager.windows[0]
+        self._old_mouse_pos = (event.mouse_x, event.mouse_y)
+        center_x = window.width // 2
+        center_y = window.height // 2
+        window.cursor_warp(center_x, center_y)
+        # Restore mouse after popup appears
+        def restore_mouse():
+            window.cursor_warp(*self._old_mouse_pos)
+            self._old_mouse_pos = None
+            return None  # Only run once
+        bpy.app.timers.register(restore_mouse, first_interval=0.01)
+        return context.window_manager.invoke_props_dialog(self, width=600)
+    
+    def draw(self, context):
+        layout = self.layout
+        config_yaml = str(context.scene.traitblender_config)
+        for line in config_yaml.splitlines():
+            layout.label(text=line)
+
+
+class TRAITBLENDER_OT_export_config(Operator):
+    """Export current TraitBlender configuration to a YAML file"""
+    bl_idname = "traitblender.export_config"
+    bl_label = "Export Config as YAML"
+    bl_description = "Export the current configuration to a YAML file"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    filepath: StringProperty(
+        name="File Path",
+        description="Path to export YAML file",
+        default="",
+        subtype='FILE_PATH',
+    )
+
+    def execute(self, context):
+        config_yaml = str(context.scene.traitblender_config)
+        try:
+            with open(self.filepath, 'w', encoding='utf-8') as f:
+                f.write(config_yaml)
+            self.report({'INFO'}, f"Configuration exported to {self.filepath}")
+            return {'FINISHED'}
+        except Exception as e:
+            self.report({'ERROR'}, f"Failed to export configuration: {e}")
+            return {'CANCELLED'}
+
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 

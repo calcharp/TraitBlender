@@ -31,6 +31,8 @@ class TRAITBLENDER_OT_setup_scene(Operator):
     bl_description = "Load the pre-configured museum scene with lighting and camera setup"
     bl_options = {'REGISTER', 'UNDO'}
     
+    _old_mouse_pos = None
+    
     def execute(self, context):
         """Execute the setup scene operation"""
         
@@ -76,8 +78,11 @@ class TRAITBLENDER_OT_setup_scene(Operator):
     
     def invoke(self, context, event):
         """Called when the operator is invoked"""
-        # Check if current file has unsaved changes
         if bpy.data.is_dirty:
+            window = context.window_manager.windows[0]
+            center_x = window.width // 2
+            center_y = window.height // 2
+            window.cursor_warp(center_x, center_y)
             return context.window_manager.invoke_confirm(self, event)
         else:
             return self.execute(context)
