@@ -9,5 +9,7 @@ class BackgroundConfig(bpy.types.PropertyGroup):
         default=(0.0, 0.0, 0.0, 0.0),
         min=0.0,
         max=1.0,
-        size=4
+        size=4,
+        get=lambda self: bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value,
+        set=lambda self, value: bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value = value
     )
