@@ -11,5 +11,5 @@ class BackgroundConfig(bpy.types.PropertyGroup):
         max=1.0,
         size=4,
         get=lambda self: bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value,
-        set=lambda self, value: bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value = value
+        set=lambda self, value: setattr(bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0], "default_value", value)
     )
