@@ -144,14 +144,24 @@ def register(name: str):
                     raise ValueError(f"Class {cls.__name__} does not inherit from bpy.types.PropertyGroup")
                 
                 try:
+                    # Copy all attributes from the original class, including property definitions
+                    new_dict = {
+                        '__module__': cls.__module__,
+                        '__doc__': cls.__doc__,
+                        '__annotations__': cls.__annotations__
+                    }
+                    
+                    # Copy all property definitions from the original class
+                    for attr_name in dir(cls):
+                        if not attr_name.startswith('_'):
+                            attr_value = getattr(cls, attr_name)
+                            if hasattr(attr_value, '__class__') and 'Property' in attr_value.__class__.__name__:
+                                new_dict[attr_name] = attr_value
+                    
                     new_cls = type(
                         cls.__name__,
                         (TraitBlenderConfig,),
-                        {
-                            '__module__': cls.__module__,
-                            '__doc__': cls.__doc__,
-                            '__annotations__': cls.__annotations__
-                        }
+                        new_dict
                     )
                     cls = new_cls
                     print(f"Class {cls.__name__} converted to {new_cls}")
