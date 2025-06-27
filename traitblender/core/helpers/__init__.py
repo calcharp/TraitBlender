@@ -11,6 +11,7 @@ from .object_validator import (
     must_exist,
     check_object_exists,
 )   
+from .prop_gettersetter import get_property, set_property
 
 def get_asset_path(*path_parts):
     """
@@ -40,4 +41,7 @@ __all__ = [
     "ObjectNotFoundError",
     "must_exist",
     "check_object_exists",
+    # Property getter/setter
+    "get_property",
+    "set_property",
 ] 
