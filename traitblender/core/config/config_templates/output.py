@@ -1,5 +1,7 @@
 import bpy
 from ..register_config import register
+from ...helpers import get_property, set_property
+
 
 @register("output")
 class OutputConfig(bpy.types.PropertyGroup):

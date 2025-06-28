@@ -1,5 +1,7 @@
 import bpy
 from ..register_config import register
+from ...helpers import get_property, set_property
+
 
 @register("mat")
 class MatConfig(bpy.types.PropertyGroup):
@@ -8,5 +10,5 @@ class MatConfig(bpy.types.PropertyGroup):
         description="The type of material to use",
         items=[("standard", "Standard", "A standard material"),
                ("principled", "Principled", "A principled material")],
-        default="standard"
+        default=0
     )
