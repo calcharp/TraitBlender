@@ -55,8 +55,11 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
                 else:
                     items = [self._format_value_for_yaml(item) for item in value]
                     return f"[{', '.join(items)}]"
-            except (TypeError, IndexError):
+            except (TypeError, IndexError) as e:
                 # Fallback for non-indexable iterables
+                import traceback
+                print(f"Warning: Error formatting iterable value {value} (type: {type(value)}): {e}")
+                print(f"Traceback: {traceback.format_exc()}")
                 return str(value)
         else:
             return str(value)

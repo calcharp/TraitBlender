@@ -10,46 +10,18 @@ class RenderConfig(bpy.types.PropertyGroup):
         name="Engine",
         description="The engine to use",    
         items=[("CYCLES", "Cycles", "Cycles"),
-               ("BLENDER_EEVEE", "Eevee", "Eevee")],
-        default=0,
-        get=get_property("bpy.data.scenes['Scene'].render.engine"),
-        set=set_property("bpy.data.scenes['Scene'].render.engine")
+               ("BLENDER_EEVEE_NEXT", "Eevee", "Eevee"),
+               ("BLENDER_WORKBENCH", "Workbench", "Workbench")],
+        get=get_property("bpy.context.scene.render.engine", options=["CYCLES", "BLENDER_EEVEE_NEXT", "BLENDER_WORKBENCH"]),
+        set=set_property("bpy.context.scene.render.engine")
     )
 
     eevee_use_raytracing: bpy.props.BoolProperty(
         name="Use Raytracing",
         description="Whether to use raytracing",
         default=False,
-        get=get_property("bpy.data.scenes['Scene'].render.eevee.use_raytracing"),
-        set=set_property("bpy.data.scenes['Scene'].render.eevee.use_raytracing")
+        get=get_property("bpy.context.scene.eevee.use_raytracing"),
+        set=set_property("bpy.context.scene.eevee.use_raytracing")
     )
 
-    eevee_use_denoising: bpy.props.BoolProperty(
-        name="Use Denoising",
-        description="Whether to use denoising",
-        default=False,
-        get=get_property("bpy.data.scenes['Scene'].render.eevee.use_denoising"),
-        set=set_property("bpy.data.scenes['Scene'].render.eevee.use_denoising")
-    )
-
-    cycles_device: bpy.props.EnumProperty(
-        name="Device",
-        description="The device to use",
-        items=[("CPU", "CPU", "CPU"),
-               ("GPU", "GPU", "GPU")],
-        default=0,
-        get=get_property("bpy.data.scenes['Scene'].cycles.device"),
-        set=set_property("bpy.data.scenes['Scene'].cycles.device")
-    )
-
-    cycles_shading_system: bpy.props.EnumProperty(
-        name="Shading System",
-        description="The shading system to use",
-        items=[("B", "B", "B"),
-               ("C", "C", "C")],
-        default=0,
-        get=get_property("bpy.data.scenes['Scene'].cycles.shading_system"),
-        set=set_property("bpy.data.scenes['Scene'].cycles.shading_system")
-    )
-    
     

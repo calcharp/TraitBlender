@@ -25,7 +25,7 @@ class CameraConfig(bpy.types.PropertyGroup):
                ("ORTHO", "Orthographic", "An orthographic camera"),
                ("PANO", "Panoramic", "A panoramic camera")],
         default=0,
-        get=get_property("bpy.data.cameras['Camera'].type"),
+        get=get_property("bpy.data.cameras['Camera'].type", options=["PERSP", "ORTHO", "PANO"]),
         set=set_property("bpy.data.cameras['Camera'].type")
     )
     focal_length: bpy.props.FloatProperty(

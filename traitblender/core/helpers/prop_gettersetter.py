@@ -1,27 +1,44 @@
 import bpy
 
 
-def get_property(property_path: str):
+def get_property(property_path: str, options: list = None):
     """Create a getter function for a Blender property.
     
     Args:
         property_path (str): The Blender property path (e.g., 
                            'bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value')
+        options (list, optional): List of enum options for pattern matching. If provided, 
+                                 the getter will return an int index instead of a string.
     
     Returns:
         function: A getter function that returns the value of the specified Blender property
         
     Raises:
-        RuntimeError: If getting the value fails at runtime
+        RuntimeError: If getting the value fails at runtime or if enum pattern matching fails
         
     Example:
-        >>> getter = get_property('bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value')
+        >>> getter = get_property('bpy.data.cameras["Camera"].type')
         >>> value = getter(self)  # Returns the current value of the property
+        
+        >>> getter = get_property('bpy.data.cameras["Camera"].type', 
+        ...                       options=["PERSP", "ORTHO", "PANO"])
+        >>> value = getter(self)  # Returns the int index (0, 1, or 2)
     """
     def get(self):
         try:
-            return eval(property_path)
+            value = eval(property_path)
+            
+            # If options are provided, treat this as an enum and return the index
+            if options is not None:
+                if value not in options:
+                    raise RuntimeError(f"Enum value '{value}' not found in options list: {options}")
+                return options.index(value)
+            
+            return value
         except Exception as e:
+            import traceback
+            print(f"Error getting property '{property_path}': {e}")
+            print(f"Traceback: {traceback.format_exc()}")
             raise RuntimeError(f"Failed to get value from property '{property_path}': {e}")
     return get
 
@@ -48,5 +65,8 @@ def set_property(property_path: str):
             # Use exec with bpy and value in the namespace for complex Blender properties
             exec(f"{property_path} = value", {"bpy": bpy, "value": value})
         except Exception as e:
+            import traceback
+            print(f"Error setting property '{property_path}' to value '{value}': {e}")
+            print(f"Traceback: {traceback.format_exc()}")
             raise RuntimeError(f"Failed to set value for property '{property_path}': {e}")
     return set
