@@ -43,25 +43,40 @@ def get_property(property_path: str, options: list = None):
     return get
 
 
-def set_property(property_path: str):
+def set_property(property_path: str, options: list = None):
     """Create a setter function for a Blender property.
     
     Args:
         property_path (str): The Blender property path (e.g., 
                            'bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value')
+        options (list, optional): List of enum options for pattern matching. If provided, 
+                                 the setter will convert integer indices to string values.
     
     Returns:
         function: A setter function that sets the value of the specified Blender property
         
     Raises:
-        RuntimeError: If setting the value fails at runtime
+        RuntimeError: If setting the value fails at runtime or if enum conversion fails
         
     Example:
-        >>> setter = set_property('bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value')
-        >>> setter(self, (1.0, 0.5, 0.2, 1.0))  # Sets the property to a new color value
+        >>> setter = set_property('bpy.data.cameras["Camera"].type')
+        >>> setter(self, "PERSP")  # Sets the property to a string value
+        
+        >>> setter = set_property('bpy.data.cameras["Camera"].type', 
+        ...                       options=["PERSP", "ORTHO", "PANO"])
+        >>> setter(self, 1)  # Converts 1 to "ORTHO" and sets the property
     """
     def set(self, value):
         try:
+            # If options are provided, treat this as an enum and convert index to string
+            if options is not None:
+                if isinstance(value, int):
+                    if value < 0 or value >= len(options):
+                        raise RuntimeError(f"Enum index {value} out of range for options: {options}")
+                    value = options[value]
+                elif value not in options:
+                    raise RuntimeError(f"Enum value '{value}' not found in options list: {options}")
+            
             # Use exec with bpy and value in the namespace for complex Blender properties
             exec(f"{property_path} = value", {"bpy": bpy, "value": value})
         except Exception as e:

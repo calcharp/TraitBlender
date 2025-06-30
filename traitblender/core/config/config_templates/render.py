@@ -13,7 +13,7 @@ class RenderConfig(bpy.types.PropertyGroup):
                ("BLENDER_EEVEE_NEXT", "Eevee", "Eevee"),
                ("BLENDER_WORKBENCH", "Workbench", "Workbench")],
         get=get_property("bpy.context.scene.render.engine", options=["CYCLES", "BLENDER_EEVEE_NEXT", "BLENDER_WORKBENCH"]),
-        set=set_property("bpy.context.scene.render.engine")
+        set=set_property("bpy.context.scene.render.engine", options=["CYCLES", "BLENDER_EEVEE_NEXT", "BLENDER_WORKBENCH"])
     )
 
     eevee_use_raytracing: bpy.props.BoolProperty(
