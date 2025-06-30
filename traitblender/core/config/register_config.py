@@ -14,23 +14,33 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         """Convert the configuration to YAML format with proper indentation."""
         result = []
         indent = "  " * indent_level
+        missing_any = False
         
         # Get all properties of this class
         for prop_name in self.__class__.__annotations__.keys():
-            prop_value = getattr(self, prop_name)
-            
-            # If it's another TraitBlenderConfig, recurse
-            if isinstance(prop_value, TraitBlenderConfig):
-                result.append(f"{indent}{prop_name}:")
-                nested_yaml = prop_value._to_yaml(indent_level + 1)
-                if nested_yaml.strip():  # Only add if there's content
-                    result.append(nested_yaml)
-            else:
-                # Handle different property types for YAML
-                yaml_value = self._format_value_for_yaml(prop_value)
-                result.append(f"{indent}{prop_name}: {yaml_value}")
+            try:
+                prop_value = getattr(self, prop_name)
+                # If it's another TraitBlenderConfig, recurse
+                if isinstance(prop_value, TraitBlenderConfig):
+                    result.append(f"{indent}{prop_name}:")
+                    nested_yaml = prop_value._to_yaml(indent_level + 1)
+                    if nested_yaml.strip():  # Only add if there's content
+                        result.append(nested_yaml)
+                else:
+                    # Handle different property types for YAML
+                    yaml_value = self._format_value_for_yaml(prop_value)
+                    result.append(f"{indent}{prop_name}: {yaml_value}")
+            except Exception:
+                result.append(f"{indent}{prop_name}: # missing required Blender objects")
+                missing_any = True
         
-        return '\n'.join(result)
+        yaml_str = '\n'.join(result)
+        if indent_level == 0 and missing_any:
+            yaml_str += ("\n\n[TraitBlender] Some configuration values are missing. "
+                         "To fix this, run the following in the Blender Python console to set up the scene:\n"
+                         "    bpy.ops.traitblender.setup_scene()\n"
+                         "This will create any required objects (such as Camera, World, etc.) that are missing.")
+        return yaml_str
     
     def _format_value_for_yaml(self, value):
         """Format a value appropriately for YAML output."""
@@ -48,6 +58,8 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         elif hasattr(value, '__iter__') and not isinstance(value, str):
             # Handle lists, tuples, vectors, etc.
             try:
+                if value is None:
+                    return "null"
                 if len(value) == 0:
                     return "[]"
                 elif len(value) == 1:
