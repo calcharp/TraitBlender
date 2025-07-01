@@ -27,7 +27,7 @@ class Transform:
         self.property_path = "bpy.context.scene.traitblender_config." + property_path
         self.sampler_name = sampler_name
         self.params = params or {}
-        self._cache = None
+        self._cache_stack = []  # Stack to store previous values
         
         # Validate sampler exists
         if sampler_name not in TRANSFORMS:
@@ -89,9 +89,15 @@ class Transform:
 
     def __call__(self):
         """Apply the transform to the property."""
-        # Cache the original value
-        self._cache = self._get_property_value()
-        print(f"Original value: {self._cache}")
+        # Get current value and push to stack
+        current_value = self._get_property_value()
+        if not self._cache_stack:  # First application - store original
+            print(f"Original value: {current_value}")
+        else:
+            print(f"Previous value: {current_value}")
+        
+        self._cache_stack.append(current_value)
+        
         # Sample new value
         new_value = self._call_sampler()
         print(f"New sampled value: {new_value}")
@@ -101,21 +107,48 @@ class Transform:
         return new_value
 
     def undo(self):
-        """Revert the property to its original value."""
-        if self._cache is not None:
-            try:
-                print(f"Undoing: setting {self.property_path} back to {self._cache}")
-                self._set_property_value(self._cache)
-                current_value = self._get_property_value()
-                print(f"Undo successful: {self.property_path} = {current_value}")
-                self._cache = None
-                # Update view layer to see changes immediately
-                bpy.context.view_layer.update()
-            except Exception as e:
-                print(f"Undo failed: {e}")
-                raise RuntimeError(f"Failed to undo transform: {e}")
-        else:
-            print("No cached value to undo")
+        """Revert the property to the previous value in the stack."""
+        if not self._cache_stack:
+            print("No cached values to undo")
+            return
+        
+        try:
+            # Pop the previous value from stack
+            previous_value = self._cache_stack.pop()
+            print(f"Undoing: setting {self.property_path} back to {previous_value}")
+            self._set_property_value(previous_value)
+            current_value = self._get_property_value()
+            print(f"Undo successful: {self.property_path} = {current_value}")
+            # Update view layer to see changes immediately
+            bpy.context.view_layer.update()
+        except Exception as e:
+            print(f"Undo failed: {e}")
+            raise RuntimeError(f"Failed to undo transform: {e}")
+
+    def undo_all(self):
+        """Revert the property to the original value (first cached value)."""
+        if not self._cache_stack:
+            print("No cached values to undo")
+            return
+        
+        try:
+            # Get the original value (first in stack)
+            original_value = self._cache_stack[0]
+            print(f"Undoing all: setting {self.property_path} back to original {original_value}")
+            self._set_property_value(original_value)
+            current_value = self._get_property_value()
+            print(f"Undo all successful: {self.property_path} = {current_value}")
+            # Clear the stack
+            self._cache_stack.clear()
+            # Update view layer to see changes immediately
+            bpy.context.view_layer.update()
+        except Exception as e:
+            print(f"Undo all failed: {e}")
+            raise RuntimeError(f"Failed to undo all transforms: {e}")
+
+    def get_history(self):
+        """Get the history of values (original + all applied values)."""
+        return self._cache_stack.copy()
 
     def __repr__(self):
         return f"Transform(property_path='{self.property_path}', sampler_name='{self.sampler_name}', params={self.params})" 
