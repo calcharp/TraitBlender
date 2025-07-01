@@ -14,7 +14,7 @@ from PIL import ImageColor
 VALID_TEXTURES = {"DIFFUSE", "AO", "ROUGHNESS", "METALLIC", "NORMAL", "DISPLACEMENT"}
 
 
-def apply_material(object_name: str, textures_path: str = None, hex_color: str = None, material_name: str = None):
+def apply_material(object_name: str, textures_path: str = None, hex_color: str = None, existing_material_name: str = None, new_material_name: str = None):
     """
     Apply a material to a given object in Blender.
     
@@ -25,31 +25,35 @@ def apply_material(object_name: str, textures_path: str = None, hex_color: str =
         textures_path (str, optional): Path to folder containing texture files matching 
                                      format {TYPE}_{description}.ext
         hex_color (str, optional): Hex color code (e.g., "#FF5733", "#000000")
-        material_name (str, optional): Name of existing material to apply
-        
+        existing_material_name (str, optional): Name of existing material to apply
+        new_material_name (str, optional): Name for the new material to be created (solid color or textured)
+            If not provided, uses hex code for color or folder name for textures.
+    
     Returns:
         bpy.types.Material: The applied material, or None if failed
-        
+    
     Example:
-        # Apply textures (creates material named "wood_textures")
+        # Apply textures (creates material named after folder or new_material_name)
         apply_material("Cube", textures_path="/path/to/wood_textures/")
+        apply_material("Cube", textures_path="/path/to/wood_textures/", new_material_name="wood_mat")
         
-        # Apply solid color (creates material named "#FF5733")
+        # Apply solid color (creates material named after hex code or new_material_name)
         apply_material("Cube", hex_color="#ff5733")
+        apply_material("Cube", hex_color="#ff5733", new_material_name="red_mat")
         
         # Apply existing material
-        apply_material("Cube", material_name="My_Existing_Material")
+        apply_material("Cube", existing_material_name="My_Existing_Material")
     """
     
     # Count how many options are provided
-    options_count = sum(x is not None for x in [textures_path, hex_color, material_name])
+    options_count = sum(x is not None for x in [textures_path, hex_color, existing_material_name])
     
     if options_count == 0:
-        print("Error: Must specify one of: textures_path, hex_color, or material_name.")
+        print("Error: Must specify one of: textures_path, hex_color, or existing_material_name.")
         return None
     
     if options_count > 1:
-        print("Error: Can only specify one of: textures_path, hex_color, or material_name.")
+        print("Error: Can only specify one of: textures_path, hex_color, or existing_material_name.")
         return None
     
     # Validate object exists
@@ -57,49 +61,48 @@ def apply_material(object_name: str, textures_path: str = None, hex_color: str =
         print(f"Error: Mesh '{object_name}' not found or is not a mesh.")
         return None
 
-    if material_name:
+    if existing_material_name:
+        if new_material_name:
+            print("Warning: Both existing_material_name and new_material_name provided. Only existing_material_name will be used.")
         # Apply existing material
-        if material_name in bpy.data.materials:
-            material = bpy.data.materials[material_name]
-            print(f"Found existing material '{material_name}'")
+        if existing_material_name in bpy.data.materials:
+            material = bpy.data.materials[existing_material_name]
+            print(f"Found existing material '{existing_material_name}'")
         else:
-            print(f"Error: Material '{material_name}' not found in scene.")
+            print(f"Error: Material '{existing_material_name}' not found in scene.")
             return None
     
     elif hex_color:
-        # Create solid color material (named after hex code or material_name if provided)
+        # Create solid color material (named after hex code or new_material_name if provided)
         try:
-            # Convert hex to RGBA (PIL returns RGB tuple, we add alpha=1.0)
             rgb = ImageColor.getrgb(hex_color)
-            rgba = (*[c/255.0 for c in rgb], 1.0)  # Convert to 0-1 range and add alpha
-            
-            # Name material after material_name if provided, else hex code
-            mat_name = material_name if material_name else hex_color
+            rgba = (*[c/255.0 for c in rgb], 1.0)
+            mat_name = new_material_name if new_material_name else hex_color
+            if mat_name in bpy.data.materials:
+                print(f"Warning: Material '{mat_name}' already exists. Replacing it.")
+                bpy.data.materials.remove(bpy.data.materials[mat_name], do_unlink=True)
             material = bpy.data.materials.new(name=mat_name)
             material.use_nodes = True
-            
             bsdf = material.node_tree.nodes["Principled BSDF"]
             bsdf.inputs["Base Color"].default_value = rgba
             print(f"Created solid color material '{mat_name}' for '{object_name}'")
-            
         except ValueError as e:
             print(f"Error: Invalid hex color '{hex_color}': {e}")
             return None
     
     else:
-        # Create textured material (named after folder)
+        # Create textured material (named after folder or new_material_name if provided)
         folder_name = os.path.basename(textures_path.rstrip(os.sep))
-        material = _create_textured_material(object_name, textures_path, folder_name)
+        mat_name = new_material_name if new_material_name else folder_name
+        material = _create_textured_material(object_name, textures_path, mat_name)
         if not material:
             return None
 
     # Apply material to object
     mesh_obj = bpy.data.objects.get(object_name)
     if mesh_obj.data.materials:
-        # Replace the first material slot if one exists
         mesh_obj.data.materials[0] = material
     else:
-        # Otherwise, add the material to the object's material slots
         mesh_obj.data.materials.append(material)
 
     return material
@@ -114,6 +117,10 @@ def _create_textured_material(object_name: str, textures_path: str, material_nam
         print(f"Error: Directory '{textures_path}' does not exist.")
         return None
     
+    # Remove existing material with the same name
+    if material_name in bpy.data.materials:
+        print(f"Warning: Material '{material_name}' already exists. Replacing it.")
+        bpy.data.materials.remove(bpy.data.materials[material_name], do_unlink=True)
     # Create material with folder name
     material = bpy.data.materials.new(name=material_name)
     material.use_nodes = True
