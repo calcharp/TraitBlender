@@ -12,6 +12,7 @@ from .object_validator import (
     check_object_exists,
 )   
 from .prop_gettersetter import get_property, set_property
+from .asset_manager import get_addon_root, get_user_data_dir, get_asset_path, init_user_dirs
 
 def get_asset_path(*path_parts):
     """
@@ -33,6 +34,9 @@ def get_asset_path(*path_parts):
 
 __all__ = [
     "get_asset_path",
+    "get_addon_root",
+    "get_user_data_dir",
+    "init_user_dirs",
     "apply_material",
     "get_texture_info",
     "VALID_TEXTURES",

@@ -3,38 +3,23 @@ TraitBlender - Blender Add-on for Generating Museum-Style Morphological Images
 
 Main add-on initialization file.
 """
-import os
-import bpy
-
-
-def _init_dir():
-    """Initialize any necessary directories (simplified - no asset copying)"""
-    # Create user data directory for configs, outputs, etc. (not assets)
-    base_path = bpy.utils.extension_path_user(__package__, create=True)
-    
-    # Create subdirectories for user data (not assets)
-    user_dirs = ['configs', 'outputs', 'cache']
-    for dir_name in user_dirs:
-        dir_path = os.path.join(base_path, dir_name)
-        os.makedirs(dir_path, exist_ok=True)
-    
-    print(f"Initialized user directories at {base_path}")
-
 
 def register():
     """Register all add-on classes"""
+    import os
+    import bpy
+    from .core.helpers import init_user_dirs
+    from .core import configs, configure_traitblender
+    from .ui import register as ui_register
 
-    from .core import configs
     print(f"configs: {configs}")
-    from .core import configure_traitblender
     configure_traitblender()
 
     # Register UI components
-    from .ui import register
-    register()
+    ui_register()
 
-    # Initialize user directories (no asset copying)
-    _init_dir()
+    # Initialize user directories and copy assets if needed
+    init_user_dirs(copy_assets=True)
 
     # Note: Asset library registration is handled automatically by the extension system in Blender 4.3+
     # The assets directory will be accessible through the addon's package structure
@@ -49,9 +34,8 @@ def register():
 
 def unregister():
     """Unregister all add-on classes"""
-    # Unregister UI components
-    from .ui import unregister
-    unregister()
+    from .ui import unregister as ui_unregister
+    ui_unregister()
     
         
 if __name__ == "__main__":
