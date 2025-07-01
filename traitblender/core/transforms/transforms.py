@@ -90,18 +90,10 @@ class Transform:
 
     def __call__(self):
         """Apply the transform to the property."""
-        print(f"DEBUG: Starting transform for {self.property_path}")
-        
         # Get current value BEFORE applying transform
         current_value = copy.deepcopy(self._get_property_value())
-        print(f"DEBUG: Got current value: {current_value}")
         
         # Cache the current value (it will become the "previous" value for next time)
-        if len(self._cache_stack) == 0:  # First application - store original
-            print(f"Caching starting value: {current_value}")
-        else:
-            print(f"Storing new value: {current_value}, previous value: {self._cache_stack[-1]}")
-        
         # Cache a copy of the value, not the reference
         if hasattr(current_value, '__iter__') and not isinstance(current_value, str):
             # For iterables (tuples, lists, vectors), create a deep copy
@@ -113,69 +105,73 @@ class Transform:
             # For scalars, just copy the value
             cached_value = current_value
         
-        print(f"DEBUG: Caching value: {cached_value}")
         self._cache_stack.append(cached_value)
-        print("Cache stack: ", self._cache_stack, sep="\n\t")
         
         # Sample new value
         new_value = self._call_sampler()
-        print(f"New sampled value: {new_value}")
         
         # Apply the new value
-        print(f"DEBUG: Setting property to: {new_value}")
         self._set_property_value(new_value)
-        
-        # Verify the value was set
-        verify_value = self._get_property_value()
-        print(f"DEBUG: Property after setting: {verify_value}")
         
         # Update view layer to see changes immediately
         bpy.context.view_layer.update()
+        
+        # Show what changed
+        print(f"{self.property_path}: {current_value} → {new_value}")
         return new_value
 
     def undo(self):
         """Revert the property to the previous value in the stack."""
         if not self._cache_stack:
-            print("No cached values to undo")
             return
         
         try:
+            # Get current value before undoing
+            current_value = self._get_property_value()
             # Pop the previous value from stack
             previous_value = self._cache_stack.pop()
-            print(f"Undoing: setting {self.property_path} back to {previous_value}")
             self._set_property_value(previous_value)
-            current_value = self._get_property_value()
-            print(f"Undo successful: {self.property_path} = {current_value}")
             # Update view layer to see changes immediately
             bpy.context.view_layer.update()
+            # Show what changed
+            print(f"{self.property_path}: {current_value} ← {previous_value}")
         except Exception as e:
-            print(f"Undo failed: {e}")
             raise RuntimeError(f"Failed to undo transform: {e}")
 
     def undo_all(self):
         """Revert the property to the original value (first cached value)."""
         if not self._cache_stack:
-            print("No cached values to undo")
             return
         
         try:
+            # Get current value before undoing all
+            current_value = self._get_property_value()
             # Get the original value (first in stack)
             original_value = self._cache_stack[0]
-            print(f"Undoing all: setting {self.property_path} back to original {original_value}")
             self._set_property_value(original_value)
-            current_value = self._get_property_value()
-            print(f"Undo all successful: {self.property_path} = {current_value}")
             # Clear the stack
             self._cache_stack.clear()
             # Update view layer to see changes immediately
             bpy.context.view_layer.update()
+            # Show what changed
+            print(f"{self.property_path}: {current_value} ← {original_value} (original)")
         except Exception as e:
-            print(f"Undo all failed: {e}")
             raise RuntimeError(f"Failed to undo all transforms: {e}")
 
     def get_history(self):
         """Get the history of values (original + all applied values)."""
         return self._cache_stack.copy()
+
+    def __str__(self):
+        """Return a string representation of the transform."""
+        # Format parameters as a string
+        if self.params:
+            param_str = "(" + ", ".join([f"{k}={v}" for k, v in self.params.items()]) + ")"
+            sampler_with_params = f"{self.sampler_name}{param_str}"
+        else:
+            sampler_with_params = self.sampler_name
+        
+        return f"{self.property_path} ~ {sampler_with_params}"
 
     def __repr__(self):
         return f"Transform(property_path='{self.property_path}', sampler_name='{self.sampler_name}', params={self.params})" 

@@ -51,7 +51,7 @@ class TransformPipeline:
         """
         transform = Transform(property_path, sampler_name, params)
         self._transforms.append(transform)
-        print(f"Added transform #{len(self._transforms)}: {property_path} → {sampler_name}")
+        print(f"Added transform #{len(self._transforms)}: {transform}")
         return self
     
     def __call__(self) -> list:
@@ -159,9 +159,7 @@ class TransformPipeline:
         if self._transforms:
             lines.append("\nTransforms:")
             for i, transform in enumerate(self._transforms, 1):
-                lines.append(f"  {i}. {transform.property_path} → {transform.sampler_name}")
-                if transform.params:
-                    lines.append(f"     Params: {transform.params}")
+                lines.append(f"  {i}. {transform}")
         
         return "\n".join(lines)
     
@@ -199,6 +197,21 @@ class TransformPipeline:
     
     def __repr__(self):
         return f"TransformPipeline(name='{self.name}', transforms={len(self._transforms)})"
+    
+    def __getitem__(self, index):
+        """
+        Get a transform by index.
+        
+        Args:
+            index (int): Index of the transform (0-based)
+            
+        Returns:
+            Transform: The transform at the specified index
+            
+        Raises:
+            IndexError: If index is out of range
+        """
+        return self._transforms[index]
     
     def __len__(self):
         return len(self._transforms)
