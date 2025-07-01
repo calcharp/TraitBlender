@@ -142,6 +142,26 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
                     print(f"Property {prop_name} value: {result[prop_name]}")
         
         return result
+    
+    def get_config_sections(self):
+        """
+        Get all nested TraitBlenderConfig sections in this configuration.
+        
+        Returns:
+            dict: Dictionary mapping section names to their TraitBlenderConfig instances
+        """
+        sections = {}
+        
+        for prop_name in self.__class__.__annotations__.keys():
+            try:
+                prop_value = getattr(self, prop_name)
+                if isinstance(prop_value, TraitBlenderConfig):
+                    sections[prop_name] = prop_value
+            except Exception:
+                # Skip properties that can't be accessed
+                continue
+        
+        return sections
 
 def register(name: str):
 

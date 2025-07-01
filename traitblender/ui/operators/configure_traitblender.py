@@ -102,18 +102,19 @@ class TRAITBLENDER_OT_show_configuration(Operator):
 
 class TRAITBLENDER_OT_export_config(Operator):
     """Export current TraitBlender configuration to a YAML file"""
+    
     bl_idname = "traitblender.export_config"
     bl_label = "Export Config as YAML"
     bl_description = "Export the current configuration to a YAML file"
     bl_options = {'REGISTER', 'UNDO'}
-
+    
     filepath: StringProperty(
         name="File Path",
         description="Path to export YAML file",
         default="",
         subtype='FILE_PATH',
     )
-
+    
     def execute(self, context):
         config_yaml = str(context.scene.traitblender_config)
         try:
@@ -124,7 +125,7 @@ class TRAITBLENDER_OT_export_config(Operator):
         except Exception as e:
             self.report({'ERROR'}, f"Failed to export configuration: {e}")
             return {'CANCELLED'}
-
+    
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
