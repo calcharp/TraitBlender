@@ -1,6 +1,7 @@
 import random
 import inspect
 import bpy
+import copy
 from .registry import TRANSFORMS
 from ..helpers import validate_config_path, get_config_path_info
 
@@ -89,19 +90,45 @@ class Transform:
 
     def __call__(self):
         """Apply the transform to the property."""
-        # Get current value and push to stack
-        current_value = self._get_property_value()
-        if not self._cache_stack:  # First application - store original
-            print(f"Original value: {current_value}")
-        else:
-            print(f"Previous value: {current_value}")
+        print(f"DEBUG: Starting transform for {self.property_path}")
         
-        self._cache_stack.append(current_value)
+        # Get current value BEFORE applying transform
+        current_value = copy.deepcopy(self._get_property_value())
+        print(f"DEBUG: Got current value: {current_value}")
+        
+        # Cache the current value (it will become the "previous" value for next time)
+        if len(self._cache_stack) == 0:  # First application - store original
+            print(f"Caching starting value: {current_value}")
+        else:
+            print(f"Storing new value: {current_value}, previous value: {self._cache_stack[-1]}")
+        
+        # Cache a copy of the value, not the reference
+        if hasattr(current_value, '__iter__') and not isinstance(current_value, str):
+            # For iterables (tuples, lists, vectors), create a deep copy
+            if hasattr(current_value, 'copy'):
+                cached_value = current_value.copy()
+            else:
+                cached_value = copy.deepcopy(current_value)
+        else:
+            # For scalars, just copy the value
+            cached_value = current_value
+        
+        print(f"DEBUG: Caching value: {cached_value}")
+        self._cache_stack.append(cached_value)
+        print("Cache stack: ", self._cache_stack, sep="\n\t")
         
         # Sample new value
         new_value = self._call_sampler()
         print(f"New sampled value: {new_value}")
+        
+        # Apply the new value
+        print(f"DEBUG: Setting property to: {new_value}")
         self._set_property_value(new_value)
+        
+        # Verify the value was set
+        verify_value = self._get_property_value()
+        print(f"DEBUG: Property after setting: {verify_value}")
+        
         # Update view layer to see changes immediately
         bpy.context.view_layer.update()
         return new_value
