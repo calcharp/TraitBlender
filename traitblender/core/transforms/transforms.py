@@ -49,7 +49,12 @@ class Transform:
     def _get_property_value(self):
         """Get the current value of the property."""
         try:
-            return eval(self.property_path, {"bpy": bpy})
+            value = eval(self.property_path, {"bpy": bpy})
+            # Ensure we get the actual value, not a property reference
+            if hasattr(value, '__iter__') and not isinstance(value, str):
+                # Convert to tuple to get actual values
+                return tuple(value)
+            return value
         except Exception as e:
             raise RuntimeError(f"Failed to get property '{self.property_path}': {e}")
 
@@ -86,9 +91,13 @@ class Transform:
         """Apply the transform to the property."""
         # Cache the original value
         self._cache = self._get_property_value()
+        print(f"Original value: {self._cache}")
         # Sample new value
         new_value = self._call_sampler()
+        print(f"New sampled value: {new_value}")
         self._set_property_value(new_value)
+        # Update view layer to see changes immediately
+        bpy.context.view_layer.update()
         return new_value
 
     def undo(self):
@@ -97,8 +106,11 @@ class Transform:
             try:
                 print(f"Undoing: setting {self.property_path} back to {self._cache}")
                 self._set_property_value(self._cache)
-                print(f"Undo successful: {self.property_path} = {self._get_property_value()}")
+                current_value = self._get_property_value()
+                print(f"Undo successful: {self.property_path} = {current_value}")
                 self._cache = None
+                # Update view layer to see changes immediately
+                bpy.context.view_layer.update()
             except Exception as e:
                 print(f"Undo failed: {e}")
                 raise RuntimeError(f"Failed to undo transform: {e}")
