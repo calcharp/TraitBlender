@@ -149,21 +149,28 @@ class TransformPipeline:
         """Get the execution history of the pipeline."""
         return self._execution_history.copy()
     
-    def summarize(self):
-        """Print a summary of the pipeline."""
-        print(f"\n=== Pipeline Summary: {self.name} ===")
-        print(f"Transforms: {len(self._transforms)}")
-        print(f"Execution History: {self._execution_history}")
+    def __str__(self):
+        """Return a summary of the pipeline."""
+        lines = []
+        lines.append(f"=== Transform Pipeline: {self.name} ===")
+        lines.append(f"Transforms: {len(self._transforms)}")
+        lines.append(f"Execution History: {self._execution_history}")
         
         if self._transforms:
-            print("\nTransforms:")
+            lines.append("\nTransforms:")
             for i, transform in enumerate(self._transforms, 1):
-                print(f"  {i}. {transform.property_path} → {transform.sampler_name}")
+                lines.append(f"  {i}. {transform.property_path} → {transform.sampler_name}")
                 if transform.params:
-                    print(f"     Params: {transform.params}")
+                    lines.append(f"     Params: {transform.params}")
+        
+        return "\n".join(lines)
     
-    def __str__(self):
-        """Return detailed information about the pipeline."""
+    def summarize(self):
+        """Print a summary of the pipeline."""
+        print(self.__str__())
+    
+    def print_detailed(self):
+        """Print detailed information about each transform."""
         lines = []
         lines.append(f"=== Detailed Pipeline Info: {self.name} ===")
         lines.append(f"Total transforms: {len(self._transforms)}")
