@@ -13,6 +13,7 @@ from .object_validator import (
 )   
 from .prop_gettersetter import get_property, set_property
 from .asset_manager import get_addon_root, get_user_data_dir, get_asset_path, init_user_dirs
+from .config_validator import validate_config_path, get_config_path_info, list_config_properties
 
 def get_asset_path(*path_parts):
     """
@@ -29,8 +30,9 @@ def get_asset_path(*path_parts):
         get_asset_path("textures", "wood.png")
     """
     # Get the addon root directory (3 levels up from this file)
-    addon_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    return os.path.join(addon_dir, "assets", *path_parts)
+    addon_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    assets_dir = os.path.join(addon_dir, "assets")
+    return os.path.join(assets_dir, *path_parts)
 
 __all__ = [
     "get_asset_path",
@@ -48,4 +50,8 @@ __all__ = [
     # Property getter/setter
     "get_property",
     "set_property",
+    # Config validator functions
+    "validate_config_path",
+    "get_config_path_info",
+    "list_config_properties",
 ] 

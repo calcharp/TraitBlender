@@ -1,5 +1,7 @@
 import bpy
 import warnings
+import inspect
+import mathutils
 
 
 def _check_object_dependencies(object_dependencies):
@@ -25,25 +27,6 @@ def _check_object_dependencies(object_dependencies):
                 return False
     
     return True
-
-
-def _universal_default(property_path, options=None):
-    # Enum property
-    if options is not None:
-        return 0
-    # Vector properties
-    if any(key in property_path.lower() for key in ["location", "rotation"]):
-        return (0.0, 0.0, 0.0)
-    if "color" in property_path.lower():
-        return (0.0, 0.0, 0.0, 1.0)
-    # String property
-    if "name" in property_path.lower() or "path" in property_path.lower():
-        return ""
-    # List/collection property
-    if "list" in property_path.lower() or "collection" in property_path.lower():
-        return []
-    # Fallback: float/int
-    return 0.0
 
 
 def get_property(property_path: str, options: list = None, object_dependencies: dict = None):
@@ -75,22 +58,34 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
         >>> value = getter(self)  # Returns None if Camera doesn't exist
     """
     def get(self):
+        def _auto_default():
+            # Try to get the property value from the instance using the calling property name
+            prop_val = None
+            try:
+                prop_name = inspect.currentframe().f_back.f_code.co_name
+                prop_val = getattr(self, prop_name, None)
+            except Exception:
+                pass
+            if isinstance(prop_val, mathutils.Vector):
+                return tuple([0.0] * len(prop_val))
+            return 0.0
+
         if not _check_object_dependencies(object_dependencies):
+            val = _auto_default()
             warnings.warn(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()", UserWarning)
-            return _universal_default(property_path, options)
+            return val if options is None else 0
         try:
             value = eval(property_path)
-            
             # If options are provided, treat this as an enum and return the index
             if options is not None:
                 if value not in options:
                     raise RuntimeError(f"Enum value '{value}' not found in options list: {options}")
                 return options.index(value)
-            
             return value
         except Exception:
+            val = _auto_default()
             warnings.warn(f"[TraitBlender] Error accessing property: {property_path}", UserWarning)
-            return _universal_default(property_path, options)
+            return val if options is None else 0
     return get
 
 
