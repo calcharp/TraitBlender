@@ -5,6 +5,37 @@ from ...helpers import get_property, set_property
 
 @register("mat")
 class MatConfig(bpy.types.PropertyGroup):
+
+    location: bpy.props.FloatVectorProperty(
+        name="Material Location",
+        description="The location of the material",
+        subtype='TRANSLATION',
+        get=get_property("bpy.data.objects['Mat'].location",
+                        object_dependencies={"objects": ["Mat"]}),
+        set=set_property("bpy.data.objects['Mat'].location",
+                        object_dependencies={"objects": ["Mat"]})
+    )
+
+    rotation: bpy.props.FloatVectorProperty(
+        name="Material Rotation",
+        description="The rotation of the material",
+        subtype='ROTATION',
+        get=get_property("bpy.data.objects['Mat'].rotation_euler",
+                        object_dependencies={"objects": ["Mat"]}),
+        set=set_property("bpy.data.objects['Mat'].rotation_euler",
+                        object_dependencies={"objects": ["Mat"]})
+    )
+
+    scale: bpy.props.FloatVectorProperty(
+        name="Material Scale",
+        description="The scale of the material",
+        subtype='XYZ',
+        get=get_property("bpy.data.objects['Mat'].scale",
+                        object_dependencies={"objects": ["Mat"]}),
+        set=set_property("bpy.data.objects['Mat'].scale",
+                        object_dependencies={"objects": ["Mat"]})
+    )
+
     color: bpy.props.FloatVectorProperty(
         name="Material Color",
         description="The color of the material",

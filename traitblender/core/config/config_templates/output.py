@@ -18,3 +18,10 @@ class OutputConfig(bpy.types.PropertyGroup):
         description="The format of the image",
         items=[("PNG", "PNG", "PNG"),
                ("JPEG", "JPEG", "JPEG")])
+    
+    output_directory: bpy.props.StringProperty(
+        name="Base Output Path",
+        description="The base path of the output",
+        default="",
+        subtype='DIR_PATH'
+    )
