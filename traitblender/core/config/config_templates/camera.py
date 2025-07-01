@@ -8,6 +8,7 @@ class CameraConfig(bpy.types.PropertyGroup):
         name="Location",
         description="The location of the camera",
         default=(0.0, 0.0, 0.0),
+        subtype='TRANSLATION',
         get=get_property("bpy.data.objects['Camera'].location", 
                         object_dependencies={"objects": ["Camera"]}),
         set=set_property("bpy.data.objects['Camera'].location", 
@@ -17,6 +18,7 @@ class CameraConfig(bpy.types.PropertyGroup):
         name="Rotation",
         description="The rotation of the camera",
         default=(0.0, 0.0, 0.0),
+        subtype='EULER',
         get=get_property("bpy.data.objects['Camera'].rotation_euler", 
                         object_dependencies={"objects": ["Camera"]}),
         set=set_property("bpy.data.objects['Camera'].rotation_euler", 
@@ -63,6 +65,16 @@ class CameraConfig(bpy.types.PropertyGroup):
                         object_dependencies={"cameras": ["Camera"]}),
         set=set_property("bpy.data.cameras['Camera'].shift_y", 
                         object_dependencies={"cameras": ["Camera"]})
+    )
+    lens_unit: bpy.props.EnumProperty(
+        name="Lens Unit",
+        description="Unit for camera lens",
+        items=[('MILLIMETERS', "Millimeters", "Focal length in mm"),
+               ('FOV', "Field of View", "Field of view in degrees")],
+        get=get_property("bpy.data.cameras['Camera'].lens_unit", options=['MILLIMETERS', 'FOV'],
+                         object_dependencies={'cameras': ['Camera']}),
+        set=set_property("bpy.data.cameras['Camera'].lens_unit", options=['MILLIMETERS', 'FOV'],
+                         object_dependencies={'cameras': ['Camera']})
     )
 
 

@@ -1,7 +1,6 @@
 import bpy
 from bpy.types import Panel
 
-
 class TRAITBLENDER_PT_main_panel(Panel):
     bl_label = "TraitBlender"
     bl_idname = "TRAITBLENDER_PT_main_panel"
@@ -43,30 +42,21 @@ class TRAITBLENDER_PT_main_panel(Panel):
                 self._draw_config_section(layout, section_name, section_obj)
         else:
             layout.label(text="No configuration sections found", icon='INFO')
-    
+
     def _draw_config_section(self, layout, section_name, section_obj):
-        """Draw a configuration section with its properties."""
-        # Create a box for this section
         box = layout.box()
-        
-        # Section header
         row = box.row()
         row.label(text=section_name.replace('_', ' ').title(), icon='SETTINGS')
-        
-        # Display section properties
+
         for prop_name in section_obj.__class__.__annotations__.keys():
             try:
                 prop_value = getattr(section_obj, prop_name)
-                
-                # If it's another TraitBlenderConfig, create a sub-section
                 if isinstance(prop_value, type(section_obj)):
                     sub_box = box.box()
                     sub_box.label(text=prop_name.replace('_', ' ').title())
                     self._draw_config_section(sub_box, prop_name, prop_value)
                 else:
-                    # For simple properties, show as an interactive property
                     box.prop(section_obj, prop_name)
             except Exception as e:
-                # If there's an error accessing the property, show it as missing
                 prop_row = box.row()
                 prop_row.label(text=f"{prop_name.replace('_', ' ').title()}: # Error - {str(e)}") 
