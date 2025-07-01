@@ -7,7 +7,7 @@ Operator for setting up the scene for trait blending operations.
 import bpy
 from bpy.types import Operator
 import os
-from ...core.helpers import get_asset_path
+from ...core.helpers import get_asset_path, apply_material
 from bpy.app.handlers import persistent
 
 @persistent
@@ -61,6 +61,23 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                 for obj in data_to.objects:
                     if obj is not None:  # Skip None objects
                         bpy.context.scene.collection.objects.link(obj)
+                
+                # Re-apply table material using dynamic asset path
+                table_name = "Table"
+                table_textures_path = get_asset_path("objects", "table", "table_material")
+                if table_name in bpy.data.objects:
+                    apply_material(table_name, textures_path=table_textures_path)
+                else:
+                    self.report({'ERROR'}, f"Initialization failed, table object not found in scene: {table_name}")
+                    return {'CANCELLED'}
+
+                # Re-apply mat material using solid black color
+                mat_name = "Mat"
+                if mat_name in bpy.data.objects:
+                    apply_material(mat_name, hex_color="#000000")
+                else:
+                    self.report({'ERROR'}, f"Initialization failed, mat object not found in scene: {mat_name}")
+                    return {'CANCELLED'}
                 
                 # Set rendered view
                 set_rendered_view(None)
