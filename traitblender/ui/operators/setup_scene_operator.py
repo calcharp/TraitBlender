@@ -71,10 +71,10 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                     self.report({'ERROR'}, f"Initialization failed, table object not found in scene: {table_name}")
                     return {'CANCELLED'}
 
-                # Re-apply mat material using solid black color
+                # Re-apply mat material using solid black color and name it 'mat_material'
                 mat_name = "Mat"
                 if mat_name in bpy.data.objects:
-                    apply_material(mat_name, hex_color="#000000")
+                    apply_material(mat_name, hex_color="#000000", material_name="mat_material")
                 else:
                     self.report({'ERROR'}, f"Initialization failed, mat object not found in scene: {mat_name}")
                     return {'CANCELLED'}

@@ -67,14 +67,14 @@ def apply_material(object_name: str, textures_path: str = None, hex_color: str =
             return None
     
     elif hex_color:
-        # Create solid color material (named after hex code)
+        # Create solid color material (named after hex code or material_name if provided)
         try:
             # Convert hex to RGBA (PIL returns RGB tuple, we add alpha=1.0)
             rgb = ImageColor.getrgb(hex_color)
             rgba = (*[c/255.0 for c in rgb], 1.0)  # Convert to 0-1 range and add alpha
             
-            # Name material after hex code (preserve original case)
-            mat_name = hex_color
+            # Name material after material_name if provided, else hex code
+            mat_name = material_name if material_name else hex_color
             material = bpy.data.materials.new(name=mat_name)
             material.use_nodes = True
             
