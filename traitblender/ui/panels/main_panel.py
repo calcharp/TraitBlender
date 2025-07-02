@@ -2,7 +2,7 @@ import bpy
 from bpy.types import Panel
 
 class TRAITBLENDER_PT_main_panel(Panel):
-    bl_label = "TraitBlender"
+    bl_label = "1) Museum Setup"
     bl_idname = "TRAITBLENDER_PT_main_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -10,107 +10,50 @@ class TRAITBLENDER_PT_main_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        # config = context.scene.traitblender_config
-        
         # Setup Museum Scene and Clear Scene buttons
         row = layout.row(align=True)
         row.operator("traitblender.setup_scene", text="Import Museum")
         row.operator("traitblender.clear_scene", text="Clear Scene", icon='TRASH')
-        
-        # Configuration section
         layout.separator()
-        
         # Config file path row
         row = layout.row(align=True)
         row.prop(context.scene.traitblender_setup, "config_file", text="Config File")
-
-        # Configure Scene button row (keep here)
+        # Configure Scene button row
         row = layout.row(align=True)
         row.operator("traitblender.configure_scene", text="Configure Scene")
 
-        # --- The following sections are commented out for refactor ---
-        # Display all config sections
-        # layout.separator()
-        # layout.label(text="Configuration:")
-        # config_sections = config.get_config_sections()
-        # if config_sections:
-        #     for section_name, section_obj in config_sections.items():
-        #         if section_name == "transforms":
-        #             continue  # Skip transforms in the main config section
-        #         self._draw_config_section(layout, section_name, section_obj)
-        # else:
-        #     layout.label(text="No configuration sections found", icon='INFO')
-        #
-        # Show Configuration and Export Config as YAML buttons at the bottom
-        # layout.separator()
-        # row = layout.row(align=True)
-        # row.operator("traitblender.show_configuration", text="Show Configuration")
-        # row.operator("traitblender.export_config", text="Export Config as YAML")
-        #
-        # --- Transforms dropdown section (separate from config) ---
-        # layout.separator()
-        # box = layout.box()
-        # row = box.row()
-        # row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
-        # row.label(text="Transforms")
-        #
-        # if config.transforms.show:
-        #     transforms_config = config.transforms
-        #     row = box.row()
-        #     row.prop(transforms_config, "selected_section", text="Section")
-        #     row = box.row()
-        #     row.prop(transforms_config, "selected_property", text="Property")
-        #     if transforms_config.selected_section and transforms_config.selected_property:
-        #         property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
-        #         row = box.row()
-        #         row.label(text=f"Path: {property_path}")
-        #     row = box.row(align=True)
-        #     row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
-        #     row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
-        #     row = box.row()
-        #     row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
-
+    # Helper methods for config panel
     def _draw_config_section(self, layout, section_name, section_obj):
         box = layout.box()
         row = box.row()
-        
-        # Check if this section has a show property
         has_show_prop = hasattr(section_obj, 'show')
-        
         if has_show_prop:
-            # Create dropdown with toggle
             row.prop(section_obj, 'show', text="", icon='DISCLOSURE_TRI_DOWN' if section_obj.show else 'DISCLOSURE_TRI_RIGHT')
             row.label(text=section_name.replace('_', ' ').title())
-            
-            # Only show content if expanded
             if section_obj.show:
                 self._draw_section_content(box, section_obj)
         else:
-            # No show property - show always
             row.label(text=section_name.replace('_', ' ').title())
             self._draw_section_content(box, section_obj)
-    
+
     def _draw_section_content(self, layout, section_obj):
-        """Draw the content of a configuration section"""
         for prop_name in section_obj.__class__.__annotations__.keys():
             if prop_name == "show":
-                continue  # Skip the show property
+                continue
             try:
                 prop_value = getattr(section_obj, prop_name)
                 if isinstance(prop_value, type(section_obj)):
-                    # Nested section - recurse
                     sub_box = layout.box()
                     sub_box.label(text=prop_name.replace('_', ' ').title())
                     self._draw_config_section(sub_box, prop_name, prop_value)
                 else:
-                    # Regular property - show as UI control
                     layout.prop(section_obj, prop_name)
             except Exception as e:
                 prop_row = layout.row()
-                prop_row.label(text=f"{prop_name.replace('_', ' ').title()}: # Error - {str(e)}") 
+                prop_row.label(text=f"{prop_name.replace('_', ' ').title()}: # Error - {str(e)}")
 
 class TRAITBLENDER_PT_config_panel(Panel):
-    bl_label = "Configuration"
+    bl_label = "2) Configuration"
     bl_idname = "TRAITBLENDER_PT_config_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -119,31 +62,28 @@ class TRAITBLENDER_PT_config_panel(Panel):
     def draw(self, context):
         layout = self.layout
         config = context.scene.traitblender_config
-
         layout.label(text="Configuration:")
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
                 if section_name == "transforms":
-                    continue  # Skip transforms in the main config section
+                    continue
                 self._draw_config_section(layout, section_name, section_obj)
         else:
             layout.label(text="No configuration sections found", icon='INFO')
-
         layout.separator()
         row = layout.row(align=True)
         row.operator("traitblender.show_configuration", text="Show Configuration")
         row.operator("traitblender.export_config", text="Export Config as YAML")
 
     def _draw_config_section(self, layout, section_name, section_obj):
-        # Use the same helper as before
         TRAITBLENDER_PT_main_panel._draw_config_section(self, layout, section_name, section_obj)
 
     def _draw_section_content(self, layout, section_obj):
-        TRAITBLENDER_PT_main_panel._draw_section_content(self, layout, section_obj) 
+        TRAITBLENDER_PT_main_panel._draw_section_content(self, layout, section_obj)
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
-    bl_label = "Transforms"
+    bl_label = "3) Transforms"
     bl_idname = "TRAITBLENDER_PT_transforms_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -152,13 +92,11 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
     def draw(self, context):
         layout = self.layout
         config = context.scene.traitblender_config
-
         layout.separator()
         box = layout.box()
         row = box.row()
         row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
         row.label(text="Transforms")
-
         if config.transforms.show:
             transforms_config = config.transforms
             row = box.row()
