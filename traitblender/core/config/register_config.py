@@ -196,6 +196,16 @@ def register(name: str):
                             if hasattr(attr_value, '__class__') and 'Property' in attr_value.__class__.__name__:
                                 new_dict[attr_name] = attr_value
                     
+                    # Add toggle properties for each TraitBlenderConfig section
+                    for prop_name in cls.__annotations__.keys():
+                        if isinstance(cls.__annotations__[prop_name], type) and issubclass(cls.__annotations__[prop_name], TraitBlenderConfig):
+                            toggle_prop_name = f"show_{prop_name}"
+                            new_dict[toggle_prop_name] = bpy.props.BoolProperty(
+                                name=f"Show {prop_name.replace('_', ' ').title()}",
+                                description=f"Show/hide the {prop_name.replace('_', ' ')} configuration section",
+                                default=False
+                            )
+                    
                     new_cls = type(
                         cls.__name__,
                         (TraitBlenderConfig,),

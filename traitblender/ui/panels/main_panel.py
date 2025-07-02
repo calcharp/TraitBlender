@@ -40,26 +40,46 @@ class TRAITBLENDER_PT_main_panel(Panel):
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
-                self._draw_config_section(layout, section_name, section_obj)
+                self._draw_config_section(layout, section_name, section_obj, config)
         else:
             layout.label(text="No configuration sections found", icon='INFO')
         
 
 
-    def _draw_config_section(self, layout, section_name, section_obj):
+    def _draw_config_section(self, layout, section_name, section_obj, parent_config=None):
         box = layout.box()
         row = box.row()
-        row.label(text=section_name.replace('_', ' ').title(), icon='SETTINGS')
-
+        
+        # Check if this section has a toggle property
+        toggle_prop_name = f"show_{section_name}"
+        has_toggle = hasattr(parent_config, toggle_prop_name) if parent_config else False
+        
+        if has_toggle:
+            # Create dropdown with toggle
+            row.prop(parent_config, toggle_prop_name, text="", icon='DISCLOSURE_TRI_DOWN' if getattr(parent_config, toggle_prop_name) else 'DISCLOSURE_TRI_RIGHT')
+            row.label(text=section_name.replace('_', ' ').title(), icon='SETTINGS')
+            
+            # Only show content if expanded
+            if getattr(parent_config, toggle_prop_name):
+                self._draw_section_content(box, section_obj, parent_config)
+        else:
+            # No toggle - show always
+            row.label(text=section_name.replace('_', ' ').title(), icon='SETTINGS')
+            self._draw_section_content(box, section_obj, parent_config)
+    
+    def _draw_section_content(self, layout, section_obj, parent_config=None):
+        """Draw the content of a configuration section"""
         for prop_name in section_obj.__class__.__annotations__.keys():
             try:
                 prop_value = getattr(section_obj, prop_name)
                 if isinstance(prop_value, type(section_obj)):
-                    sub_box = box.box()
+                    # Nested section - recurse
+                    sub_box = layout.box()
                     sub_box.label(text=prop_name.replace('_', ' ').title())
-                    self._draw_config_section(sub_box, prop_name, prop_value)
+                    self._draw_config_section(sub_box, prop_name, prop_value, section_obj)
                 else:
-                    box.prop(section_obj, prop_name)
+                    # Regular property - show as UI control
+                    layout.prop(section_obj, prop_name)
             except Exception as e:
-                prop_row = box.row()
+                prop_row = layout.row()
                 prop_row.label(text=f"{prop_name.replace('_', ' ').title()}: # Error - {str(e)}") 
