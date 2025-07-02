@@ -19,6 +19,8 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         
         # Get all properties of this class
         for prop_name in self.__class__.__annotations__.keys():
+            if prop_name == "show":
+                continue  # Skip the show property
             try:
                 prop_value = getattr(self, prop_name)
                 # If it's another TraitBlenderConfig, recurse
@@ -123,6 +125,8 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         result = {}
         
         for prop_name in self.__class__.__annotations__.keys():
+            if prop_name == "show":
+                continue  # Skip the show property
             prop_value = getattr(self, prop_name)
             print(f"Property {prop_name} value: {prop_value}")
             
