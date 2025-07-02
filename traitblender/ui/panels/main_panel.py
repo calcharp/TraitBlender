@@ -10,7 +10,7 @@ class TRAITBLENDER_PT_main_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        config = context.scene.traitblender_config
+        # config = context.scene.traitblender_config
         
         # Setup Museum Scene and Clear Scene buttons
         row = layout.row(align=True)
@@ -28,47 +28,47 @@ class TRAITBLENDER_PT_main_panel(Panel):
         row = layout.row(align=True)
         row.operator("traitblender.configure_scene", text="Configure Scene")
 
+        # --- The following sections are commented out for refactor ---
         # Display all config sections
-        layout.separator()
-        layout.label(text="Configuration:")
-        
-        config_sections = config.get_config_sections()
-        if config_sections:
-            for section_name, section_obj in config_sections.items():
-                if section_name == "transforms":
-                    continue  # Skip transforms in the main config section
-                self._draw_config_section(layout, section_name, section_obj)
-        else:
-            layout.label(text="No configuration sections found", icon='INFO')
-
+        # layout.separator()
+        # layout.label(text="Configuration:")
+        # config_sections = config.get_config_sections()
+        # if config_sections:
+        #     for section_name, section_obj in config_sections.items():
+        #         if section_name == "transforms":
+        #             continue  # Skip transforms in the main config section
+        #         self._draw_config_section(layout, section_name, section_obj)
+        # else:
+        #     layout.label(text="No configuration sections found", icon='INFO')
+        #
         # Show Configuration and Export Config as YAML buttons at the bottom
-        layout.separator()
-        row = layout.row(align=True)
-        row.operator("traitblender.show_configuration", text="Show Configuration")
-        row.operator("traitblender.export_config", text="Export Config as YAML")
-
+        # layout.separator()
+        # row = layout.row(align=True)
+        # row.operator("traitblender.show_configuration", text="Show Configuration")
+        # row.operator("traitblender.export_config", text="Export Config as YAML")
+        #
         # --- Transforms dropdown section (separate from config) ---
-        layout.separator()
-        box = layout.box()
-        row = box.row()
-        row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
-        row.label(text="Transforms")
-
-        if config.transforms.show:
-            transforms_config = config.transforms
-            row = box.row()
-            row.prop(transforms_config, "selected_section", text="Section")
-            row = box.row()
-            row.prop(transforms_config, "selected_property", text="Property")
-            if transforms_config.selected_section and transforms_config.selected_property:
-                property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
-                row = box.row()
-                row.label(text=f"Path: {property_path}")
-            row = box.row(align=True)
-            row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
-            row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
-            row = box.row()
-            row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
+        # layout.separator()
+        # box = layout.box()
+        # row = box.row()
+        # row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
+        # row.label(text="Transforms")
+        #
+        # if config.transforms.show:
+        #     transforms_config = config.transforms
+        #     row = box.row()
+        #     row.prop(transforms_config, "selected_section", text="Section")
+        #     row = box.row()
+        #     row.prop(transforms_config, "selected_property", text="Property")
+        #     if transforms_config.selected_section and transforms_config.selected_property:
+        #         property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
+        #         row = box.row()
+        #         row.label(text=f"Path: {property_path}")
+        #     row = box.row(align=True)
+        #     row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
+        #     row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
+        #     row = box.row()
+        #     row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
 
     def _draw_config_section(self, layout, section_name, section_obj):
         box = layout.box()
@@ -108,3 +108,69 @@ class TRAITBLENDER_PT_main_panel(Panel):
             except Exception as e:
                 prop_row = layout.row()
                 prop_row.label(text=f"{prop_name.replace('_', ' ').title()}: # Error - {str(e)}") 
+
+class TRAITBLENDER_PT_config_panel(Panel):
+    bl_label = "Configuration"
+    bl_idname = "TRAITBLENDER_PT_config_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        config = context.scene.traitblender_config
+
+        layout.label(text="Configuration:")
+        config_sections = config.get_config_sections()
+        if config_sections:
+            for section_name, section_obj in config_sections.items():
+                if section_name == "transforms":
+                    continue  # Skip transforms in the main config section
+                self._draw_config_section(layout, section_name, section_obj)
+        else:
+            layout.label(text="No configuration sections found", icon='INFO')
+
+        layout.separator()
+        row = layout.row(align=True)
+        row.operator("traitblender.show_configuration", text="Show Configuration")
+        row.operator("traitblender.export_config", text="Export Config as YAML")
+
+    def _draw_config_section(self, layout, section_name, section_obj):
+        # Use the same helper as before
+        TRAITBLENDER_PT_main_panel._draw_config_section(self, layout, section_name, section_obj)
+
+    def _draw_section_content(self, layout, section_obj):
+        TRAITBLENDER_PT_main_panel._draw_section_content(self, layout, section_obj) 
+
+class TRAITBLENDER_PT_transforms_panel(Panel):
+    bl_label = "Transforms"
+    bl_idname = "TRAITBLENDER_PT_transforms_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        config = context.scene.traitblender_config
+
+        layout.separator()
+        box = layout.box()
+        row = box.row()
+        row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
+        row.label(text="Transforms")
+
+        if config.transforms.show:
+            transforms_config = config.transforms
+            row = box.row()
+            row.prop(transforms_config, "selected_section", text="Section")
+            row = box.row()
+            row.prop(transforms_config, "selected_property", text="Property")
+            if transforms_config.selected_section and transforms_config.selected_property:
+                property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
+                row = box.row()
+                row.label(text=f"Path: {property_path}")
+            row = box.row(align=True)
+            row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
+            row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
+            row = box.row()
+            row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}") 
