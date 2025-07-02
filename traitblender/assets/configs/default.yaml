@@ -1,3 +1,7 @@
+# TraitBlender Default Configuration
+# This file is used to configure the scene automatically
+# when the set_up scene operator (Import Museum button) is called.
+# You can edit these values to change the default scene setup.
 ---
 camera:
   location: [0.0, 0.0, 1.0]
