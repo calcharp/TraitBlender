@@ -37,23 +37,27 @@ class TransformPipelineConfig(TraitBlenderConfig):
         indent = "  " * indent_level
         
         if not self.pipeline_yaml:
-            return f"{indent}transforms: []"
+            return f"{indent}[]"
         
         try:
             transforms_list = yaml.safe_load(self.pipeline_yaml)
             if not transforms_list:
-                return f"{indent}transforms: []"
+                return f"{indent}[]"
             
-            # Format the transforms list with proper indentation
-            yaml_content = yaml.dump(transforms_list, default_flow_style=False, sort_keys=False)
-            # Add indentation to each line except the first
-            lines = yaml_content.split('\n')
-            indented_lines = [lines[0]] + [f"{indent}  {line}" for line in lines[1:] if line.strip()]
+            # Build custom YAML with specific ordering
+            result = []
+            for transform in transforms_list:
+                result.append(f"{indent}- property_path: {transform['property_path']}")
+                result.append(f"{indent}  sampler_name: {transform['sampler_name']}")
+                if transform.get('params'):
+                    result.append(f"{indent}  params:")
+                    for key, value in transform['params'].items():
+                        result.append(f"{indent}    {key}: {value}")
             
-            return f"{indent}transforms:\n" + '\n'.join(indented_lines)
+            return '\n'.join(result)
         except Exception as e:
             print(f"Error formatting transforms YAML: {e}")
-            return f"{indent}transforms: []"
+            return f"{indent}[]"
 
     def to_dict(self):
         """Override to provide custom dict conversion for transforms."""

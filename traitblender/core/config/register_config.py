@@ -7,6 +7,12 @@ from ..helpers import get_property_type
 class TraitBlenderConfig(bpy.types.PropertyGroup):
     """Base class for all TraitBlender configuration property groups."""
     
+    show: bpy.props.BoolProperty(
+        name="Show",
+        description="Show this section in the UI",
+        default=False
+    )
+    
     def __str__(self):
         """Recursively display all parameters and their values in YAML format."""
         return self._to_yaml()
@@ -183,23 +189,13 @@ def register(name: str):
     """
     def decorator(cls):
         try:
-            # Convert the class to inherit from TraitBlenderConfig
+            # Convert the class to inherit from TraitBlenderConfig if needed
             if not issubclass(cls, TraitBlenderConfig):
                 # Create a new class that inherits from TraitBlenderConfig
                 # and has all the same properties as the original class
                 if not issubclass(cls, bpy.types.PropertyGroup):
                     raise ValueError(f"Class {cls.__name__} does not inherit from bpy.types.PropertyGroup")
                 
-                # Add a show property to the class for easier UI integration
-                try:
-                    cls.__annotations__['show'] = bpy.props.BoolProperty(
-                        name=f"Show {cls.__name__}",
-                        description=f"Show {cls.__name__}",
-                        default=False
-                    )
-                except Exception as e:
-                    print(f"Error adding show property to {cls.__name__}: {e}")
-
                 try:
                     # Copy all attributes from the original class, including property definitions
                     new_dict = {
