@@ -19,7 +19,7 @@ class MatConfig(bpy.types.PropertyGroup):
     rotation: bpy.props.FloatVectorProperty(
         name="Material Rotation",
         description="The rotation of the material",
-        subtype='ROTATION',
+        subtype='EULER',
         get=get_property("bpy.data.objects['Mat'].rotation_euler",
                         object_dependencies={"objects": ["Mat"]}),
         set=set_property("bpy.data.objects['Mat'].rotation_euler",
