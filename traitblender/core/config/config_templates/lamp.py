@@ -71,9 +71,9 @@ class LampConfig(bpy.types.PropertyGroup):
         description="The size of the lamp's beam",
         min=0.0,
         max=10.0,
-        get=get_property("bpy.data.lights['Lamp'].Lamp_size",
+        get=get_property("bpy.data.lights['Lamp'].spot_size",
                         object_dependencies={"lights": ["Lamp"]}),
-        set=set_property("bpy.data.lights['Lamp'].Lamp_size",
+        set=set_property("bpy.data.lights['Lamp'].spot_size",
                         object_dependencies={"lights": ["Lamp"]})
     )
 
@@ -81,9 +81,9 @@ class LampConfig(bpy.types.PropertyGroup):
         name="Lamp Beam Blend",
         description="The blend of the lamp's beam",
         min=0.0,
-        get=get_property("bpy.data.lights['Lamp'].Lamp_blend",
+        get=get_property("bpy.data.lights['Lamp'].spot_blend",
                         object_dependencies={"lights": ["Lamp"]}),  
-        set=set_property("bpy.data.lights['Lamp'].Lamp_blend",
+        set=set_property("bpy.data.lights['Lamp'].spot_blend",
                         object_dependencies={"lights": ["Lamp"]})
     )
 

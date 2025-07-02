@@ -1,6 +1,7 @@
 import bpy
 from bpy.props import PointerProperty
 from . import CONFIG
+from ..helpers import get_property_type
 
 
 class TraitBlenderConfig(bpy.types.PropertyGroup):
@@ -10,7 +11,7 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         """Recursively display all parameters and their values in YAML format."""
         return self._to_yaml()
     
-    def _to_yaml(self, indent_level=0):
+    def _to_yaml(self, indent_level=0, parent_path=""):
         """Convert the configuration to YAML format with proper indentation."""
         result = []
         indent = "  " * indent_level
@@ -23,12 +24,17 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
                 # If it's another TraitBlenderConfig, recurse
                 if isinstance(prop_value, TraitBlenderConfig):
                     result.append(f"{indent}{prop_name}:")
-                    nested_yaml = prop_value._to_yaml(indent_level + 1)
+                    # Build the path for nested properties
+                    current_path = f"{parent_path}.{prop_name}" if parent_path else prop_name
+                    nested_yaml = prop_value._to_yaml(indent_level + 1, current_path)
                     if nested_yaml.strip():  # Only add if there's content
                         result.append(nested_yaml)
                 else:
                     # Handle different property types for YAML
-                    yaml_value = self._format_value_for_yaml(prop_value)
+                    # Build the full property path for type checking
+                    current_path = f"{parent_path}.{prop_name}" if parent_path else prop_name
+                    prop_type = get_property_type(current_path)
+                    yaml_value = self._format_value_for_yaml(prop_value, prop_type)
                     result.append(f"{indent}{prop_name}: {yaml_value}")
             except Exception:
                 result.append(f"{indent}{prop_name}: # missing required Blender objects")
@@ -42,38 +48,35 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
                          "This will create any required objects (such as Camera, World, etc.) that are missing.")
         return yaml_str
     
-    def _format_value_for_yaml(self, value):
+    def _format_value_for_yaml(self, value, prop_type=None):
         """Format a value appropriately for YAML output."""
         if value is None:
             return "null"
-        elif isinstance(value, bool):
-            return str(value).lower()
-        elif isinstance(value, (int, float)):
+        
+        # Use property type to determine formatting
+        if prop_type in ['FloatVectorProperty', 'IntVectorProperty', 'BoolVectorProperty']:
+            # Convert vector properties to list format
+            try:
+                items = [str(item) for item in value]
+                return f"[{', '.join(items)}]"
+            except:
+                return str(value)
+        elif prop_type == 'EnumProperty':
+            # Enums should be strings
             return str(value)
-        elif isinstance(value, str):
-            # Quote strings that contain special characters or are empty
+        elif prop_type in ['FloatProperty', 'IntProperty']:
+            # Simple numeric properties
+            return str(value)
+        elif prop_type == 'BoolProperty':
+            # Boolean properties
+            return str(value).lower()
+        elif prop_type == 'StringProperty':
+            # String properties - quote if needed
             if not value or any(char in value for char in '":{}[]&*#?|-<>=!%@`,\'\\'):
                 return f'"{value}"'
             return value
-        elif hasattr(value, '__iter__') and not isinstance(value, str):
-            # Handle lists, tuples, vectors, etc.
-            try:
-                if value is None:
-                    return "null"
-                if len(value) == 0:
-                    return "[]"
-                elif len(value) == 1:
-                    return f"[{self._format_value_for_yaml(value[0])}]"
-                else:
-                    items = [self._format_value_for_yaml(item) for item in value]
-                    return f"[{', '.join(items)}]"
-            except (TypeError, IndexError) as e:
-                # Fallback for non-indexable iterables
-                import traceback
-                print(f"Warning: Error formatting iterable value {value} (type: {type(value)}): {e}")
-                print(f"Traceback: {traceback.format_exc()}")
-                return str(value)
         else:
+            # Fallback for unknown types
             return str(value)
     
     def from_dict(self, data_dict):
