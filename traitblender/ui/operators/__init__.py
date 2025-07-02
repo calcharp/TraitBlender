@@ -18,12 +18,20 @@ from .configure_traitblender import (
     TRAITBLENDER_OT_export_config
 )
 
+### Transform Operators
+from .transforms_operators import (
+    TRAITBLENDER_OT_run_pipeline,
+    TRAITBLENDER_OT_undo_pipeline,
+)
+
 classes = [
     TRAITBLENDER_OT_setup_scene,
     TRAITBLENDER_OT_clear_scene,
     TRAITBLENDER_OT_configure_scene,
     TRAITBLENDER_OT_show_configuration,
     TRAITBLENDER_OT_export_config,
+    TRAITBLENDER_OT_run_pipeline,
+    TRAITBLENDER_OT_undo_pipeline,
 ]
 
 

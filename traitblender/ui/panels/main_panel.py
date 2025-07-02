@@ -35,6 +35,8 @@ class TRAITBLENDER_PT_main_panel(Panel):
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
+                if section_name == "transforms":
+                    continue  # Skip transforms in the main config section
                 self._draw_config_section(layout, section_name, section_obj)
         else:
             layout.label(text="No configuration sections found", icon='INFO')
@@ -44,6 +46,29 @@ class TRAITBLENDER_PT_main_panel(Panel):
         row = layout.row(align=True)
         row.operator("traitblender.show_configuration", text="Show Configuration")
         row.operator("traitblender.export_config", text="Export Config as YAML")
+
+        # --- Transforms dropdown section (separate from config) ---
+        layout.separator()
+        box = layout.box()
+        row = box.row()
+        row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
+        row.label(text="Transforms")
+
+        if config.transforms.show:
+            transforms_config = config.transforms
+            row = box.row()
+            row.prop(transforms_config, "selected_section", text="Section")
+            row = box.row()
+            row.prop(transforms_config, "selected_property", text="Property")
+            if transforms_config.selected_section and transforms_config.selected_property:
+                property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
+                row = box.row()
+                row.label(text=f"Path: {property_path}")
+            row = box.row(align=True)
+            row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
+            row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
+            row = box.row()
+            row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
 
     def _draw_config_section(self, layout, section_name, section_obj):
         box = layout.box()
