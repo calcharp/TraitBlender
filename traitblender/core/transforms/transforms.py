@@ -174,4 +174,21 @@ class Transform:
         return f"{self.property_path} ~ {sampler_with_params}"
 
     def __repr__(self):
-        return f"Transform(property_path='{self.property_path}', sampler_name='{self.sampler_name}', params={self.params})" 
+        return f"Transform(property_path='{self.property_path}', sampler_name='{self.sampler_name}', params={self.params})"
+
+    def to_dict(self):
+        """Serialize the transform to a dictionary."""
+        return {
+            'property_path': self.property_path.replace('bpy.context.scene.traitblender_config.', ''),
+            'sampler_name': self.sampler_name,
+            'params': self.params.copy() if self.params else {}
+        }
+
+    @classmethod
+    def from_dict(cls, d):
+        """Create a Transform from a dictionary."""
+        return cls(
+            property_path=d['property_path'],
+            sampler_name=d['sampler_name'],
+            params=d.get('params', {})
+        ) 

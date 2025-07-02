@@ -217,4 +217,16 @@ class TransformPipeline:
         return len(self._transforms)
     
     def __bool__(self):
-        return len(self._transforms) > 0 
+        return len(self._transforms) > 0
+
+    def to_dict(self):
+        """Serialize the pipeline to a list of transform dicts."""
+        return [t.to_dict() for t in self._transforms]
+
+    @classmethod
+    def from_dict(cls, d, name="TransformPipeline"):
+        """Create a TransformPipeline from a list of transform dicts."""
+        pipeline = cls(name=name)
+        for t_dict in d:
+            pipeline._transforms.append(Transform.from_dict(t_dict))
+        return pipeline 
