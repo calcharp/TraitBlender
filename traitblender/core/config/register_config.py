@@ -181,6 +181,16 @@ def register(name: str):
                 if not issubclass(cls, bpy.types.PropertyGroup):
                     raise ValueError(f"Class {cls.__name__} does not inherit from bpy.types.PropertyGroup")
                 
+                # Add a show property to the class for easier UI integration
+                try:
+                    cls.__annotations__['show'] = bpy.props.BoolProperty(
+                        name=f"Show {cls.__name__}",
+                        description=f"Show {cls.__name__}",
+                        default=False
+                    )
+                except Exception as e:
+                    print(f"Error adding show property to {cls.__name__}: {e}")
+
                 try:
                     # Copy all attributes from the original class, including property definitions
                     new_dict = {
@@ -195,16 +205,6 @@ def register(name: str):
                             attr_value = getattr(cls, attr_name)
                             if hasattr(attr_value, '__class__') and 'Property' in attr_value.__class__.__name__:
                                 new_dict[attr_name] = attr_value
-                    
-                    # Add toggle properties for each TraitBlenderConfig section
-                    for prop_name in cls.__annotations__.keys():
-                        if isinstance(cls.__annotations__[prop_name], type) and issubclass(cls.__annotations__[prop_name], TraitBlenderConfig):
-                            toggle_prop_name = f"show_{prop_name}"
-                            new_dict[toggle_prop_name] = bpy.props.BoolProperty(
-                                name=f"Show {prop_name.replace('_', ' ').title()}",
-                                description=f"Show/hide the {prop_name.replace('_', ' ')} configuration section",
-                                default=False
-                            )
                     
                     new_cls = type(
                         cls.__name__,
