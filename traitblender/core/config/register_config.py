@@ -53,7 +53,7 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         if value is None:
             return "null"
         
-        # Use property type to determine formatting
+        # Use property type to determine formatting (esp for vectors)
         if prop_type in ['FloatVectorProperty', 'IntVectorProperty', 'BoolVectorProperty']:
             # Convert vector properties to list format
             try:
