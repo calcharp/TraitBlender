@@ -36,15 +36,17 @@ class LampConfig(bpy.types.PropertyGroup):
     color: bpy.props.FloatVectorProperty(
         name="Lamp Color",
         description="The color of the lamp",
+        default=(1.0, 1.0, 1.0),
         min=0.0,
         max=1.0,
-        size=4,
+        size=3,
         subtype='COLOR',
-        get=get_property("bpy.data.lights['Spot'].color",
+        get=get_property('bpy.data.lights["Spot"].color',
                         object_dependencies={"lights": ["Spot"]}),
-        set=set_property("bpy.data.lights['Spot'].color",
+        set=set_property('bpy.data.lights["Spot"].color',
                         object_dependencies={"lights": ["Spot"]})
     )
+
     power: bpy.props.FloatProperty(
         name="Lamp Power",
         description="The power of the lamp",
