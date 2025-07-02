@@ -18,6 +18,7 @@ from .helpers import (
     ObjectNotFoundError,
     must_exist,
     check_object_exists,
+    clear_scene,
 )
 
 # Scene Assets (currently empty)
@@ -47,6 +48,7 @@ __all__ = [
     "ObjectNotFoundError",
     "must_exist",
     "check_object_exists",
+    "clear_scene",
     
     # Scene Assets (currently empty)
     # "ASSET_TYPES",

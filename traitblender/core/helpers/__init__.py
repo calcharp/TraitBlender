@@ -15,6 +15,7 @@ from .prop_gettersetter import get_property, set_property
 from .asset_manager import get_addon_root, get_user_data_dir, get_asset_path, init_user_dirs
 from .config_validator import validate_config_path, get_config_path_info, list_config_properties
 from .property_type_checker import get_property_type, VALID_PROPERTY_TYPES
+from .scene_cleaner import clear_scene
 
 def get_asset_path(*path_parts):
     """
@@ -58,4 +59,6 @@ __all__ = [
     # Property type checker functions
     "get_property_type",
     "VALID_PROPERTY_TYPES",
+    # Scene cleaner functions
+    "clear_scene",
 ] 

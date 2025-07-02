@@ -12,9 +12,10 @@ class TRAITBLENDER_PT_main_panel(Panel):
         layout = self.layout
         config = context.scene.traitblender_config
         
-        # Setup Museum Scene button
+        # Setup Museum Scene and Clear Scene buttons
         row = layout.row(align=True)
-        row.operator("traitblender.setup_scene", text="Setup Museum Scene")
+        row.operator("traitblender.setup_scene", text="Import Museum")
+        row.operator("traitblender.clear_scene", text="Clear Scene", icon='TRASH')
         
         # Configuration section
         layout.separator()
@@ -42,6 +43,8 @@ class TRAITBLENDER_PT_main_panel(Panel):
                 self._draw_config_section(layout, section_name, section_obj)
         else:
             layout.label(text="No configuration sections found", icon='INFO')
+        
+
 
     def _draw_config_section(self, layout, section_name, section_obj):
         box = layout.box()

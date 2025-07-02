@@ -9,6 +9,7 @@ import bpy
 
 # Scene Setup Operators
 from .setup_scene_operator import TRAITBLENDER_OT_setup_scene
+from .clear_scene_operator import TRAITBLENDER_OT_clear_scene
 
 ### Configuration Operators
 from .configure_traitblender import (
@@ -19,6 +20,7 @@ from .configure_traitblender import (
 
 classes = [
     TRAITBLENDER_OT_setup_scene,
+    TRAITBLENDER_OT_clear_scene,
     TRAITBLENDER_OT_configure_scene,
     TRAITBLENDER_OT_show_configuration,
     TRAITBLENDER_OT_export_config,
