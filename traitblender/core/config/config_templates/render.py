@@ -1,10 +1,11 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 
 @register("render")
-class RenderConfig(bpy.types.PropertyGroup):
+class RenderConfig(TraitBlenderConfig):
+    print_index = 5
     
     engine: bpy.props.EnumProperty(
         name="Engine",

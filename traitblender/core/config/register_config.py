@@ -21,12 +21,33 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         if indent_level == 0:
             result.append('---')
         
-        # Get all properties of this class
+        # Collect all properties with their print_index values for sorting
+        properties_to_sort = []
+        
         for prop_name in self.__class__.__annotations__.keys():
             if prop_name == "show":
                 continue  # Skip the show property
             try:
                 prop_value = getattr(self, prop_name)
+                # Get print_index if it exists, otherwise use a large number to put it at the end
+                print_index = getattr(prop_value, 'print_index', float('inf')) if hasattr(prop_value, 'print_index') else float('inf')
+                properties_to_sort.append((print_index, prop_name, prop_value))
+            except Exception:
+                # If we can't get the property, still include it but with no print_index
+                properties_to_sort.append((float('inf'), prop_name, None))
+        
+        # Sort properties: first by print_index, then alphabetically within same index
+        properties_to_sort.sort(key=lambda x: (x[0], x[1]))
+        
+        # Process sorted properties
+        for print_index, prop_name, prop_value in properties_to_sort:
+            try:
+                if prop_value is None:
+                    # Property couldn't be accessed earlier
+                    result.append(f"{indent}{prop_name}: # missing required Blender objects")
+                    missing_any = True
+                    continue
+                
                 # If it's another TraitBlenderConfig, recurse
                 if isinstance(prop_value, TraitBlenderConfig):
                     result.append(f"{indent}{prop_name}:")
@@ -97,27 +118,16 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
             raise ValueError("Input must be a dictionary")
         
         for prop_name, value in data_dict.items():
-            print(f"Property {prop_name} value: {value}")
-            # Check if this property exists in the class annotations
             if prop_name not in self.__class__.__annotations__:
-                print(f"Warning: Property '{prop_name}' not found in {self.__class__.__name__}")
                 continue
-            
-            # Get the current property value
             current_prop = getattr(self, prop_name)
-            print(f"Current property {prop_name} value: {current_prop}")
-            
-            # If the current property is a TraitBlenderConfig and the value is a dict, recurse
-            if isinstance(current_prop, TraitBlenderConfig) and isinstance(value, dict):
+            if isinstance(current_prop, TraitBlenderConfig) and isinstance(value, (dict, list)):
                 current_prop.from_dict(value)
-                print(f"Current property {prop_name} value: {current_prop}")
             else:
-                # For simple properties, just set the value directly
                 try:
                     setattr(self, prop_name, value)
-                    print(f"Property {prop_name} value: {getattr(self, prop_name)}")
-                except Exception as e:
-                    print(f"Warning: Could not set property '{prop_name}' to value '{value}': {e}")
+                except Exception:
+                    pass
     
     def to_dict(self):
         """
@@ -132,25 +142,16 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
             if prop_name == "show":
                 continue  # Skip the show property
             prop_value = getattr(self, prop_name)
-            print(f"Property {prop_name} value: {prop_value}")
-            
-            # If it's another TraitBlenderConfig, recurse
             if isinstance(prop_value, TraitBlenderConfig):
                 result[prop_name] = prop_value.to_dict()
-                print(type(prop_value))
-                print(f"Property {prop_name} value: {result[prop_name]}")
             else:
-                # For simple properties, convert to a serializable format
                 if hasattr(prop_value, '__iter__') and not isinstance(prop_value, str):
                     try:
                         result[prop_name] = list(prop_value)
-                        print(f"Property {prop_name} value: {result[prop_name]}")
-                    except Exception as e:
+                    except Exception:
                         result[prop_name] = str(prop_value)
-                        print(f"Unable to convert {prop_name} to {prop_value}/ Exception: {e}")
                 else:
                     result[prop_name] = prop_value
-                    print(f"Property {prop_name} value: {result[prop_name]}")
         
         return result
     

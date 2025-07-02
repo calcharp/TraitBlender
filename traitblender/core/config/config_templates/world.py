@@ -1,9 +1,11 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 @register("world")
-class WorldConfig(bpy.types.PropertyGroup):
+class WorldConfig(TraitBlenderConfig):
+    print_index = 1
+    
     color: bpy.props.FloatVectorProperty(
         name="World Color",
         description="The color of the world",

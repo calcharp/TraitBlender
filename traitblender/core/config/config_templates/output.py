@@ -1,10 +1,11 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 
 @register("output")
-class OutputConfig(bpy.types.PropertyGroup):
+class OutputConfig(TraitBlenderConfig):
+    print_index = 6
     output_type: bpy.props.EnumProperty(
         name="Output Type",
         description="The type of material to use",

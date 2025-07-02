@@ -1,10 +1,11 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 
 @register("metadata")
-class MetadataConfig(bpy.types.PropertyGroup):
+class MetadataConfig(TraitBlenderConfig):
+    print_index = 7
 
     use_stamp_date: bpy.props.BoolProperty(
         name="Use Stamp Data",

@@ -1,10 +1,11 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 
 @register("lamp")
-class LampConfig(bpy.types.PropertyGroup):
+class LampConfig(TraitBlenderConfig):
+    print_index = 3
 
     location: bpy.props.FloatVectorProperty(
         name="Lamp Location",

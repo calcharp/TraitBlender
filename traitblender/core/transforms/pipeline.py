@@ -5,7 +5,6 @@ A factory pipeline for creating and managing multiple transforms.
 """
 
 from .transforms import Transform
-import bpy
 
 
 class TransformPipeline:
@@ -229,4 +228,12 @@ class TransformPipeline:
         pipeline = cls(name=name)
         for t_dict in d:
             pipeline._transforms.append(Transform.from_dict(t_dict))
-        return pipeline 
+        return pipeline
+
+
+def register():
+    pass
+
+
+def unregister():
+    pass 

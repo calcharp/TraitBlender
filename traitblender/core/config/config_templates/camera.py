@@ -1,9 +1,10 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 @register("camera")
-class CameraConfig(bpy.types.PropertyGroup):
+class CameraConfig(TraitBlenderConfig):
+    print_index = 2
     location: bpy.props.FloatVectorProperty(
         name="Location",
         description="The location of the camera",

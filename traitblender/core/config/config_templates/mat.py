@@ -1,10 +1,11 @@
 import bpy
-from ..register_config import register
+from ..register_config import register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
 
 @register("mat")
-class MatConfig(bpy.types.PropertyGroup):
+class MatConfig(TraitBlenderConfig):
+    print_index = 4
 
     location: bpy.props.FloatVectorProperty(
         name="Material Location",
