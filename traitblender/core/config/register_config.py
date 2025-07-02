@@ -17,6 +17,10 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
         indent = "  " * indent_level
         missing_any = False
         
+        # Add YAML document start marker at the top level
+        if indent_level == 0:
+            result.append('---')
+        
         # Get all properties of this class
         for prop_name in self.__class__.__annotations__.keys():
             if prop_name == "show":

@@ -1,0 +1,56 @@
+---
+camera:
+  location: [0.0, 0.0, 1.0]
+  rotation: [0.0, 0.0, 0.0]
+  camera_type: PERSP
+  focal_length: 60.0
+  resolution_x: 1080
+  resolution_y: 1080
+  resolution_percentage: 100
+  aspect_x: 0
+  aspect_y: 0
+  shift_x: 0.0
+  shift_y: 0.0
+  lens_unit: MILLIMETERS
+lamp:
+  location: [0.0, 0.0, 1.0]
+  rotation: [0.0, -0.0, 0.0]
+  scale: [1.0, 1.0, 1.0]
+  color: [1.0, 1.0, 1.0]
+  power: 10.0
+  use_soft_falloff: true
+  beam_size: 1
+  beam_blend: 0.0
+  shadow: true
+  diffuse: 1.0
+mat:
+  location: [0.0, 0.0, 0.5849999785423279]
+  rotation: [0.0, -0.0, 0.0]
+  scale: [0.125, 0.125, 1.0]
+  color: [0.0, 0.0, 0.0, 1.0]
+metadata:
+  use_stamp_date: true
+  use_stamp_time: true
+  use_stamp_render_time: true
+  use_stamp_frame: true
+  use_stamp_frame_range: false
+  use_stamp_memory: false
+  use_stamp_hostname: false
+  use_stamp_camera: true
+  use_stamp_lens: false
+  use_stamp_scene: true
+  use_stamp_marker: false
+  use_stamp_filename: true
+  use_stamp_sequencer_strip: false
+  use_stamp_note: false
+  stamp_note_text: ""
+output:
+  output_type: image
+  image_format: PNG
+  output_directory: ""
+render:
+  engine: BLENDER_EEVEE_NEXT
+  eevee_use_raytracing: false
+world:
+  color: [0.0, 0.0, 0.0, 1.0]
+  strength: 1.0

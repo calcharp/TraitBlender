@@ -9,6 +9,7 @@ from bpy.types import Operator
 import os
 from ...core.helpers import get_asset_path, apply_material
 from bpy.app.handlers import persistent
+import yaml
 
 @persistent
 def set_rendered_view(dummy):
@@ -81,6 +82,18 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                 
                 # Set rendered view
                 set_rendered_view(None)
+                
+                # Load and apply default configuration from assets/configs/default.yaml
+                default_yaml_path = get_asset_path("configs", "default.yaml")
+                if os.path.exists(default_yaml_path):
+                    with open(default_yaml_path, 'r') as file:
+                        config_data = yaml.safe_load(file)
+                    if config_data:
+                        context.scene.traitblender_config.from_dict(config_data)
+                    else:
+                        self.report({'WARNING'}, "Default configuration file is empty or invalid")
+                else:
+                    self.report({'WARNING'}, f"Default configuration file not found: {default_yaml_path}")
                 
                 self.report({'INFO'}, "Museum scene objects and materials appended successfully.")
             except Exception as e:
