@@ -24,37 +24,3 @@ class RenderConfig(bpy.types.PropertyGroup):
         set=set_property("bpy.context.scene.eevee.use_raytracing")
     )
 
-    resolution_x: bpy.props.IntProperty(
-        name="Resolution X",
-        description="The resolution of the render",
-        get=get_property("bpy.context.scene.render.resolution_x"),
-        set=set_property("bpy.context.scene.render.resolution_x")
-    )
-    
-    resolution_y: bpy.props.IntProperty(
-        name="Resolution Y",
-        description="The resolution of the render",
-        get=get_property("bpy.context.scene.render.resolution_y"),
-        set=set_property("bpy.context.scene.render.resolution_y")
-    )
-
-    resolution_percentage: bpy.props.IntProperty(
-        name="Resolution Percentage",
-        description="The resolution of the render",
-        get=get_property("bpy.context.scene.render.resolution_percentage"),
-        set=set_property("bpy.context.scene.render.resolution_percentage")
-    )
-
-    aspect_x: bpy.props.IntProperty(
-        name="Aspect X",
-        description="The aspect of the render",
-        get=get_property("bpy.context.scene.render.pixel_aspect_x"),
-        set=set_property("bpy.context.scene.render.pixel_aspect_x")
-    )
-
-    aspect_y: bpy.props.IntProperty(
-        name="Aspect Y",
-        description="The aspect of the render",
-        get=get_property("bpy.context.scene.render.pixel_aspect_y"),
-        set=set_property("bpy.context.scene.render.pixel_aspect_y")
-    )

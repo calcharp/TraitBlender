@@ -48,6 +48,36 @@ class CameraConfig(bpy.types.PropertyGroup):
         set=set_property("bpy.data.cameras['Camera'].lens", 
                         object_dependencies={"cameras": ["Camera"]})
     )
+    resolution_x: bpy.props.IntProperty(
+        name="Resolution X",
+        description="The resolution of the render",
+        get=get_property("bpy.context.scene.render.resolution_x"),
+        set=set_property("bpy.context.scene.render.resolution_x")
+    )
+    resolution_y: bpy.props.IntProperty(
+        name="Resolution Y",
+        description="The resolution of the render",
+        get=get_property("bpy.context.scene.render.resolution_y"),
+        set=set_property("bpy.context.scene.render.resolution_y")
+    )
+    resolution_percentage: bpy.props.IntProperty(
+        name="Resolution Percentage",
+        description="The resolution of the render",
+        get=get_property("bpy.context.scene.render.resolution_percentage"),
+        set=set_property("bpy.context.scene.render.resolution_percentage")
+    )
+    aspect_x: bpy.props.IntProperty(
+        name="Aspect X",
+        description="The aspect of the render",
+        get=get_property("bpy.context.scene.render.pixel_aspect_x"),
+        set=set_property("bpy.context.scene.render.pixel_aspect_x")
+    )
+    aspect_y: bpy.props.IntProperty(
+        name="Aspect Y",
+        description="The aspect of the render",
+        get=get_property("bpy.context.scene.render.pixel_aspect_y"),
+        set=set_property("bpy.context.scene.render.pixel_aspect_y")
+    )
     shift_x: bpy.props.FloatProperty(
         name="Shift X",
         description="The shift of the camera on the x-axis",
@@ -76,6 +106,7 @@ class CameraConfig(bpy.types.PropertyGroup):
         set=set_property("bpy.data.cameras['Camera'].lens_unit", options=['MILLIMETERS', 'FOV'],
                          object_dependencies={'cameras': ['Camera']})
     )
+
 
 
     
