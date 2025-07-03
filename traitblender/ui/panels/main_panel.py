@@ -81,8 +81,32 @@ class TRAITBLENDER_PT_config_panel(Panel):
     def _draw_section_content(self, layout, section_obj):
         TRAITBLENDER_PT_main_panel._draw_section_content(self, layout, section_obj)
 
+class TRAITBLENDER_PT_morphospaces_panel(Panel):
+    bl_label = "3 Morphospaces"
+    bl_idname = "TRAITBLENDER_PT_morphospaces_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        # Empty for now
+        pass
+
+class TRAITBLENDER_PT_datasets_panel(Panel):
+    bl_label = "4 Datasets"
+    bl_idname = "TRAITBLENDER_PT_datasets_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        # Empty for now
+        pass
+
 class TRAITBLENDER_PT_transforms_panel(Panel):
-    bl_label = "3 Transforms"
+    bl_label = "5 Transforms"
     bl_idname = "TRAITBLENDER_PT_transforms_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -93,7 +117,6 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         config = context.scene.traitblender_config
         layout.separator()
         box = layout.box()
-        row = box.row()
         transforms_config = config.transforms
         row = box.row()
         row.prop(transforms_config, "selected_section", text="Section")
@@ -107,4 +130,16 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
         row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
         row = box.row()
-        row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}") 
+        row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
+
+class TRAITBLENDER_PT_imaging_panel(Panel):
+    bl_label = "6 Imaging"
+    bl_idname = "TRAITBLENDER_PT_imaging_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        # Empty for now
+        pass 

@@ -50,3 +50,15 @@ class MatConfig(TraitBlenderConfig):
         set=set_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[0].default_value",
                         object_dependencies={"materials": ["mat_material"]})
     )
+
+    roughness: bpy.props.FloatProperty(
+        name="Material Roughness",
+        description="The roughness of the material",
+        default=1.0,
+        min=0.0,
+        max=1.0,
+        get=get_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[2].default_value",
+                        object_dependencies={"materials": ["mat_material"]}),
+        set=set_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[2].default_value",
+                        object_dependencies={"materials": ["mat_material"]})
+    )

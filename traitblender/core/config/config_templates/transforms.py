@@ -34,6 +34,8 @@ class TransformPipelineConfig(TraitBlenderConfig):
             config = bpy.context.scene.traitblender_config
             sections = config.get_config_sections()
             for i, section_name in enumerate(sections.keys()):
+                if section_name.lower() == "transforms":
+                    continue  # Skip the transforms section itself
                 items.append((section_name, section_name.replace('_', ' ').title(), f"Section {i+1}"))
         except Exception as e:
             print(f"Error getting section items: {e}")
