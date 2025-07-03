@@ -11,8 +11,8 @@ camera:
   resolution_x: 1080
   resolution_y: 1080
   resolution_percentage: 100
-  aspect_x: 0
-  aspect_y: 0
+  aspect_x: 1.0
+  aspect_y: 1.0
   shift_x: 0.0
   shift_y: 0.0
   lens_unit: MILLIMETERS

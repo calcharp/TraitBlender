@@ -69,7 +69,7 @@ class CameraConfig(TraitBlenderConfig):
         get=get_property("bpy.context.scene.render.resolution_percentage"),
         set=set_property("bpy.context.scene.render.resolution_percentage")
     )
-    aspect_x: bpy.props.IntProperty(
+    aspect_x: bpy.props.FloatProperty(
         name="Aspect X",
         description="The aspect of the render",
         get=get_property("bpy.context.scene.render.pixel_aspect_x"),
@@ -92,7 +92,6 @@ class CameraConfig(TraitBlenderConfig):
     shift_y: bpy.props.FloatProperty(
         name="Shift Y",
         description="The shift of the camera on the y-axis",
-        default=0.0,
         get=get_property("bpy.data.cameras['Camera'].shift_y", 
                         object_dependencies={"cameras": ["Camera"]}),
         set=set_property("bpy.data.cameras['Camera'].shift_y", 
