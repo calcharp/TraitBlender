@@ -20,11 +20,11 @@ TRANSFORMS = {}
 from .transform_registry_decorator import register_transform
 
 @register_transform('dirichlet')
-def dirichlet_sampler(alphas: list[float], n: int = None) -> tuple[float] | list[tuple[float]]:
+def dirichlet_sampler(alphas: list[float], n: int = None) -> list[float] | list[list[float]]:
     samples = np.random.dirichlet(alphas, n or 1)
     if n is None:
-        return tuple(samples[0])
-    return [tuple(s) for s in samples]
+        return [float(x) for x in samples[0]]
+    return [[float(x) for x in s] for s in samples]
 
 @register_transform('poisson')
 def poisson_sampler(lam: float, n: int = None) -> int | list[int]:
@@ -41,11 +41,11 @@ def cauchy_sampler(x0: float, gamma: float, n: int = None) -> float | list[float
     return [float(s) for s in samples]
 
 @register_transform('multivariate_normal')
-def multivariate_normal_sampler(mu: list[float], cov: list[list[float]], n: int = None) -> tuple[float] | list[tuple[float]]:
+def multivariate_normal_sampler(mu: list[float], cov: list[list[float]], n: int = None) -> list[float] | list[list[float]]:
     samples = np.random.multivariate_normal(mu, cov, n or 1)
     if n is None:
-        return tuple(samples[0])
-    return [tuple(s) for s in samples]
+        return [float(x) for x in samples[0]]
+    return [[float(x) for x in s] for s in samples]
 
 @register_transform('uniform')
 def uniform_sampler(low: float, high: float, n: int = None) -> float | list[float]:
@@ -55,12 +55,12 @@ def uniform_sampler(low: float, high: float, n: int = None) -> float | list[floa
     return [float(s) for s in samples]
 
 @register_transform('normal')
-def normal_sampler(mu: float, sigma: float, n: int = None, cov: list[list[float]] = None) -> float | list[float] | tuple[float] | list[tuple[float]]:
+def normal_sampler(mu: float, sigma: float, n: int = None, cov: list[list[float]] = None) -> float | list[float] | list[list[float]]:
     if cov is not None:
         samples = np.random.multivariate_normal(mu, cov, n or 1)
         if n is None:
-            return tuple(samples[0])
-        return [tuple(s) for s in samples]
+            return [float(x) for x in samples[0]]
+        return [[float(x) for x in s] for s in samples]
     else:
         samples = np.random.normal(mu, sigma, n or 1)
         if n is None:
