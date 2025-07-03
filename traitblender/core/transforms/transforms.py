@@ -68,23 +68,21 @@ class Transform:
 
     def _call_sampler(self):
         """Call the sampler function with the provided parameters using introspection."""
-        sampler = TRANSFORMS[self.sampler_name]
-        
+        factory = TRANSFORMS[self.sampler_name]
+        # Instantiate the sampler from the factory with the provided params
+        sampler = factory(**self.params)
         # Get function signature
         sig = inspect.signature(sampler)
-        
         try:
             # Try to bind all arguments
             bound_args = sig.bind(**self.params)
             bound_args.apply_defaults()
         except TypeError as e:
-            # If binding fails, provide a more helpful error message
-            required_params = [name for name, param in sig.parameters.items() 
-                             if param.default == inspect.Parameter.empty]
+            required_params = [name for name, param in sig.parameters.items()
+                              if param.default == inspect.Parameter.empty]
             raise ValueError(f"Invalid parameters for sampler '{self.sampler_name}'. "
-                           f"Required: {required_params}, Provided: {list(self.params.keys())}. "
-                           f"Error: {e}")
-        
+                             f"Required: {required_params}, Provided: {list(self.params.keys())}. "
+                             f"Error: {e}")
         # Call with positional arguments in correct order
         return sampler(*bound_args.args, **bound_args.kwargs)
 
