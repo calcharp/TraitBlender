@@ -118,18 +118,25 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         layout.separator()
         box = layout.box()
         transforms_config = config.transforms
-        row = box.row()
-        row.prop(transforms_config, "selected_section", text="Section")
-        row = box.row()
-        row.prop(transforms_config, "selected_property", text="Property")
-        if transforms_config.selected_section and transforms_config.selected_property:
-            property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
-            row = box.row()
-            row.label(text=f"Path: {property_path}")
+
+        # Property selection row: [Property:][Section][Property]
+        row = box.row(align=True)
+        row.label(text="Property:")
+        row.prop(transforms_config, "selected_section", text="", emboss=True)
+        row.prop(transforms_config, "selected_property", text="", emboss=True)
+
+        # Sampler selection row: [Sampler:][Sampler Dropdown]
+        row = box.row(align=True)
+        row.label(text="Sampler:")
+        row.prop(transforms_config, "selected_sampler", text="", emboss=True)
+
+        # Pipeline control buttons
         row = box.row(align=True)
         row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
         row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
-        row = box.row()
+
+        # Transform count
+        row = box.row(align=True)
         row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
 
 class TRAITBLENDER_PT_imaging_panel(Panel):

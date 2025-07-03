@@ -27,6 +27,13 @@ class TransformPipelineConfig(TraitBlenderConfig):
         default=0
     )
     
+    selected_sampler: bpy.props.EnumProperty(
+        name="Sampler",
+        description="Select a sampler function",
+        items=lambda self, context: self._get_sampler_items(),
+        default=0
+    )
+    
     def _get_section_items(self):
         """Get available config sections for the enum."""
         items = []
@@ -56,6 +63,17 @@ class TransformPipelineConfig(TraitBlenderConfig):
                         items.append((prop_name, prop_name.replace('_', ' ').title(), f"Property: {prop_name}"))
         except Exception as e:
             print(f"Error getting property items: {e}")
+        return items
+    
+    def _get_sampler_items(self):
+        """Get available sampler functions from the TRANSFORMS registry."""
+        items = []
+        try:
+            from ...transforms.registry import TRANSFORMS
+            for sampler_name in sorted(TRANSFORMS.keys()):
+                items.append((sampler_name, sampler_name.replace('_', ' ').title(), f"Sampler: {sampler_name}"))
+        except Exception as e:
+            print(f"Error getting sampler items: {e}")
         return items
 
     @property
