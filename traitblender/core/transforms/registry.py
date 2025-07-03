@@ -13,250 +13,87 @@ Each entry maps a string name to a callable or factory that returns a sample val
 - 'cauchy': function taking (x0, gamma, number=None) and returning a scalar or list of samples
 - 'discrete_uniform': function taking (low, high, number=None) and returning a scalar or list of samples
 """
-import random
-import math
+import numpy as np
+import scipy.stats as stats
 
-def _sample_dirichlet(alphas):
-    """
-    Sample from a Dirichlet distribution.
+TRANSFORMS = {}
+from .transform_registry_decorator import register_transform
 
-    Args:
-        alphas (list[float]): Concentration parameters (must all be > 0).
-    Returns:
-        tuple[float]: A tuple of samples summing to 1, each in (0,1).
-    """
-    gammas = [random.gammavariate(a, 1) for a in alphas]
-    total = sum(gammas)
-    return tuple(g / total for g in gammas)
-
-def _sample_poisson(lam):
-    """
-    Sample from a Poisson distribution using Knuth's algorithm.
-
-    Args:
-        lam (float): Expected number of events (lambda, must be > 0).
-    Returns:
-        int: A non-negative integer sample from Poisson(lam).
-    """
-    # Knuth's algorithm
-    L = math.exp(-lam)
-    k = 0
-    p = 1.0
-    while p > L:
-        k += 1
-        p *= random.uniform(0, 1)
-    return k - 1
-
-def _sample_cauchy(x0, gamma):
-    """
-    Sample from a Cauchy (Lorentz) distribution using inverse transform sampling.
-
-    Args:
-        x0 (float): Location parameter (peak of the distribution).
-        gamma (float): Scale parameter (half-width at half-maximum, must be > 0).
-    Returns:
-        float: A sample from Cauchy(x0, gamma).
-    """
-    # Inverse transform sampling
-    u = random.uniform(0, 1)
-    return x0 + gamma * math.tan(math.pi * (u - 0.5))
-
-def _sample_multivariate_normal(mu, cov):
-    """
-    Sample from a multivariate normal distribution using Cholesky decomposition.
-    
-    Args:
-        mu (list[float]): Mean vector.
-        cov (list[list[float]]): Covariance matrix (must be positive definite).
-    Returns:
-        tuple[float]: A sample from the multivariate normal distribution.
-    """
-    # Simple implementation using Cholesky decomposition
-    # For production, consider using numpy for better numerical stability
-    n = len(mu)
-    
-    # Generate independent standard normal samples
-    z = [random.gauss(0, 1) for _ in range(n)]
-    
-    # Cholesky decomposition of covariance matrix
-    L = [[0.0] * n for _ in range(n)]
-    for i in range(n):
-        for j in range(i + 1):
-            if i == j:
-                L[i][j] = math.sqrt(cov[i][j] - sum(L[i][k]**2 for k in range(j)))
-            else:
-                L[i][j] = (cov[i][j] - sum(L[i][k] * L[j][k] for k in range(j))) / L[j][j]
-    
-    # Transform: x = mu + L * z
-    x = [mu[i] + sum(L[i][j] * z[j] for j in range(n)) for i in range(n)]
-    return tuple(x)
-
-def _uniform_sampler(low, high, n=None):
-    """
-    Sample from a uniform distribution.
-    
-    Args:
-        low (float): Lower bound of the uniform distribution.
-        high (float): Upper bound of the uniform distribution.
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        float or list[float]: Single sample if n is None, otherwise list of samples.
-    """
+@register_transform('dirichlet')
+def dirichlet_sampler(alphas: list[float], n: int = None) -> tuple[float] | list[tuple[float]]:
+    samples = np.random.dirichlet(alphas, n or 1)
     if n is None:
-        return random.uniform(low, high)
-    return [random.uniform(low, high) for _ in range(n)]
+        return tuple(samples[0])
+    return [tuple(s) for s in samples]
 
-def _normal_sampler(mu, sigma, n=None, cov=None):
-    """
-    Sample from a normal (Gaussian) distribution.
-    
-    Args:
-        mu (float or list[float]): Mean(s) of the normal distribution.
-        sigma (float or list[float]): Standard deviation(s) of the normal distribution.
-        n (int, optional): Number of samples to return. If None, returns a single value.
-        cov (list[list[float]], optional): Covariance matrix for multivariate sampling.
-    Returns:
-        float, list[float], tuple[float], or list[tuple[float]]: Single sample if n is None, otherwise list of samples.
-    """
+@register_transform('poisson')
+def poisson_sampler(lam: float, n: int = None) -> int | list[int]:
+    samples = np.random.poisson(lam, n or 1)
+    if n is None:
+        return int(samples[0])
+    return [int(s) for s in samples]
+
+@register_transform('cauchy')
+def cauchy_sampler(x0: float, gamma: float, n: int = None) -> float | list[float]:
+    samples = stats.cauchy.rvs(loc=x0, scale=gamma, size=n or 1)
+    if n is None:
+        return float(samples[0])
+    return [float(s) for s in samples]
+
+@register_transform('multivariate_normal')
+def multivariate_normal_sampler(mu: list[float], cov: list[list[float]], n: int = None) -> tuple[float] | list[tuple[float]]:
+    samples = np.random.multivariate_normal(mu, cov, n or 1)
+    if n is None:
+        return tuple(samples[0])
+    return [tuple(s) for s in samples]
+
+@register_transform('uniform')
+def uniform_sampler(low: float, high: float, n: int = None) -> float | list[float]:
+    samples = np.random.uniform(low, high, n or 1)
+    if n is None:
+        return float(samples[0])
+    return [float(s) for s in samples]
+
+@register_transform('normal')
+def normal_sampler(mu: float, sigma: float, n: int = None, cov: list[list[float]] = None) -> float | list[float] | tuple[float] | list[tuple[float]]:
     if cov is not None:
-        # Multivariate case
+        samples = np.random.multivariate_normal(mu, cov, n or 1)
         if n is None:
-            return _sample_multivariate_normal(mu, cov)
-        return [_sample_multivariate_normal(mu, cov) for _ in range(n)]
+            return tuple(samples[0])
+        return [tuple(s) for s in samples]
     else:
-        # Univariate case
+        samples = np.random.normal(mu, sigma, n or 1)
         if n is None:
-            return random.gauss(mu, sigma)
-        return [random.gauss(mu, sigma) for _ in range(n)]
+            return float(samples[0])
+        return [float(s) for s in samples]
 
-def _multivariate_normal_sampler(mu, cov, n=None):
-    """
-    Sample from a multivariate normal distribution.
-    
-    Args:
-        mu (list[float]): Mean vector.
-        cov (list[list[float]]): Covariance matrix (must be positive definite).
-        n (int, optional): Number of samples to return. If None, returns a single tuple.
-    Returns:
-        tuple[float] or list[tuple[float]]: Single tuple if n is None, otherwise list of tuples.
-    """
+@register_transform('beta')
+def beta_sampler(a: float, b: float, n: int = None) -> float | list[float]:
+    samples = np.random.beta(a, b, n or 1)
     if n is None:
-        return _sample_multivariate_normal(mu, cov)
-    return [_sample_multivariate_normal(mu, cov) for _ in range(n)]
+        return float(samples[0])
+    return [float(s) for s in samples]
 
-def _dirichlet_sampler(alphas, n=None):
-    """
-    Sample from a Dirichlet distribution.
-    
-    Args:
-        alphas (list[float]): Concentration parameters (must all be > 0).
-        n (int, optional): Number of samples to return. If None, returns a single tuple.
-    Returns:
-        tuple[float] or list[tuple[float]]: Single tuple if n is None, otherwise list of tuples.
-    """
+@register_transform('gamma')
+def gamma_sampler(alpha: float, beta: float, n: int = None) -> float | list[float]:
+    samples = np.random.gamma(alpha, beta, n or 1)
     if n is None:
-        return _sample_dirichlet(alphas)
-    return [_sample_dirichlet(alphas) for _ in range(n)]
+        return float(samples[0])
+    return [float(s) for s in samples]
 
-def _beta_sampler(a, b, n=None):
-    """
-    Sample from a Beta distribution.
-    
-    Args:
-        a (float): First shape parameter (must be > 0).
-        b (float): Second shape parameter (must be > 0).
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        float or list[float]: Single sample if n is None, otherwise list of samples.
-    """
+@register_transform('exponential')
+def exponential_sampler(lambd: float, n: int = None) -> float | list[float]:
+    samples = np.random.exponential(1.0 / lambd, n or 1)
     if n is None:
-        return random.betavariate(a, b)
-    return [random.betavariate(a, b) for _ in range(n)]
+        return float(samples[0])
+    return [float(s) for s in samples]
 
-def _poisson_sampler(lam, n=None):
-    """
-    Sample from a Poisson distribution.
-    
-    Args:
-        lam (float): Expected number of events (lambda, must be > 0).
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        int or list[int]: Single sample if n is None, otherwise list of samples.
-    """
+@register_transform('discrete_uniform')
+def discrete_uniform_sampler(low: int, high: int, n: int = None) -> int | list[int]:
+    samples = np.random.randint(low, high + 1, n or 1)
     if n is None:
-        return _sample_poisson(lam)
-    return [_sample_poisson(lam) for _ in range(n)]
+        return int(samples[0])
+    return [int(s) for s in samples]
 
-def _gamma_sampler(alpha, beta, n=None):
-    """
-    Sample from a Gamma distribution.
-    
-    Args:
-        alpha (float): Shape parameter (must be > 0).
-        beta (float): Scale parameter (must be > 0).
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        float or list[float]: Single sample if n is None, otherwise list of samples.
-    """
-    if n is None:
-        return random.gammavariate(alpha, beta)
-    return [random.gammavariate(alpha, beta) for _ in range(n)]
-
-def _exponential_sampler(lambd, n=None):
-    """
-    Sample from an Exponential distribution.
-    
-    Args:
-        lambd (float): Rate parameter (must be > 0).
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        float or list[float]: Single sample if n is None, otherwise list of samples.
-    """
-    if n is None:
-        return random.expovariate(lambd)
-    return [random.expovariate(lambd) for _ in range(n)]
-
-def _cauchy_sampler(x0, gamma, n=None):
-    """
-    Sample from a Cauchy (Lorentz) distribution.
-    
-    Args:
-        x0 (float): Location parameter (peak of the distribution).
-        gamma (float): Scale parameter (half-width at half-maximum, must be > 0).
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        float or list[float]: Single sample if n is None, otherwise list of samples.
-    """
-    if n is None:
-        return _sample_cauchy(x0, gamma)
-    return [_sample_cauchy(x0, gamma) for _ in range(n)]
-
-def _discrete_uniform_sampler(low, high, n=None):
-    """
-    Sample from a discrete uniform distribution.
-    
-    Args:
-        low (int): Lower bound (inclusive).
-        high (int): Upper bound (inclusive).
-        n (int, optional): Number of samples to return. If None, returns a single value.
-    Returns:
-        int or list[int]: Single sample if n is None, otherwise list of samples.
-    """
-    if n is None:
-        return random.randint(low, high)
-    return [random.randint(low, high) for _ in range(n)]
-
-TRANSFORMS = {
-    'uniform': _uniform_sampler,
-    'normal': _normal_sampler,
-    'multivariate_normal': _multivariate_normal_sampler,
-    'dirichlet': _dirichlet_sampler,
-    'beta': _beta_sampler,
-    'poisson': _poisson_sampler,
-    'gamma': _gamma_sampler,
-    'exponential': _exponential_sampler,
-    'cauchy': _cauchy_sampler,
-    'discrete_uniform': _discrete_uniform_sampler,
-    # Add more as needed
-}
+# TRANSFORMS dict is now populated by the decorator
 

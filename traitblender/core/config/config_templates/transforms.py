@@ -95,19 +95,62 @@ class TransformPipelineConfig(TraitBlenderConfig):
         except Exception as e:
             print(f"Error saving pipeline to YAML: {e}")
 
+    # --- Pipeline interface delegation ---
+    def add_transform(self, *args, **kwargs):
+        pipeline = self.pipeline
+        result = pipeline.add_transform(*args, **kwargs)
+        self.pipeline = pipeline
+        return result
+
+    def remove_transform(self, index):
+        pipeline = self.pipeline
+        try:
+            removed = pipeline._transforms.pop(index)
+            self.pipeline = pipeline
+            print(f"Removed transform #{index + 1}: {removed}")
+            return True
+        except Exception as e:
+            print(f"Error removing transform: {e}")
+            return False
+
+    def clear(self):
+        pipeline = self.pipeline
+        result = pipeline.clear()
+        self.pipeline = pipeline
+        return result
+
+    def run(self, *args, **kwargs):
+        return self.pipeline.run(*args, **kwargs)
+
+    def undo(self, *args, **kwargs):
+        return self.pipeline.undo(*args, **kwargs)
+
+    # --- Sequence protocol ---
+    def __iter__(self):
+        return iter(self.pipeline)
+
+    def __getitem__(self, index):
+        return self.pipeline[index]
+
+    def __setitem__(self, index, value):
+        pipeline = self.pipeline
+        pipeline[index] = value
+        self.pipeline = pipeline
+
+    def __len__(self):
+        return len(self.pipeline)
+
+    # --- Private serialization methods ---
     def _to_yaml(self, indent_level=0, parent_path=""):
         """Override to provide custom YAML formatting for transforms."""
         import yaml
         indent = "  " * indent_level
-        
         if not self.pipeline_yaml:
             return f"{indent}[]"
-        
         try:
             transforms_list = yaml.safe_load(self.pipeline_yaml)
             if not transforms_list:
                 return f"{indent}[]"
-            
             # Build custom YAML with specific ordering
             result = []
             for transform in transforms_list:
@@ -117,14 +160,12 @@ class TransformPipelineConfig(TraitBlenderConfig):
                     result.append(f"{indent}  params:")
                     for key, value in transform['params'].items():
                         result.append(f"{indent}    {key}: {value}")
-            
             return '\n'.join(result)
         except Exception as e:
             print(f"Error formatting transforms YAML: {e}")
             return f"{indent}[]"
 
     def to_dict(self):
-        """Override to provide custom dict conversion for transforms."""
         try:
             if self.pipeline_yaml:
                 import yaml
@@ -135,167 +176,12 @@ class TransformPipelineConfig(TraitBlenderConfig):
             return []
 
     def from_dict(self, data_dict):
-        """Override to provide custom dict loading for transforms."""
         if not data_dict:
             self.pipeline_yaml = ""
             return
-        
         try:
             import yaml
             self.pipeline_yaml = yaml.dump(data_dict)
         except Exception as e:
             print(f"Error loading transforms from dict: {e}")
-            self.pipeline_yaml = ""
-
-    def add_transform(self, property_path: str, sampler_name: str, params: dict = None):
-        """
-        Add a transform to the pipeline.
-        
-        Args:
-            property_path (str): Relative property path (e.g., 'world.color')
-            sampler_name (str): Name of the sampler function
-            params (dict): Parameters for the sampler
-            
-        Example:
-            config.add_transform("world.color", "uniform", {"low": 0, "high": 1})
-        """
-        try:
-            # Get current pipeline
-            current_pipeline = self.pipeline
-            
-            # Add the transform
-            current_pipeline.add_transform(property_path, sampler_name, params)
-            
-            # Update the YAML storage
-            self.pipeline = current_pipeline
-            
-            print(f"Added transform: {property_path} ~ {sampler_name}")
-            return True
-        except Exception as e:
-            print(f"Error adding transform: {e}")
-            return False
-
-    def remove_transform(self, index: int):
-        """
-        Remove a transform from the pipeline by index.
-        
-        Args:
-            index (int): Index of the transform to remove (0-based)
-            
-        Returns:
-            bool: True if successful, False otherwise
-            
-        Example:
-            config.remove_transform(0)  # Remove first transform
-        """
-        try:
-            # Get current pipeline
-            current_pipeline = self.pipeline
-            
-            if index < 0 or index >= len(current_pipeline._transforms):
-                print(f"Invalid transform index: {index}")
-                return False
-            
-            # Remove the transform
-            removed_transform = current_pipeline._transforms.pop(index)
-            print(f"Removed transform #{index + 1}: {removed_transform}")
-            
-            # Update the YAML storage
-            self.pipeline = current_pipeline
-            
-            return True
-        except Exception as e:
-            print(f"Error removing transform: {e}")
-            return False
-
-    def clear_transforms(self):
-        """
-        Clear all transforms from the pipeline.
-        
-        Example:
-            config.clear_transforms()
-        """
-        try:
-            # Get current pipeline
-            current_pipeline = self.pipeline
-            
-            # Clear all transforms
-            count = len(current_pipeline._transforms)
-            current_pipeline.clear()
-            
-            # Update the YAML storage
-            self.pipeline = current_pipeline
-            
-            print(f"Cleared {count} transforms from pipeline")
-            return True
-        except Exception as e:
-            print(f"Error clearing transforms: {e}")
-            return False
-
-    def get_transform_count(self):
-        """Get the number of transforms in the pipeline."""
-        return len(self.pipeline._transforms)
-
-    def get_transform_info(self, index: int = None):
-        """
-        Get information about transforms in the pipeline.
-        
-        Args:
-            index (int, optional): Specific transform index. If None, returns all transforms.
-            
-        Returns:
-            dict or list: Transform information
-        """
-        try:
-            current_pipeline = self.pipeline
-            
-            if index is not None:
-                if index < 0 or index >= len(current_pipeline._transforms):
-                    return None
-                transform = current_pipeline._transforms[index]
-                return {
-                    'index': index,
-                    'property_path': transform.property_path.replace('bpy.context.scene.traitblender_config.', ''),
-                    'sampler_name': transform.sampler_name,
-                    'params': transform.params.copy()
-                }
-            else:
-                # Return all transforms
-                transforms_info = []
-                for i, transform in enumerate(current_pipeline._transforms):
-                    transforms_info.append({
-                        'index': i,
-                        'property_path': transform.property_path.replace('bpy.context.scene.traitblender_config.', ''),
-                        'sampler_name': transform.sampler_name,
-                        'params': transform.params.copy()
-                    })
-                return transforms_info
-        except Exception as e:
-            print(f"Error getting transform info: {e}")
-            return None
-
-    def run_pipeline(self):
-        """
-        Execute all transforms in the pipeline.
-        
-        Returns:
-            list: Results from each transform execution
-        """
-        try:
-            return self.pipeline.run()
-        except Exception as e:
-            print(f"Error running pipeline: {e}")
-            return []
-
-    def undo_pipeline(self):
-        """
-        Undo all transforms in the pipeline.
-        
-        Returns:
-            list: Results from each transform undo operation
-        """
-        try:
-            return self.pipeline.undo()
-        except Exception as e:
-            print(f"Error undoing pipeline: {e}")
-            return [] 
+            self.pipeline_yaml = "" 

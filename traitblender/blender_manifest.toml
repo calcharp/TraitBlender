@@ -24,9 +24,19 @@ wheels = [
   "./wheels/tzdata-2025.2-py2.py3-none-any.whl",
   "./wheels/six-1.17.0-py2.py3-none-any.whl",
   "./wheels/PyYAML-6.0.2-cp311-cp311-win_amd64.whl",
+  "./wheels/scipy-1.16.0-cp311-cp311-win_amd64.whl",
 ]
 
-
+[dependencies]
+numpy = "./wheels/numpy-2.2.6-cp311-cp311-win_amd64.whl"
+pandas = "./wheels/pandas-2.2.3-cp311-cp311-win_amd64.whl"
+pillow = "./wheels/pillow-11.2.1-cp311-cp311-win_amd64.whl"
+python_dateutil = "./wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl"
+pytz = "./wheels/pytz-2025.2-py2.py3-none-any.whl"
+PyYAML = "./wheels/PyYAML-6.0.2-cp311-cp311-win_amd64.whl"
+six = "./wheels/six-1.17.0-py2.py3-none-any.whl"
+tzdata = "./wheels/tzdata-2025.2-py2.py3-none-any.whl"
+scipy = "./wheels/scipy-1.16.0-cp311-cp311-win_amd64.whl"
 
 [permissions]
 files = "Needed for reading trait data, assets, and morphospace models"

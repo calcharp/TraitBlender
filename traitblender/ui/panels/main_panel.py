@@ -137,7 +137,7 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
 
         # Transform count
         row = box.row(align=True)
-        row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}")
+        row.label(text=f"Transforms in pipeline: {len(transforms_config)}")
 
 class TRAITBLENDER_PT_imaging_panel(Panel):
     bl_label = "6 Imaging"

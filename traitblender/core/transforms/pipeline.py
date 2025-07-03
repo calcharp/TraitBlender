@@ -17,7 +17,7 @@ class TransformPipeline:
     Example:
         pipeline = TransformPipeline()
         pipeline.add_transform("world.color", "dirichlet", {"alphas": [0.3, 0.3, 0.3, 1]})
-        pipeline.add_transform("camera.location", "normal", {"mu": 0, "sigma": 1, "number": 3})
+        pipeline.add_transform("camera.location", "normal", {"mu": 0, "sigma": 1, "n": 3})
         pipeline.run()  # Execute all transforms
         pipeline.undo()  # Undo all transforms in reverse order
     """
@@ -229,6 +229,14 @@ class TransformPipeline:
         for t_dict in d:
             pipeline._transforms.append(Transform.from_dict(t_dict))
         return pipeline
+
+    def __iter__(self):
+        """Iterate over transforms in the pipeline."""
+        return iter(self._transforms)
+
+    def __setitem__(self, index, value):
+        """Set a transform at a specific index."""
+        self._transforms[index] = value
 
 
 def register():
