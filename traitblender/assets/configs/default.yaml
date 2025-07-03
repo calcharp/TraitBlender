@@ -7,7 +7,7 @@ camera:
   location: [0.0, 0.0, 1.0]
   rotation: [0.0, 0.0, 0.0]
   camera_type: PERSP
-  focal_length: 60.0
+  focal_length: 60
   resolution_x: 1080
   resolution_y: 1080
   resolution_percentage: 100

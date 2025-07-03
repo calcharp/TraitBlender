@@ -2,6 +2,7 @@ import bpy
 import warnings
 import inspect
 import mathutils
+from .property_type_checker import get_property_type
 
 
 def _check_object_dependencies(object_dependencies):
@@ -29,7 +30,50 @@ def _check_object_dependencies(object_dependencies):
     return True
 
 
-def get_property(property_path: str, options: list = None, object_dependencies: dict = None):
+def get_default(property_path: str, prop_type: str):
+    """
+    Get an appropriate default value for a property based on its type.
+    
+    Args:
+        property_path (str): The Blender property path
+        prop_type (str): The property type (e.g., 'FloatVectorProperty', 'IntProperty')
+    
+    Returns:
+        The appropriate default value for the property type
+    """
+    # Define default values for scalar property types
+    scalar_defaults = {
+        'FloatProperty': 0.0,
+        'IntProperty': 0,
+        'BoolProperty': False,
+        'StringProperty': "",
+        'EnumProperty': 0
+    }
+    
+    # Check if it's a scalar property
+    if prop_type in scalar_defaults:
+        return scalar_defaults[prop_type]
+    
+    # Handle vector properties by extracting the scalar type and repeating it
+    if prop_type.endswith('VectorProperty'):
+        # Get the scalar type (e.g., 'Float' from 'FloatVectorProperty')
+        scalar_type = prop_type.replace('VectorProperty', 'Property')
+        if scalar_type in scalar_defaults:
+            # Determine vector length
+            try:
+                current_value = eval(property_path, {"bpy": bpy})
+                vector_length = len(current_value) if hasattr(current_value, '__len__') else 3
+            except Exception:
+                vector_length = 3
+            
+            return tuple([scalar_defaults[scalar_type]] * vector_length)
+    
+    # Fallback for unknown types
+    warnings.warn(f"[TraitBlender] Unknown property type: {prop_type} for property: {property_path}")
+    return 0.0
+
+
+def get_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False):
     """Create a getter function for a Blender property.
     
     Args:
@@ -40,6 +84,8 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
         object_dependencies (dict, optional): Dictionary mapping object types to lists of required names.
                                             If any dependency is missing, the getter returns None.
                                             Example: {"objects": ["Camera"], "cameras": ["Camera"]}
+        strict_error_reporting (bool, optional): If True, raises RuntimeError with property path instead of warning.
+                                               Useful for debugging type mismatches.
     
     Returns:
         function: A getter function that returns the value of the specified Blender property
@@ -57,21 +103,14 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
         ...                       object_dependencies={"cameras": ["Camera"]})
         >>> value = getter(self)  # Returns None if Camera doesn't exist
     """
+    
+    prop_type = get_property_type(property_path, in_config=False)
+    
     def get(self):
-        def _auto_default():
-            # Try to get the property value from the instance using the calling property name
-            prop_val = None
-            try:
-                prop_name = inspect.currentframe().f_back.f_code.co_name
-                prop_val = getattr(self, prop_name, None)
-            except Exception:
-                pass
-            if isinstance(prop_val, mathutils.Vector):
-                return tuple([0.0] * len(prop_val))
-            return 0.0
-
         if not _check_object_dependencies(object_dependencies):
-            val = _auto_default()
+            val = get_default(property_path, prop_type)
+            if strict_error_reporting:
+                raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
             warnings.warn(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()", UserWarning)
             return val if options is None else 0
         try:
@@ -82,14 +121,16 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
                     raise RuntimeError(f"Enum value '{value}' not found in options list: {options}")
                 return options.index(value)
             return value
-        except Exception:
-            val = _auto_default()
+        except Exception as e:
+            val = get_default(property_path, prop_type)
+            if strict_error_reporting:
+                raise RuntimeError(f"[TraitBlender] Error accessing property: {property_path}\nError: {str(e)}")
             warnings.warn(f"[TraitBlender] Error accessing property: {property_path}", UserWarning)
             return val if options is None else 0
     return get
 
 
-def set_property(property_path: str, options: list = None, object_dependencies: dict = None):
+def set_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False):
     """Create a setter function for a Blender property.
     
     Args:
@@ -100,6 +141,8 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
         object_dependencies (dict, optional): Dictionary mapping object types to lists of required names.
                                             If any dependency is missing, the setter does nothing.
                                             Example: {"objects": ["Camera"], "cameras": ["Camera"]}
+        strict_error_reporting (bool, optional): If True, raises RuntimeError with property path instead of warning.
+                                               Useful for debugging type mismatches.
     
     Returns:
         function: A setter function that sets the value of the specified Blender property
@@ -119,6 +162,8 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
     """
     def set(self, value):
         if not _check_object_dependencies(object_dependencies):
+            if strict_error_reporting:
+                raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
             return  # Silently do nothing if dependencies are missing
         
         try:
@@ -135,6 +180,8 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
             exec(f"{property_path} = value", {"bpy": bpy, "value": value})
         except Exception as e:
             import traceback
+            if strict_error_reporting:
+                raise RuntimeError(f"[TraitBlender] Error setting property '{property_path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}")
             warnings.warn(f"Error setting property '{property_path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}", UserWarning)
             raise RuntimeError(f"Failed to set value for property '{property_path}': {e}")
     return set
