@@ -2,7 +2,7 @@ import bpy
 from bpy.types import Panel
 
 class TRAITBLENDER_PT_main_panel(Panel):
-    bl_label = "1) Museum Setup"
+    bl_label = "1 Museum Setup"
     bl_idname = "TRAITBLENDER_PT_main_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -53,7 +53,7 @@ class TRAITBLENDER_PT_main_panel(Panel):
                 prop_row.label(text=f"{prop_name.replace('_', ' ').title()}: # Error - {str(e)}")
 
 class TRAITBLENDER_PT_config_panel(Panel):
-    bl_label = "2) Configuration"
+    bl_label = "2 Configuration"
     bl_idname = "TRAITBLENDER_PT_config_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -62,7 +62,6 @@ class TRAITBLENDER_PT_config_panel(Panel):
     def draw(self, context):
         layout = self.layout
         config = context.scene.traitblender_config
-        layout.label(text="Configuration:")
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
@@ -83,7 +82,7 @@ class TRAITBLENDER_PT_config_panel(Panel):
         TRAITBLENDER_PT_main_panel._draw_section_content(self, layout, section_obj)
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
-    bl_label = "3) Transforms"
+    bl_label = "3 Transforms"
     bl_idname = "TRAITBLENDER_PT_transforms_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -95,20 +94,17 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         layout.separator()
         box = layout.box()
         row = box.row()
-        row.prop(config.transforms, "show", text="", icon='DISCLOSURE_TRI_DOWN' if config.transforms.show else 'DISCLOSURE_TRI_RIGHT', emboss=False)
-        row.label(text="Transforms")
-        if config.transforms.show:
-            transforms_config = config.transforms
+        transforms_config = config.transforms
+        row = box.row()
+        row.prop(transforms_config, "selected_section", text="Section")
+        row = box.row()
+        row.prop(transforms_config, "selected_property", text="Property")
+        if transforms_config.selected_section and transforms_config.selected_property:
+            property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
             row = box.row()
-            row.prop(transforms_config, "selected_section", text="Section")
-            row = box.row()
-            row.prop(transforms_config, "selected_property", text="Property")
-            if transforms_config.selected_section and transforms_config.selected_property:
-                property_path = f"{transforms_config.selected_section}.{transforms_config.selected_property}"
-                row = box.row()
-                row.label(text=f"Path: {property_path}")
-            row = box.row(align=True)
-            row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
-            row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
-            row = box.row()
-            row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}") 
+            row.label(text=f"Path: {property_path}")
+        row = box.row(align=True)
+        row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
+        row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
+        row = box.row()
+        row.label(text=f"Transforms in pipeline: {transforms_config.get_transform_count()}") 
