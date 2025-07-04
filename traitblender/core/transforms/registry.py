@@ -55,17 +55,11 @@ def uniform_sampler(low: float, high: float, n: int = None) -> float | list[floa
     return [float(s) for s in samples]
 
 @register_transform('normal')
-def normal_sampler(mu: float, sigma: float, n: int = None, cov: list[list[float]] = None) -> float | list[float] | list[list[float]]:
-    if cov is not None:
-        samples = np.random.multivariate_normal(mu, cov, n or 1)
-        if n is None:
-            return [float(x) for x in samples[0]]
-        return [[float(x) for x in s] for s in samples]
-    else:
-        samples = np.random.normal(mu, sigma, n or 1)
-        if n is None:
-            return float(samples[0])
-        return [float(s) for s in samples]
+def normal_sampler(mu: float, sigma: float, n: int = None) -> float | list[float]:
+    samples = np.random.normal(mu, sigma, n or 1)
+    if n is None:
+        return float(samples[0])
+    return [float(s) for s in samples]
 
 @register_transform('beta')
 def beta_sampler(a: float, b: float, n: int = None) -> float | list[float]:
