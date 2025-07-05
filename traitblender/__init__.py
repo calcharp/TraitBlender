@@ -10,10 +10,14 @@ def register():
     import bpy
     from .core.helpers import init_user_dirs
     from .core import configs, configure_traitblender
+    from .core.datasets import register as datasets_register
     from .ui import register as ui_register
 
     print(f"configs: {configs}")
     configure_traitblender()
+
+    # Register datasets
+    datasets_register()
 
     # Register UI components
     ui_register()
@@ -35,7 +39,10 @@ def register():
 def unregister():
     """Unregister all add-on classes"""
     from .ui import unregister as ui_unregister
+    from .core.datasets import unregister as datasets_unregister
+    
     ui_unregister()
+    datasets_unregister()
     
         
 if __name__ == "__main__":

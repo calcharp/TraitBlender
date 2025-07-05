@@ -102,8 +102,15 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        # Empty for now
-        pass
+        dataset = context.scene.traitblender_dataset
+        
+        # File format selection row
+        row = layout.row(align=True)
+        row.prop(dataset, "ext", text="Format")
+        
+        # Dataset file path row
+        row = layout.row(align=True)
+        row.prop(dataset, "filepath", text="Dataset File")
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
     bl_label = "5 Transforms"
