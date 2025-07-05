@@ -104,13 +104,13 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         layout = self.layout
         dataset = context.scene.traitblender_dataset
         
-        # File format selection row
-        row = layout.row(align=True)
-        row.prop(dataset, "ext", text="Format")
-        
         # Dataset file path row
         row = layout.row(align=True)
         row.prop(dataset, "filepath", text="Dataset File")
+        
+        # Edit dataset button
+        row = layout.row(align=True)
+        row.operator("traitblender.edit_dataset", text="Edit Dataset")
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
     bl_label = "5 Transforms"

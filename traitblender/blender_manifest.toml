@@ -25,6 +25,9 @@ wheels = [
   "./wheels/six-1.17.0-py2.py3-none-any.whl",
   "./wheels/PyYAML-6.0.2-cp311-cp311-win_amd64.whl",
   "./wheels/scipy-1.16.0-cp311-cp311-win_amd64.whl",
+  "./wheels/et_xmlfile-2.0.0-py3-none-any.whl",
+  "./wheels/openpyxl-3.1.5-py2.py3-none-any.whl",
+  "./wheels/tcinter-0.0.6-cp311-cp311-win_amd64.whl"
 ]
 
 [dependencies]
@@ -37,6 +40,9 @@ PyYAML = "./wheels/PyYAML-6.0.2-cp311-cp311-win_amd64.whl"
 six = "./wheels/six-1.17.0-py2.py3-none-any.whl"
 tzdata = "./wheels/tzdata-2025.2-py2.py3-none-any.whl"
 scipy = "./wheels/scipy-1.16.0-cp311-cp311-win_amd64.whl"
+et_xmlfile = "./wheels/et_xmlfile-2.0.0-py3-none-any.whl"
+openpyxl = "./wheels/openpyxl-3.1.5-py2.py3-none-any.whl"
+tcinter = "./wheels/tcinter-0.0.6-cp311-cp311-win_amd64.whl"
 
 [permissions]
 files = "Needed for reading trait data, assets, and morphospace models"

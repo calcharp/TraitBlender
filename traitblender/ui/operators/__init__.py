@@ -24,6 +24,10 @@ from .transforms_operators import (
     TRAITBLENDER_OT_undo_pipeline,
 )
 
+### Dataset Operators
+from .import_dataset_operator import TRAITBLENDER_OT_import_dataset
+from .edit_dataset_operator import TRAITBLENDER_OT_edit_dataset
+
 classes = [
     TRAITBLENDER_OT_setup_scene,
     TRAITBLENDER_OT_clear_scene,
@@ -32,6 +36,8 @@ classes = [
     TRAITBLENDER_OT_export_config,
     TRAITBLENDER_OT_run_pipeline,
     TRAITBLENDER_OT_undo_pipeline,
+    TRAITBLENDER_OT_import_dataset,
+    TRAITBLENDER_OT_edit_dataset,
 ]
 
 

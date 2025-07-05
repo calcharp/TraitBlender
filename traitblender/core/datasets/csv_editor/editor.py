@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
 import pandas as pd
 from io import StringIO
 from copy import deepcopy
@@ -18,8 +16,9 @@ def edit_table_string(initial_string):
     Returns:
         str: The modified string after editing, or None if cancelled
     """
-    # Check for Excel support
-    has_excel_support = importlib.util.find_spec("openpyxl") is not None
+
+    import tcinter as tk
+    from tkinter import ttk, filedialog, messagebox
 
     # Let pandas infer types automatically
     try:
@@ -1185,75 +1184,12 @@ def edit_table_string(initial_string):
     
     return result_string[0]
 
-def create_example_data():
-    # Create column headers
-    headers = [
-        "ID", "Name", "Age", "Height", "Weight", "Active", "Email",
-        "Phone", "Birthday", "Balance", "Last Login", "Premium",
-        "Score", "Rating", "Status", "Region", "Joined Date",
-        "Points", "Level", "Verified"
-    ]
-    
-    # Sample data generation helpers
-    import random
-    from datetime import datetime, timedelta
-    
-    def random_date(start_year=2020):
-        days = random.randint(0, 1095)  # Up to 3 years of dates
-        base = datetime(start_year, 1, 1)
-        date = base + timedelta(days=days)
-        return date.strftime("%Y-%m-%d")
-    
-    def random_phone():
-        return f"{random.randint(100,999)}-{random.randint(100,999)}-{random.randint(1000,9999)}"
-    
-    # Create sample data
-    data = []
-    for i in range(1000):  # 1000 rows of data
-        row = [
-            str(i + 1001),  # ID
-            f"User {chr(65 + i)}",  # Name
-            str(random.randint(18, 65)),  # Age
-            f"{random.uniform(1.50, 2.00):.2f}",  # Height in meters
-            str(random.randint(50, 100)),  # Weight in kg
-            str(random.choice([True, False])),  # Active
-            f"user{chr(97 + i)}@example.com",  # Email
-            random_phone(),  # Phone
-            random_date(2000),  # Birthday
-            f"${random.uniform(100, 10000):.2f}",  # Balance
-            random_date(2023),  # Last Login
-            str(random.choice([True, False])),  # Premium
-            str(random.randint(0, 100)),  # Score
-            f"{random.uniform(1, 5):.1f}",  # Rating
-            random.choice(["Active", "Pending", "Inactive"]),  # Status
-            random.choice(["North", "South", "East", "West"]),  # Region
-            random_date(2020),  # Joined Date
-            str(random.randint(1000, 50000)),  # Points
-            str(random.randint(1, 100)),  # Level
-            str(random.choice([True, False]))  # Verified
-        ]
-        data.append(",".join(row))
-    
-    return ",".join(headers) + "\n" + "\n".join(data)
-
-if __name__ == "__main__":
-    # Example usage
-    sample_data = create_example_data()
-    # Print the head of the CSV before opening
-    import pandas as pd
-    from io import StringIO
-    print("=== CSV HEAD BEFORE ===")
-    print(pd.read_csv(StringIO(sample_data)).head())
-    print("======================\n")
-    result = edit_table_string(sample_data)
-    if result:
-        print("=== CSV RETURNED AFTER (HEAD) ===")
-        print(pd.read_csv(StringIO(result)).head())
-        print("==========================")
-    else:
-        print("No changes were saved")
 
 def populate_tree(tree, data_string):
+
+    import tkinter as tk
+    from tkinter import ttk, filedialog, messagebox
+
     # Clear existing items
     tree.delete(*tree.get_children())
     
