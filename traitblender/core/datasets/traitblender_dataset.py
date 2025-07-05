@@ -1,5 +1,5 @@
 import bpy
-from bpy.props import StringProperty
+from bpy.props import StringProperty, EnumProperty
 import pandas as pd
 import os
 from io import StringIO
@@ -71,6 +71,13 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
         default="",
         subtype='FILE_PATH',
         update=update_filepath
+    )
+    
+    sample: EnumProperty(
+        name="Sample",
+        description="Select a sample from the dataset",
+        items=lambda self, context: [(name, name, "") for name in self.rownames],
+        default=0
     )
     
     def _get_dataframe(self):

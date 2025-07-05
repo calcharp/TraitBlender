@@ -111,6 +111,10 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         # Edit dataset button
         row = layout.row(align=True)
         row.operator("traitblender.edit_dataset", text="Edit Dataset")
+        
+        # Sample selection dropdown
+        row = layout.row(align=True)
+        row.prop(dataset, "sample", text="Sample")
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
     bl_label = "5 Transforms"
