@@ -3,7 +3,7 @@ from .context_wrapper import dpg_context
 from .csv_handlers import get_table
 from .pd_to_gui import pd_to_gui
 from .left_sidebar import create_sidebar
-from .themes import create_theme
+from .header import create_header
 
 @dpg_context
 def gui(datatable: str) -> str | None:
@@ -12,6 +12,7 @@ def gui(datatable: str) -> str | None:
     pd_to_gui(df)
 
     create_sidebar()
+    create_header()
 
     with dpg.window(tag='Background'):
         pass
