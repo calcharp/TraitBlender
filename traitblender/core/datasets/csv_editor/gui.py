@@ -10,8 +10,8 @@ def gui(datatable: str) -> str | None:
 
     df = get_table(datatable)
     pd_to_gui(df)
+
     create_sidebar()
-    create_theme()
 
     with dpg.window(tag='Background'):
         pass
