@@ -27,7 +27,8 @@ class TRAITBLENDER_OT_edit_dataset(Operator):
         
         try:
             # Call the CSV editor with the current CSV string
-            gui(dataset.csv)
+            result = gui(dataset.csv)
+            print(result)
             
             # If result is not None, update the dataset
             # if result is not None:

@@ -6,7 +6,7 @@ def pd_to_gui(df: pd.DataFrame) -> None:
     Convert a pandas dataframe to a gui table
     """
     with dpg.window(label="Dataset", no_move=True, no_title_bar=True, no_resize=True, no_background=True, no_collapse=True, menubar=False,pos=(200, 100), height=500, width=700):
-        with dpg.table(header_row=True, tag="data_table"):
+        with dpg.table(header_row=True, row_background=True, borders_innerH=True, borders_innerV=True, borders_outerH=True, borders_outerV=True, tag="data_table"):
             # Add columns
             for column in df.columns:
                 dpg.add_table_column(label=column)

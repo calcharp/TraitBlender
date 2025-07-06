@@ -7,8 +7,7 @@ def dpg_context(fxn):
     def wrapper(*args, **kwargs):
         # setup the context
         dpg.create_context()
-        # run the function
-        fxn(*args, **kwargs)
+        result = fxn(*args, **kwargs)
         # start the engine
         dpg.setup_dearpygui()
         # show the viewport
@@ -17,4 +16,5 @@ def dpg_context(fxn):
         dpg.start_dearpygui()
         # destroy the context
         dpg.destroy_context()
+        return result
     return wrapper
