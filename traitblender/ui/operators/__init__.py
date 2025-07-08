@@ -7,37 +7,27 @@ Operators handle user actions and commands.
 
 import bpy
 
-# Scene Setup Operators
-from .setup_scene_operator import TRAITBLENDER_OT_setup_scene
-from .clear_scene_operator import TRAITBLENDER_OT_clear_scene
-
-### Configuration Operators
-from .configure_traitblender import (
-    TRAITBLENDER_OT_configure_scene,
-    TRAITBLENDER_OT_show_configuration,
-    TRAITBLENDER_OT_export_config
+from . import (
+    setup_scene_operator,
+    clear_scene_operator,
+    configure_traitblender,
+    import_dataset_operator,
+    edit_dataset_operator,
+    transforms_operators,
+    generate_morphospace_sample_operator,
 )
-
-### Transform Operators
-from .transforms_operators import (
-    TRAITBLENDER_OT_run_pipeline,
-    TRAITBLENDER_OT_undo_pipeline,
-)
-
-### Dataset Operators
-from .import_dataset_operator import TRAITBLENDER_OT_import_dataset
-from .edit_dataset_operator import TRAITBLENDER_OT_edit_dataset
 
 classes = [
-    TRAITBLENDER_OT_setup_scene,
-    TRAITBLENDER_OT_clear_scene,
-    TRAITBLENDER_OT_configure_scene,
-    TRAITBLENDER_OT_show_configuration,
-    TRAITBLENDER_OT_export_config,
-    TRAITBLENDER_OT_run_pipeline,
-    TRAITBLENDER_OT_undo_pipeline,
-    TRAITBLENDER_OT_import_dataset,
-    TRAITBLENDER_OT_edit_dataset,
+    setup_scene_operator.TRAITBLENDER_OT_setup_scene,
+    clear_scene_operator.TRAITBLENDER_OT_clear_scene,
+    configure_traitblender.TRAITBLENDER_OT_configure_scene,
+    configure_traitblender.TRAITBLENDER_OT_show_configuration,
+    configure_traitblender.TRAITBLENDER_OT_export_config,
+    import_dataset_operator.TRAITBLENDER_OT_import_dataset,
+    edit_dataset_operator.TRAITBLENDER_OT_edit_dataset,
+    transforms_operators.TRAITBLENDER_OT_run_pipeline,
+    transforms_operators.TRAITBLENDER_OT_undo_pipeline,
+    generate_morphospace_sample_operator.TRAITBLENDER_OT_generate_morphospace_sample,
 ]
 
 
@@ -46,9 +36,10 @@ def register():
     for cls in r_classes:
         bpy.utils.register_class(cls)
 
+
 def unregister():
     r_classes = classes
     for cls in r_classes:
         bpy.utils.unregister_class(cls)
-    
+
 __all__ = ["register", "unregister"] 

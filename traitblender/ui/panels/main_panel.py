@@ -21,6 +21,10 @@ class TRAITBLENDER_PT_main_panel(Panel):
         # Configure Scene button row
         row = layout.row(align=True)
         row.operator("traitblender.configure_scene", text="Configure Scene")
+        layout.separator()
+        # Available morphospaces row
+        row = layout.row(align=True)
+        row.prop(context.scene.traitblender_setup, "available_morphospaces", text="Morphospace")
 
     # Helper methods for config panel
     def _draw_config_section(self, layout, section_name, section_obj):
@@ -90,8 +94,15 @@ class TRAITBLENDER_PT_morphospaces_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        # Empty for now
-        pass
+        setup = context.scene.traitblender_setup
+        
+        # Morphospace selection dropdown
+        row = layout.row(align=True)
+        row.prop(setup, "available_morphospaces", text="Morphospace")
+        
+        # Generate sample button
+        row = layout.row(align=True)
+        row.operator("traitblender.generate_morphospace_sample", text="Generate Sample", icon='ADD')
 
 class TRAITBLENDER_PT_datasets_panel(Panel):
     bl_label = "4 Datasets"
