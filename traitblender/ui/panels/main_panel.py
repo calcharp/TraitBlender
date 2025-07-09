@@ -69,7 +69,7 @@ class TRAITBLENDER_PT_config_panel(Panel):
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
-                if section_name == "transforms":
+                if section_name in ["transforms", "sample"]:
                     continue
                 self._draw_config_section(layout, section_name, section_obj)
         else:
@@ -99,10 +99,6 @@ class TRAITBLENDER_PT_morphospaces_panel(Panel):
         # Morphospace selection dropdown
         row = layout.row(align=True)
         row.prop(setup, "available_morphospaces", text="Morphospace")
-        
-        # Generate sample button
-        row = layout.row(align=True)
-        row.operator("traitblender.generate_morphospace_sample", text="Generate Sample", icon='ADD')
 
 class TRAITBLENDER_PT_datasets_panel(Panel):
     bl_label = "4 Datasets"
@@ -114,6 +110,7 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
     def draw(self, context):
         layout = self.layout
         dataset = context.scene.traitblender_dataset
+        setup = context.scene.traitblender_setup
         
         # Dataset file path row
         row = layout.row(align=True)
@@ -126,6 +123,20 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         # Sample selection dropdown
         row = layout.row(align=True)
         row.prop(dataset, "sample", text="Sample")
+        
+        # Generate sample button
+        row = layout.row(align=True)
+        row.operator("traitblender.generate_morphospace_sample", text="Generate Sample", icon='ADD')
+        
+        # Sample controls (only show if a sample is selected and exists)
+        if dataset.sample and dataset.sample in bpy.data.objects:
+            layout.separator()
+            box = layout.box()
+            box.label(text="Sample Controls", icon='OBJECT_DATA')
+            
+            sample_config = context.scene.traitblender_config.sample
+            box.prop(sample_config, "location", text="Location")
+            box.prop(sample_config, "rotation", text="Rotation")
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
     bl_label = "5 Transforms"
