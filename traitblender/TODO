@@ -2,3 +2,5 @@
 Get the transforms GUI fully set up
 
 Get the interactive dataset editor to cooperate
+
+TODO: Fix TransformPipelineConfig undo functionality - the undo operation doesn't work correctly when using the config wrapper, but works fine with direct TransformPipeline instances. The issue is likely related to serialization/deserialization of the pipeline state and undo history.

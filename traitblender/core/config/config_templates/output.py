@@ -26,3 +26,10 @@ class OutputConfig(TraitBlenderConfig):
         default="",
         subtype='DIR_PATH'
     )
+
+    images_per_view: bpy.props.IntProperty(
+        name="Images Per View",
+        description="Number of images to generate per view per specimen",
+        default=1,
+        min=1
+    )

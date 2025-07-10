@@ -10,6 +10,7 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
 
     _timer = None
     _sample_index = 0
+    _image_index = 0
     _running = False
 
     def modal(self, context, event):
@@ -27,33 +28,43 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                 self.cancel(context)
                 return {'FINISHED'}
             
-            # Apply all transforms at the start of the cycle
+            # Get images_per_view from output config
+            output_config = context.scene.traitblender_config.output
+            images_per_view = output_config.images_per_view
+            
+            # Apply transforms for this image
             transforms_config = context.scene.traitblender_config.transforms
             if len(transforms_config) > 0:
                 try:
                     transforms_config.run()
-                    transforms_config.run_pipeline()
-                    print(f"Applied transforms for sample {self._sample_index + 1}")
+                    print(f"Applied transforms for sample {self._sample_index + 1}, image {self._image_index + 1}")
                 except Exception as e:
                     print(f"Error applying transforms: {e}")
             
-            # Update the sample value
-            dataset.sample = rownames[self._sample_index]
-            # Refresh the UI
-            for window in context.window_manager.windows:
-                for area in window.screen.areas:
-                    if area.type == 'VIEW_3D':
-                        area.tag_redraw()
+            # Update the sample value (only on first image of each specimen)
+            if self._image_index == 0:
+                dataset.sample = rownames[self._sample_index]
+                # Refresh the UI
+                for window in context.window_manager.windows:
+                    for area in window.screen.areas:
+                        if area.type == 'VIEW_3D':
+                            area.tag_redraw()
             
-            # Undo all transforms before moving to the next sample
+            # Undo transforms before moving to next image/specimen
             if len(transforms_config) > 0:
                 try:
-                    transforms_config.undo_pipeline()
-                    print(f"Undid transforms for sample {self._sample_index + 1}")
+                    transforms_config.undo()
+                    print(f"Undid transforms for sample {self._sample_index + 1}, image {self._image_index + 1}")
                 except Exception as e:
                     print(f"Error undoing transforms: {e}")
             
-            self._sample_index += 1
+            # Move to next image or specimen
+            self._image_index += 1
+            if self._image_index >= images_per_view:
+                # Move to next specimen
+                self._sample_index += 1
+                self._image_index = 0
+                
         return {'PASS_THROUGH'}
 
     def execute(self, context):
@@ -61,6 +72,7 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
             self.report({'WARNING'}, "Imaging pipeline is already running.")
             return {'CANCELLED'}
         self._sample_index = 0
+        self._image_index = 0
         self._running = True
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.5, window=context.window)  # 0.5 seconds per sample
@@ -74,5 +86,6 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
         self._running = False
         self._timer = None
         self._sample_index = 0
+        self._image_index = 0
         self.report({'INFO'}, "Imaging pipeline cancelled.")
         return {'CANCELLED'} 
