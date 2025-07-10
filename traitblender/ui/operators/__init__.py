@@ -15,6 +15,7 @@ from . import (
     edit_dataset_operator,
     transforms_operators,
     generate_morphospace_sample_operator,
+    imaging_pipeline_operator,
 )
 
 classes = [
@@ -28,6 +29,7 @@ classes = [
     transforms_operators.TRAITBLENDER_OT_run_pipeline,
     transforms_operators.TRAITBLENDER_OT_undo_pipeline,
     generate_morphospace_sample_operator.TRAITBLENDER_OT_generate_morphospace_sample,
+    imaging_pipeline_operator.TRAITBLENDER_OT_imaging_pipeline,
 ]
 
 

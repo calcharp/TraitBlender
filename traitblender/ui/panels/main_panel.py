@@ -181,5 +181,6 @@ class TRAITBLENDER_PT_imaging_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        # Empty for now
-        pass 
+        # Imaging pipeline button
+        row = layout.row(align=True)
+        row.operator("traitblender.imaging_pipeline", text="Run Imaging Pipeline", icon='PLAY') 
