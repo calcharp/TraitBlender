@@ -122,7 +122,7 @@ class TransformPipeline:
             transform_index = i + 1
             print(f"\n--- Undoing Transform {transform_index}/{len(self._transforms)} ---")
             try:
-                transform.undo()
+                transform.undo_all()
                 undo_results.append(True)
                 print(f"✓ Transform {transform_index} undone successfully")
             except Exception as e:

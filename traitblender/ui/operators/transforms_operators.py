@@ -13,7 +13,7 @@ class TRAITBLENDER_OT_run_pipeline(Operator):
         """Execute the run pipeline operation"""
         try:
             transforms_config = context.scene.traitblender_config.transforms
-            results = transforms_config.run_pipeline()
+            results = transforms_config.run()
             
             if results:
                 self.report({'INFO'}, f"Pipeline executed successfully with {len(results)} transforms")
@@ -39,7 +39,7 @@ class TRAITBLENDER_OT_undo_pipeline(Operator):
         """Execute the undo pipeline operation"""
         try:
             transforms_config = context.scene.traitblender_config.transforms
-            results = transforms_config.undo_pipeline()
+            results = transforms_config.undo()
             
             if results:
                 self.report({'INFO'}, f"Pipeline undone successfully with {len(results)} transforms")

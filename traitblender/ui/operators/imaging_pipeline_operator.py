@@ -26,6 +26,17 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                 self.report({'INFO'}, "Finished iterating through all samples.")
                 self.cancel(context)
                 return {'FINISHED'}
+            
+            # Apply all transforms at the start of the cycle
+            transforms_config = context.scene.traitblender_config.transforms
+            if len(transforms_config) > 0:
+                try:
+                    transforms_config.run()
+                    transforms_config.run_pipeline()
+                    print(f"Applied transforms for sample {self._sample_index + 1}")
+                except Exception as e:
+                    print(f"Error applying transforms: {e}")
+            
             # Update the sample value
             dataset.sample = rownames[self._sample_index]
             # Refresh the UI
@@ -33,6 +44,15 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                 for area in window.screen.areas:
                     if area.type == 'VIEW_3D':
                         area.tag_redraw()
+            
+            # Undo all transforms before moving to the next sample
+            if len(transforms_config) > 0:
+                try:
+                    transforms_config.undo_pipeline()
+                    print(f"Undid transforms for sample {self._sample_index + 1}")
+                except Exception as e:
+                    print(f"Error undoing transforms: {e}")
+            
             self._sample_index += 1
         return {'PASS_THROUGH'}
 
