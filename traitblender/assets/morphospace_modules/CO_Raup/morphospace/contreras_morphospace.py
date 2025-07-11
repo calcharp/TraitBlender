@@ -11,7 +11,7 @@ class Contreras_MORPHOSPACE():
 
     def generate_sample(self, name="Shell", b = .1, d = 4, z = 0, a = 1, phi = 0, psi = 0, 
                          c_depth=0.1, c_n = 70, n_depth = 0, n = 0, t = 20, time_step = .25/30, 
-                         points_in_circle=40, eps=0.8, h_0=0.1):
+                         points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
 
         t_values = np.arange(0, t, time_step)
         theta_values = np.arange(0, 2*np.pi, np.pi/points_in_circle)
@@ -79,6 +79,24 @@ class Contreras_MORPHOSPACE():
             "inner_surface": inner_surface,
             "aperture": np.vstack((outer_surface[-1], inner_surface[-1]))
         }
+
+        # Calculate the current length along the x-axis and apply scaling
+        if length is not None:
+            # Get all x coordinates from the shell data
+            all_x_coords = []
+            all_x_coords.extend(outer_surface[:, :, 0].flatten())
+            all_x_coords.extend(inner_surface[:, :, 0].flatten())
+            all_x_coords.extend(shell["aperture"][:, 0])
+            
+            x_length_current = max(all_x_coords) - min(all_x_coords)
+            
+            # Calculate the scale factor
+            scale_factor = length / x_length_current if x_length_current != 0 else 1
+            
+            # Apply scaling to all shell data
+            shell["outer_surface"] = outer_surface * scale_factor
+            shell["inner_surface"] = inner_surface * scale_factor
+            shell["aperture"] = shell["aperture"] * scale_factor
 
         return Contreras_MORPHOSPACE_SAMPLE(
             name = name,

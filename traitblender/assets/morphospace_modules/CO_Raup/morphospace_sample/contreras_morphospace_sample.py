@@ -9,7 +9,7 @@ class Contreras_MORPHOSPACE_SAMPLE():
         self.name = name
         self.data = data
 
-    def to_blender(self, length=.015, smooth=True):
+    def to_blender(self):
 
         def create_uv_map_from_grid(obj, cols):
             """
@@ -187,32 +187,13 @@ class Contreras_MORPHOSPACE_SAMPLE():
         obj = bpy.context.active_object
         obj.name = self.name
 
-        # Access mesh data from the object
-        mesh = obj.data
-
-        # Calculate the current max length along the x-axis
-        x_coords = [vert.co.x for vert in mesh.vertices]
-        x_length_current = max(x_coords) - min(x_coords)
-
-        # Desired length along the x-axis (based on your 'length' parameter)
-        length_desired = length
-
-        # Calculate the scale factor
-        scale_factor = length_desired / x_length_current if x_length_current != 0 else 1
-
-        # Apply scale to the object, not directly to the mesh
-        obj.scale.x *= scale_factor
-        obj.scale.y *= scale_factor
-        obj.scale.z *= scale_factor
-
         bpy.context.view_layer.objects.active = obj
         bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME')
 
         # Move the object to the global origin
-        if smooth:
-            bpy.context.view_layer.objects.active = obj
-            obj.select_set(True)
-            bpy.ops.object.shade_smooth()
+        bpy.context.view_layer.objects.active = obj
+        obj.select_set(True)
+        bpy.ops.object.shade_smooth()
         
 
         # Update the scene

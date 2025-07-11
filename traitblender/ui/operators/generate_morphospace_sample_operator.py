@@ -67,22 +67,20 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             print(f"Calling {morphospace_name}.sample with name={selected_sample_name} and params={params}")
             try:
                 sample_obj = sample_func(name=selected_sample_name, **params)
-                sample_obj.to_blender(length=0.015, smooth=True)
+                sample_obj.to_blender()
+
+                bpy.context.view_layer.update()
                 
                 # Get the generated object
-                generated_obj = bpy.data.objects.get(selected_sample_name)
-                if generated_obj:
-                    # Get the mat object to position the generated object
-                    mat_obj = bpy.data.objects.get("Mat")
-                    if mat_obj:
-                        generated_obj.table_coords = mat_obj.table_coords
-                        print(f"Positioned {selected_sample_name} at mat table location {mat_obj.table_coords}")
+                try:
+                    if bpy.data.objects.get("Table"):
+                        bpy.data.objects.get(selected_sample_name).table_coords = (0.0,0.0,0.0)
+                        print(f"Set table coordinates for {selected_sample_name} to {bpy.data.objects.get(selected_sample_name).table_coords}")
                     else:
-                        # Fallback: position at world origin
-                        generated_obj.location = (0.0, 0.0, 0.0)
-                        print(f"Positioned {selected_sample_name} at world origin (0, 0, 0)")
-                else:
-                    print(f"Warning: Generated object {selected_sample_name} not found")
+                        bpy.data.objects.get(selected_sample_name).location = (0.0, 0.0, 0.0)
+                        print(f"Set location for {selected_sample_name} to {bpy.data.objects.get(selected_sample_name).location}")
+                except Exception as e:
+                    print(f"Warning: Failed to set table coordinates for {selected_sample_name}: {e}")
                 
                 self.report({'INFO'}, f"Generated morphospace sample: {selected_sample_name}")
             except Exception as e:

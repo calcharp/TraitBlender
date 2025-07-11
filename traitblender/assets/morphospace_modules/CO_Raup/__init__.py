@@ -3,7 +3,7 @@ from .morphospace_sample.contreras_morphospace_sample import Contreras_MORPHOSPA
 
 def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0, 
            c_depth=0.1, c_n=70, n_depth=0, n=0, t=20, time_step=0.25/30, 
-           points_in_circle=40, eps=0.8, h_0=0.1):
+           points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
     """
     Generate a shell sample using the Contreras morphospace model.
     
@@ -24,6 +24,7 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
         points_in_circle (int): Number of points around each shell ring
         eps (float): Thickness parameter
         h_0 (float): Base thickness parameter
+        length (float): Desired length of the shell in meters
     
     Returns:
         Contreras_MORPHOSPACE_SAMPLE: A shell sample object that can be converted to Blender
@@ -33,7 +34,7 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
         name=name, b=b, d=d, z=z, a=a, phi=phi, psi=psi,
         c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, t=t, 
         time_step=time_step, points_in_circle=points_in_circle, 
-        eps=eps, h_0=h_0
+        eps=eps, h_0=h_0, length=length
     )
 
 __all__ = ['sample'] 
