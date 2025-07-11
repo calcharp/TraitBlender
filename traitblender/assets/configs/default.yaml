@@ -4,7 +4,7 @@
 # You can edit these values to change the default scene setup.
 ---
 camera:
-  location: [0.0, 0.0, 1.0]
+  location_table: [0.0, 0.0, 42.0]
   rotation: [0.0, 0.0, 0.0]
   camera_type: PERSP
   focal_length: 60
@@ -17,7 +17,7 @@ camera:
   shift_y: 0.0
   lens_unit: MILLIMETERS
 lamp:
-  location: [0.0, 0.0, 1.0]
+  location_table: [0.0, 0.0, 42.0]
   rotation: [0.0, -0.0, 0.0]
   scale: [1.0, 1.0, 1.0]
   color: [1.0, 1.0, 1.0]
@@ -28,7 +28,7 @@ lamp:
   shadow: true
   diffuse: 1.0
 mat:
-  location: [0.0, 0.0, 0.5849999785423279]
+  location_table: [0.0, 0.0, 0.0]
   rotation: [0.0, -0.0, 0.0]
   scale: [0.125, 0.125, 1.0]
   color: [0.0, 0.0, 0.0, 1.0]

@@ -15,6 +15,15 @@ class CameraConfig(TraitBlenderConfig):
         set=set_property("bpy.data.objects['Camera'].location", 
                         object_dependencies={"objects": ["Camera"]})
     )
+    # Normalized table coordinates
+    location_table: bpy.props.FloatVectorProperty(
+        name="Location (Table-Normalized)",
+        description="Camera location in normalized table coordinates (-1 to 1 on X/Y, meters on Z)",
+        default=(0.0, 0.0, 0.0),
+        subtype='TRANSLATION',
+        get=get_property("bpy.data.objects['Camera'].table_coords_norm", object_dependencies={"objects": ["Camera", "Table"]}),
+        set=set_property("bpy.data.objects['Camera'].table_coords_norm", object_dependencies={"objects": ["Camera", "Table"]})
+    )
     rotation: bpy.props.FloatVectorProperty(
         name="Rotation",
         description="The rotation of the camera",
