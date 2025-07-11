@@ -13,7 +13,7 @@ Scene Assets are the core building blocks of TraitBlender, providing object-orie
 Abstract base class for managing Blender objects with enhanced transformation capabilities.
 
 ```python
-from traitblender.core.scene_assets import SceneAsset
+from traitblender.core.positioning import SceneAsset
 ```
 
 #### Constructor
@@ -127,7 +127,7 @@ Set the object's origin with extended options beyond standard Blender functional
 A concrete implementation of SceneAsset that can be instantiated directly.
 
 ```python
-from traitblender.core.scene_assets import GenericAsset
+from traitblender.core.positioning import GenericAsset
 
 # Create an asset for an existing Blender object
 asset = GenericAsset("Suzanne")
@@ -142,7 +142,7 @@ asset = GenericAsset("Suzanne")
 A specialized SceneAsset that provides a surface interface for placing other objects. The surface is defined by the upper face of the object's bounding box with a -1 to 1 coordinate grid.
 
 ```python
-from traitblender.core.scene_assets import SurfaceAsset
+from traitblender.core.positioning import SurfaceAsset
 
 # Create a surface asset (typically for tables, platforms, etc.)
 table = SurfaceAsset("Cube")
@@ -196,11 +196,12 @@ Place an asset on the surface at the given coordinates. The asset will be positi
 
 ### Basic Asset Manipulation
 ```python
-from traitblender.core.scene_assets import GenericAsset
+from traitblender.core.positioning import GenericAsset
 import math
 
 # Create an asset for an existing object
 specimen = GenericAsset("SpecimenMesh")
+```
 
 # Position and orient the specimen
 specimen.location = (0, 0, 2)
@@ -213,7 +214,7 @@ specimen.origin_set(type="BOTTOM_CENTER")
 
 ### Surface Placement
 ```python
-from traitblender.core.scene_assets import SurfaceAsset, GenericAsset
+from traitblender.core.positioning import SurfaceAsset, GenericAsset
 
 # Create surface and objects
 table = SurfaceAsset("TableMesh")

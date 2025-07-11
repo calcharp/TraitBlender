@@ -21,8 +21,8 @@ from .helpers import (
     clear_scene,
 )
 
-# Scene Assets (currently empty)
-# from .scene_assets import (
+# Positioning (currently empty)
+# from .positioning import (
 #     # No exports currently available
 # )
 
@@ -50,7 +50,7 @@ __all__ = [
     "check_object_exists",
     "clear_scene",
     
-    # Scene Assets (currently empty)
+    # Positioning
     # "ASSET_TYPES",
     # "scene_asset",
     # "with_scene_asset",

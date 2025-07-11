@@ -41,7 +41,7 @@ bpy.ops.import_scene.obj(filepath="/path/to/your/specimen.obj")
 ### 2.1 Create a Scene Asset for Your Specimen
 
 ```python
-from traitblender.core.scene_assets import GenericAsset
+from traitblender.core.positioning import GenericAsset
 
 # Create an asset for your imported specimen
 # Replace "SpecimenName" with your actual object name
@@ -54,7 +54,7 @@ specimen.origin_set(type="BOTTOM_CENTER")
 ### 2.2 Create a Surface for Specimen Placement
 
 ```python
-from traitblender.core.scene_assets import SurfaceAsset
+from traitblender.core.positioning import SurfaceAsset
 
 # Add a plane as a base/table
 bpy.ops.mesh.primitive_plane_add(size=10, location=(0, 0, 0))
@@ -308,7 +308,7 @@ Here's a complete script that implements this tutorial:
 import bpy
 import math
 import os
-from traitblender.core.scene_assets import GenericAsset, SurfaceAsset
+from traitblender.core.positioning import GenericAsset
 
 def setup_basic_specimen_imaging(specimen_path, output_dir):
     # Clear scene
