@@ -5,23 +5,14 @@ from ...helpers import get_property, set_property
 class MatConfig(TraitBlenderConfig):
     print_index = 4
 
+    # Table coordinates in meters
     location: bpy.props.FloatVectorProperty(
-        name="Mat Location",
-        description="The location of the Mat",
-        subtype='TRANSLATION',
-        get=get_property("bpy.data.objects['Mat'].location",
-                        object_dependencies={"objects": ["Mat"]}),
-        set=set_property("bpy.data.objects['Mat'].location",
-                        object_dependencies={"objects": ["Mat"]})
-    )
-    # Normalized table coordinates (clamped with min/max)
-    location_table: bpy.props.FloatVectorProperty(
-        name="Mat Location (Table-Normalized)",
-        description="Mat location in normalized table coordinates (-1 to 1 on X/Y, always Z=0)",
+        name="Mat Location (Relative to Table Surface)",
+        description="Mat location in table coordinates (origin at table top center, Z is table normal) in meters",
         subtype='TRANSLATION',
         size=3,
-        get=get_property("bpy.data.objects['Mat'].table_coords_norm", object_dependencies={"objects": ["Mat", "Table"]}),
-        set=set_property("bpy.data.objects['Mat'].table_coords_norm", object_dependencies={"objects": ["Mat", "Table"]})
+        get=get_property("bpy.data.objects['Mat'].table_coords", object_dependencies={"objects": ["Mat", "Table"]}),
+        set=set_property("bpy.data.objects['Mat'].table_coords", object_dependencies={"objects": ["Mat", "Table"]})
     )
     rotation: bpy.props.FloatVectorProperty(
         name="Mat Rotation",
@@ -49,10 +40,12 @@ class MatConfig(TraitBlenderConfig):
         max=1.0,
         size=4,
         subtype='COLOR',
-        get=get_property("bpy.data.Mats['mat_material'].node_tree.nodes['Principled BSDF'].inputs[0].default_value",
-                        object_dependencies={"Mats": ["mat_material"]}),
-        set=set_property("bpy.data.Mats['mat_material'].node_tree.nodes['Principled BSDF'].inputs[0].default_value",
-                        object_dependencies={"Mats": ["mat_material"]})
+        get=get_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[0].default_value",
+                        object_dependencies={"objects": ["Mat"],
+                                             "materials": ["mat_material"]}),
+        set=set_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[0].default_value",
+                        object_dependencies={"objects": ["Mat"],
+                                             "materials": ["mat_material"]})
     )
     roughness: bpy.props.FloatProperty(
         name="Mat Roughness",
@@ -60,8 +53,10 @@ class MatConfig(TraitBlenderConfig):
         default=1.0,
         min=0.0,
         max=1.0,
-        get=get_property("bpy.data.Mats['mat_material'].node_tree.nodes['Principled BSDF'].inputs[2].default_value",
-                        object_dependencies={"Mats": ["mat_Mat"]}),
-        set=set_property("bpy.data.Mats['mat_material'].node_tree.nodes['Principled BSDF'].inputs[2].default_value",
-                        object_dependencies={"Mats": ["mat_material"]})
+        get=get_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[2].default_value",
+                        object_dependencies={"objects": ["Mat"],
+                                             "materials": ["mat_material"]}),
+        set=set_property("bpy.data.materials['mat_material'].node_tree.nodes['Principled BSDF'].inputs[2].default_value",
+                        object_dependencies={"objects": ["Mat"],
+                                             "materials": ["mat_material"]})
     )

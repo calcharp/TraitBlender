@@ -6,22 +6,14 @@ from ...helpers import get_property, set_property
 class LampConfig(TraitBlenderConfig):
     print_index = 3
 
+    # Table coordinates in meters
     location: bpy.props.FloatVectorProperty(
-        name="Lamp Location",
-        description="The location of the lamp",
-        get=get_property("bpy.data.objects['Lamp'].location",
-                        object_dependencies={"objects": ["Lamp"]}),
-        set=set_property("bpy.data.objects['Lamp'].location",
-                        object_dependencies={"objects": ["Lamp"]})
-    )
-    # Normalized table coordinates
-    location_table: bpy.props.FloatVectorProperty(
-        name="Lamp Location (Table-Normalized)",
-        description="Lamp location in normalized table coordinates (-1 to 1 on X/Y, meters on Z)",
+        name="Lamp Location (Relative to Table Surface)",
+        description="Lamp location in table coordinates (origin at table top center, Z is table normal) in meters",
         default=(0.0, 0.0, 0.0),
         subtype='TRANSLATION',
-        get=get_property("bpy.data.objects['Lamp'].table_coords_norm", object_dependencies={"objects": ["Lamp", "Table"]}),
-        set=set_property("bpy.data.objects['Lamp'].table_coords_norm", object_dependencies={"objects": ["Lamp", "Table"]})
+        get=get_property("bpy.data.objects['Lamp'].table_coords", object_dependencies={"objects": ["Lamp", "Table"]}),
+        set=set_property("bpy.data.objects['Lamp'].table_coords", object_dependencies={"objects": ["Lamp", "Table"]})
     )
 
     rotation: bpy.props.FloatVectorProperty(

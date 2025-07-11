@@ -68,6 +68,42 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             try:
                 sample_obj = sample_func(name=selected_sample_name, **params)
                 sample_obj.to_blender(length=0.015, smooth=True)
+                
+                # Get the generated object
+                generated_obj = bpy.data.objects.get(selected_sample_name)
+                if generated_obj:
+                    # Check if both Table and Mat objects exist
+                    table_obj = bpy.data.objects.get("Table")
+                    mat_obj = bpy.data.objects.get("Mat")
+                    
+                    if table_obj and mat_obj and hasattr(mat_obj, 'table_coords'):
+                        # Parent the generated object to the table
+                        generated_obj.parent = table_obj
+                        generated_obj.matrix_parent_inverse = table_obj.matrix_world.inverted()
+                        
+                        # Set the generated object's table coordinates to match the Mat
+                        generated_obj.table_coords = mat_obj.table_coords
+                        print(f"Positioned {selected_sample_name} at table coordinates: {mat_obj.table_coords}")
+                    else:
+                        # Fallback: position at world origin
+                        generated_obj.location = (0.0, 0.0, 0.0)
+                        print(f"Positioned {selected_sample_name} at world origin (0, 0, 0)")
+                        
+                        # Warn user if museum scene objects are missing
+                        if not table_obj or not mat_obj:
+                            missing_objects = []
+                            if not table_obj:
+                                missing_objects.append("Table")
+                            if not mat_obj:
+                                missing_objects.append("Mat")
+                            
+                            warning_msg = f"Missing museum scene objects: {', '.join(missing_objects)}. "
+                            warning_msg += "Run 'Import Museum' in the TraitBlender -> Museum Setup panel to set up the scene properly."
+                            self.report({'WARNING'}, warning_msg)
+                            print(f"Warning: {warning_msg}")
+                else:
+                    print(f"Warning: Generated object {selected_sample_name} not found")
+                
                 self.report({'INFO'}, f"Generated morphospace sample: {selected_sample_name}")
             except Exception as e:
                 traceback.print_exc()
