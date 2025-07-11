@@ -133,9 +133,11 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
             layout.separator()
             box = layout.box()
             box.label(text="Sample Controls", icon='OBJECT_DATA')
-            
+
             sample_config = context.scene.traitblender_config.sample
-            box.prop(sample_config, "location", text="Location")
+            sample_obj = bpy.data.objects[dataset.sample]
+            # Use table_coords for location
+            box.prop(sample_obj, "table_coords", text="Location (Relative to the Table Surface)")
             box.prop(sample_config, "rotation", text="Rotation")
 
 class TRAITBLENDER_PT_transforms_panel(Panel):

@@ -1,6 +1,5 @@
 import bpy
 from ..register_config import register, TraitBlenderConfig
-from ...helpers import get_property, set_property
 
 
 @register("sample")
@@ -17,19 +16,6 @@ class SampleConfig(TraitBlenderConfig):
         except:
             return None
     
-    def _get_location(self):
-        """Get the location of the current sample object."""
-        obj_name = self._get_sample_object_name()
-        if obj_name and obj_name in bpy.data.objects:
-            return bpy.data.objects[obj_name].location
-        return (0.0, 0.0, 0.0)
-    
-    def _set_location(self, value):
-        """Set the location of the current sample object."""
-        obj_name = self._get_sample_object_name()
-        if obj_name and obj_name in bpy.data.objects:
-            bpy.data.objects[obj_name].location = value
-    
     def _get_rotation(self):
         """Get the rotation of the current sample object."""
         obj_name = self._get_sample_object_name()
@@ -42,15 +28,6 @@ class SampleConfig(TraitBlenderConfig):
         obj_name = self._get_sample_object_name()
         if obj_name and obj_name in bpy.data.objects:
             bpy.data.objects[obj_name].rotation_euler = value
-    
-    location: bpy.props.FloatVectorProperty(
-        name="Sample Location",
-        description="The location of the generated sample object",
-        default=(0.0, 0.0, 0.0),
-        subtype='TRANSLATION',
-        get=lambda self: self._get_location(),
-        set=lambda self, value: self._set_location(value)
-    )
     
     rotation: bpy.props.FloatVectorProperty(
         name="Sample Rotation",

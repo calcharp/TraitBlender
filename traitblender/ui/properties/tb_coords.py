@@ -5,7 +5,7 @@ Lowest vertex placement logic included.
 """
 
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 
 def get_table_coordinate_system():
@@ -25,7 +25,6 @@ def get_table_coordinate_system():
     y_axis.normalize()
     x_axis = y_axis.cross(z_axis)
     x_axis.normalize()
-    from mathutils import Matrix
     coord_matrix = Matrix.Identity(4)
     coord_matrix.col[0] = Vector((x_axis.x, x_axis.y, x_axis.z, 0))
     coord_matrix.col[1] = Vector((y_axis.x, y_axis.y, y_axis.z, 0))
@@ -43,7 +42,6 @@ def get_object_lowest_vertex_z(obj):
 def world_to_table_coords(world_pos, coord_matrix):
     if coord_matrix is None:
         return Vector((0, 0, 0))
-    from mathutils import Vector
     local_pos = coord_matrix.inverted() @ Vector((world_pos.x, world_pos.y, world_pos.z, 1))
     return Vector((local_pos.x, local_pos.y, local_pos.z))
 
@@ -51,26 +49,62 @@ def world_to_table_coords(world_pos, coord_matrix):
 def table_to_world_coords(table_pos, coord_matrix):
     if coord_matrix is None:
         return Vector((0, 0, 0))
-    from mathutils import Vector
     world_pos = coord_matrix @ Vector((table_pos.x, table_pos.y, table_pos.z, 1))
     return Vector((world_pos.x, world_pos.y, world_pos.z))
 
 
 def get_table_coords(self):
-    bpy.context.view_layer.update()
-    coord_matrix = get_table_coordinate_system()
-    world_pos = self.location
-    return world_to_table_coords(world_pos, coord_matrix)
+    try:
+        # Try to update the view layer, but handle potential errors
+        try:
+            bpy.context.view_layer.update()
+        except Exception:
+            pass  # Ignore view layer update errors
+        
+        coord_matrix = get_table_coordinate_system()
+        world_pos = self.location
+        
+        return world_to_table_coords(world_pos, coord_matrix)
+    except Exception:
+        # Return default coordinates if anything goes wrong
+        return Vector((0, 0, 0))
 
 
 def set_table_coords(self, value):
-    bpy.context.view_layer.update()
-    coord_matrix = get_table_coordinate_system()
-    world_pos = table_to_world_coords(Vector(value), coord_matrix)
-    lowest_z = get_object_lowest_vertex_z(self)
-    offset = world_pos.z - lowest_z
-    adjusted_world_pos = Vector((world_pos.x, world_pos.y, self.location.z + offset))
-    self.location = adjusted_world_pos
+    try:
+        # Try to update the view layer, but handle potential errors
+        try:
+            bpy.context.view_layer.update()
+        except Exception:
+            pass  # Ignore view layer update errors
+        
+        coord_matrix = get_table_coordinate_system()
+        
+        # Ensure value is a valid Vector
+        if isinstance(value, (list, tuple)):
+            table_pos = Vector(value)
+        else:
+            table_pos = value
+        
+        world_pos = table_to_world_coords(table_pos, coord_matrix)
+        
+        try:
+            lowest_z = get_object_lowest_vertex_z(self)
+            offset = world_pos.z - lowest_z
+            adjusted_world_pos = Vector((world_pos.x, world_pos.y, self.location.z + offset))
+            self.location = adjusted_world_pos
+        except Exception:
+            # If we can't calculate the offset, just set the position directly
+            self.location = world_pos
+    except Exception:
+        # If anything goes wrong, just set the location to the world position
+        try:
+            if coord_matrix is not None:
+                world_pos = table_to_world_coords(Vector(value), coord_matrix)
+                if world_pos is not None:
+                    self.location = world_pos
+        except Exception:
+            pass  # Final fallback - do nothing
 
 
 def register():
