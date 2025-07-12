@@ -7,6 +7,11 @@ import bpy
 from mathutils import Vector
 
 
+# Unit scale factor to fix coordinate system mismatch
+# Adjust this value if your table model uses different units than Blender
+UNIT_SCALE_FACTOR = 0.01  # Change this to 0.01 if you want to scale down instead
+
+
 def get_table_surface_offset(table=None):
     """Get the offset from table origin to table surface (halfway between vertices 2 and 5)."""
     if table is None:
@@ -45,6 +50,9 @@ def world_to_table_coords(world_pos, table=None):
     surface_offset = get_table_surface_offset(table)
     table_local -= surface_offset
     
+    # Apply unit scale factor
+    table_local *= UNIT_SCALE_FACTOR
+    
     return table_local
 
 
@@ -55,9 +63,12 @@ def table_to_world_coords(table_pos, table=None):
     if table is None:
         return Vector(table_pos)
     
+    # Remove unit scale factor
+    adjusted_table_pos = Vector(table_pos) / UNIT_SCALE_FACTOR
+    
     # Add back the surface offset
     surface_offset = get_table_surface_offset(table)
-    adjusted_table_pos = Vector(table_pos) + surface_offset
+    adjusted_table_pos += surface_offset
     
     # Convert to world coordinates
     return table.matrix_world @ adjusted_table_pos

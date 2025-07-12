@@ -3,7 +3,7 @@ world:
   color: [0.0, 0.0, 0.0, 1.0]
   strength: 1.0
 camera:
-  location: [0.0, 0.0, 0.5]
+  location: [0.0, 0.0, 1.0]
   aspect_x: 1.0
   aspect_y: 1.0
   camera_type: PERSP
@@ -16,7 +16,7 @@ camera:
   shift_x: 0.0
   shift_y: 0.0
 lamp:
-  location: [0.0, 0.0, 0.5]
+  location: [0.0, 0.0, 1.0]
   beam_blend: 0.0
   beam_size: 1.0
   color: [1.0, 1.0, 1.0]
@@ -28,7 +28,7 @@ lamp:
   use_soft_falloff: true
 mat:
   color: [0.0, 0.0, 0.0, 1.0]
-  location: [0.0, 0.0, 0.00001]
+  location: [0.0, 0.0, 0.0]
   rotation: [0.0, 0.0, 0.0]
   roughness: 0.0
   scale: [0.125, 0.125, 1.0]
