@@ -11,8 +11,8 @@ class MatConfig(TraitBlenderConfig):
         description="Mat location in table coordinates (origin at table top center, Z is table normal) in meters",
         subtype='TRANSLATION',
         size=3,
-        get=get_property("bpy.data.objects['Mat'].table_coords", object_dependencies={"objects": ["Mat", "Table"]}),
-        set=set_property("bpy.data.objects['Mat'].table_coords", object_dependencies={"objects": ["Mat", "Table"]})
+            get=get_property("bpy.data.objects['Mat'].location", object_dependencies={"objects": ["Mat"]}),
+    set=set_property("bpy.data.objects['Mat'].location", object_dependencies={"objects": ["Mat"]})
     )
     rotation: bpy.props.FloatVectorProperty(
         name="Mat Rotation",

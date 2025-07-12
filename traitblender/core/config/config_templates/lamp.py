@@ -12,8 +12,8 @@ class LampConfig(TraitBlenderConfig):
         description="Lamp location in table coordinates (origin at table top center, Z is table normal) in meters",
         default=(0.0, 0.0, 0.0),
         subtype='TRANSLATION',
-        get=get_property("bpy.data.objects['Lamp'].table_coords", object_dependencies={"objects": ["Lamp", "Table"]}),
-        set=set_property("bpy.data.objects['Lamp'].table_coords", object_dependencies={"objects": ["Lamp", "Table"]})
+            get=get_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]}),
+    set=set_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]})
     )
 
     rotation: bpy.props.FloatVectorProperty(

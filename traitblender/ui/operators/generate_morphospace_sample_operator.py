@@ -81,17 +81,9 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 # Always set the object to a known good position first
                 generated_obj.location = (0.0, 0.0, 0.0)
                 
-                try:
-                    if bpy.data.objects.get("Table"):
-                        # Set table coordinates - this will work now since we have a valid location
-                        generated_obj.table_coords = (0.0, 0.0, 0.0)
-                        print(f"Set table coordinates for {selected_sample_name} to {generated_obj.table_coords}")
-                    else:
-                        # No table, but we already set the location to (0,0,0)
-                        print(f"Set location for {selected_sample_name} to {generated_obj.location}")
-                except Exception as e:
-                    print(f"Warning: Failed to set table coordinates for {selected_sample_name}: {e}")
-                    # Location is already set to (0,0,0), so we're good
+                # Set location to origin
+                generated_obj.location = (0.0, 0.0, 0.0)
+                print(f"Set location for {selected_sample_name} to {generated_obj.location}")
                 
                 self.report({'INFO'}, f"Generated morphospace sample: {selected_sample_name}")
             except Exception as e:
