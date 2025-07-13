@@ -19,6 +19,15 @@ from .scene_cleaner import clear_scene
 from .property_type_mapping import get_bpy_prop_from_type_hint
 from .pretty_type_hint import pretty_type_hint
 
+# Import table coordinates functions
+try:
+    from ..ui.properties.table_coords import z_dist_to_lowest, _get_tb_coords, _set_tb_coords
+except ImportError:
+    # Fallback if UI module is not available
+    z_dist_to_lowest = None
+    _get_tb_coords = None
+    _set_tb_coords = None
+
 def get_asset_path(*path_parts):
     """
     Get the full path to an asset in the addon's assets directory.
@@ -66,4 +75,8 @@ __all__ = [
     # Property type mapping
     "get_bpy_prop_from_type_hint",
     "pretty_type_hint",
+    # Table coordinates functions
+    "z_dist_to_lowest",
+    "_get_tb_coords",
+    "_set_tb_coords",
 ] 
