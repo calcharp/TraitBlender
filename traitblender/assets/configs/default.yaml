@@ -56,6 +56,8 @@ metadata:
   use_stamp_scene: true
   use_stamp_sequencer_strip: false
   use_stamp_time: true
-sample:
+orientations:
+  object_location_origin: OBJECT
+  location_shift_axes: XYZ
 transforms:
   [] 

@@ -33,6 +33,7 @@ from .transforms import (
 
 from .positioning import (
     world_to_table_coords,
+    get_depsgraph,
 )
 
 # Config
@@ -56,7 +57,7 @@ __all__ = [
     
     # Positioning
     "world_to_table_coords",
-    
+    "get_depsgraph",
     # Transforms
     "TRANSFORMS",
     

@@ -69,7 +69,7 @@ class TRAITBLENDER_PT_config_panel(Panel):
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
-                if section_name in ["transforms", "sample"]:
+                if section_name in ["transforms", "sample", "orientations"]:
                     continue
                 self._draw_config_section(layout, section_name, section_obj)
         else:
@@ -140,8 +140,31 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
             box.prop(sample_obj, "location", text="Location")
             box.prop(sample_config, "rotation", text="Rotation")
 
+class TRAITBLENDER_PT_orientations_panel(Panel):
+    bl_label = "5 Orientations"
+    bl_idname = "TRAITBLENDER_PT_orientations_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        config = context.scene.traitblender_config
+        
+        # Object Location Origin dropdown
+        row = layout.row(align=True)
+        row.prop(config.orientations, "object_location_origin", text="Object Location Origin")
+        
+        # Location Shift Axes dropdown
+        row = layout.row(align=True)
+        row.prop(config.orientations, "location_shift_axes", text="Location Shift Axes")
+        
+        # Shift Sample Origin button
+        row = layout.row(align=True)
+        row.operator("traitblender.sample_origin_shift", text="Shift Sample Origin", icon='ARROW_LEFTRIGHT')
+
 class TRAITBLENDER_PT_transforms_panel(Panel):
-    bl_label = "5 Transforms"
+    bl_label = "6 Transforms"
     bl_idname = "TRAITBLENDER_PT_transforms_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -175,7 +198,7 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         row.label(text=f"Transforms in pipeline: {len(transforms_config)}")
 
 class TRAITBLENDER_PT_imaging_panel(Panel):
-    bl_label = "6 Imaging"
+    bl_label = "7 Imaging"
     bl_idname = "TRAITBLENDER_PT_imaging_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'

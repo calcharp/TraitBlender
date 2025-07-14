@@ -67,6 +67,9 @@ def world_to_table_coords(world_point, precision=4):
             round(local.z, precision))
 
 
+
+
+
 def get_table_axes_coords(length=1.0, precision=4):
     """
     Return a dictionary of the table's local XYZ axis endpoints, expressed in table-local coordinates.
