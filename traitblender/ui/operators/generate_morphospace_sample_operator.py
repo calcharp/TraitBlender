@@ -78,11 +78,16 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                     self.report({'ERROR'}, f"Failed to find generated object: {selected_sample_name}")
                     return {'CANCELLED'}
                 
-                # Always set the object to a known good position first
+                # Handles weird cases where objects have infinite or nonexistent locations/rotations
                 generated_obj.location = (0.0, 0.0, 0.0)
+                generated_obj.rotation_euler = (0.0, 0.0, 0.0)
+
+                bpy.context.view_layer.update()
+
+                # Sets the objects to the center of the table
+                generated_obj.tb_coords = (0.0, 0.0, 0.0)
+                generated_obj.tb_rotation = (0.0, 0.0, 0.0)
                 
-                # Set location to origin
-                generated_obj.location = (0.0, 0.0, 0.0)
                 print(f"Set location for {selected_sample_name} to {generated_obj.location}")
                 
                 self.report({'INFO'}, f"Generated morphospace sample: {selected_sample_name}")
