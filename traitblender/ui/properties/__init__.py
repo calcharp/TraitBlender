@@ -1,6 +1,7 @@
 import bpy
 from . import setup_properties
 from . import table_coords
+from . import table_rotations
 
 classes = [
     setup_properties.TraitBlenderSetupProperties,
@@ -15,6 +16,8 @@ def register():
     bpy.types.Scene.traitblender_setup = bpy.props.PointerProperty(type=setup_properties.TraitBlenderSetupProperties)
     # Register table coordinate properties
     table_coords.register_table_coords()
+    # Register table rotation properties
+    table_rotations.register_table_rotations()
 
 
 def unregister():
@@ -25,5 +28,7 @@ def unregister():
         bpy.utils.unregister_class(cls)
     # Unregister table coordinate properties
     table_coords.unregister_table_coords()
+    # Unregister table rotation properties
+    table_rotations.unregister_table_rotations()
 
 __all__ = ["register", "unregister"]
