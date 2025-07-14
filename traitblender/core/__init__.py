@@ -31,6 +31,10 @@ from .transforms import (
     TRANSFORMS,
 )
 
+from .positioning import (
+    world_to_table_coords,
+)
+
 # Config
 from .config import CONFIG, register, configs, configure_traitblender
 
@@ -51,9 +55,7 @@ __all__ = [
     "clear_scene",
     
     # Positioning
-    # "ASSET_TYPES",
-    # "scene_asset",
-    # "with_scene_asset",
+    "world_to_table_coords",
     
     # Transforms
     "TRANSFORMS",
