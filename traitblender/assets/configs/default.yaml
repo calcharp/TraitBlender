@@ -3,11 +3,11 @@ world:
   color: [0.0, 0.0, 0.0, 1.0]
   strength: 1.0
 camera:
-  location: [0.0, 0.0, 2.0]
+  location: [0.0, 0.0, 1.0]
   aspect_x: 1.0
   aspect_y: 1.0
   camera_type: PERSP
-  focal_length: 73.0
+  focal_length: 60.0
   lens_unit: MILLIMETERS
   resolution_percentage: 100
   resolution_x: 1080
@@ -16,12 +16,12 @@ camera:
   shift_x: 0.0
   shift_y: 0.0
 lamp:
-  location: [0.0, 0.0, 2.1]
+  location: [0.0, 0.0, 1.0]
   beam_blend: 0.0
   beam_size: 1.0
   color: [1.0, 1.0, 1.0]
   diffuse: 1.0
-  power: 15.0
+  power: 10.0
   rotation: [0.0, 0.0, 0.0]
   scale: [1.0, 1.0, 1.0]
   shadow: true
