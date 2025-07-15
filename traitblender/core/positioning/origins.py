@@ -61,8 +61,16 @@ def _get_mean_origin(obj):
             invalid_indices.append(i)
         else:
             valid_vertices.append(v)
+    total_vertices = len(local_vertices)
+    adjacent_count = 0
     if invalid_indices:
-        print(f"[TraitBlender] Warning: Ignoring NaN/Inf vertices at indices: {invalid_indices} in object '{obj.name}' for mean origin calculation.")
+        sorted_invalid = sorted(invalid_indices)
+        adjacent_set = set()
+        for i, idx in enumerate(sorted_invalid):
+            if (idx - 1 in invalid_indices) or (idx + 1 in invalid_indices):
+                adjacent_set.add(idx)
+        adjacent_count = len(adjacent_set)
+        print(f"[TraitBlender] Warning: Ignoring NaN/Inf vertices at indices: {invalid_indices} in object '{obj.name}' for mean origin calculation. ({len(invalid_indices)}/{total_vertices} broken, proportion: {len(invalid_indices)}/{total_vertices}, adjacent: {adjacent_count}/{len(invalid_indices)})")
     if not valid_vertices:
         print(f"[TraitBlender] Warning: All vertices are invalid in object '{obj.name}' for mean origin calculation.")
         return (0.0, 0.0, 0.0)
@@ -91,8 +99,16 @@ def _get_median_origin(obj):
             invalid_indices.append(i)
         else:
             valid_coords.append(arr)
+    total_vertices = len(local_vertices)
+    adjacent_count = 0
     if invalid_indices:
-        print(f"[TraitBlender] Warning: Ignoring NaN/Inf vertices at indices: {invalid_indices} in object '{obj.name}' for median origin calculation.")
+        sorted_invalid = sorted(invalid_indices)
+        adjacent_set = set()
+        for i, idx in enumerate(sorted_invalid):
+            if (idx - 1 in invalid_indices) or (idx + 1 in invalid_indices):
+                adjacent_set.add(idx)
+        adjacent_count = len(adjacent_set)
+        print(f"[TraitBlender] Warning: Ignoring NaN/Inf vertices at indices: {invalid_indices} in object '{obj.name}' for median origin calculation. ({len(invalid_indices)}/{total_vertices} broken, proportion: {len(invalid_indices)}/{total_vertices}, adjacent: {adjacent_count}/{len(invalid_indices)})")
     if not valid_coords:
         print(f"[TraitBlender] Warning: All vertices are invalid in object '{obj.name}' for median origin calculation.")
         return (0.0, 0.0, 0.0)

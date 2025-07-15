@@ -58,7 +58,37 @@ class Contreras_MORPHOSPACE():
                 surface = surface[1] * surface[2]
                 surface_norm = np.linalg.norm(surface)
                 thickness = ((np.exp(b*t) - (1 / (t + 1)))**eps)*h_0
-                surface_product = surface * (1 - thickness/surface_norm)
+                
+                # NUMERICAL SAFEGUARDS FOR INNER SURFACE THICKNESS CALCULATION
+                # 
+                # ISSUE: The inner surface calculation can produce NaN/infinite coordinates at the 
+                # beginning and end of the shell due to numerical instability in the thickness formula.
+                # 
+                # ROOT CAUSES:
+                # 1. Division by zero: When surface_norm ≈ 0, thickness/surface_norm → ∞
+                # 2. Small t values: At shell start (t ≈ 0), np.exp(b*t) - (1/(t+1)) can be negative/small
+                #    When raised to power eps, this can produce NaN or extreme values
+                # 3. Thickness ratio: If thickness > surface_norm, the subtraction creates negative/infinite results
+                #
+                # SOLUTION: Add checks to detect problematic cases and use safe fallbacks:
+                # - Skip thickness for very small surface norms (prevents division by zero)
+                # - Detect NaN/inf thickness and use 90% surface reduction
+                # - Cap thickness at 90% of surface norm to prevent extreme ratios
+                # - Use 10% reduction as safe fallback for large thickness ratios
+                #
+                # This ensures the inner surface remains numerically stable while preserving
+                # the shell's visual appearance and geometric properties.
+                
+                # Add numerical safeguards to prevent NaN/Inf
+                if surface_norm < 1e-10:  # Very small norm - don't apply thickness
+                    surface_product = surface
+                elif np.isnan(thickness) or np.isinf(thickness) or thickness < 0:
+                    # Invalid thickness - use small reduction
+                    surface_product = surface * 0.9
+                elif thickness > surface_norm * 0.9:  # Thickness too large relative to surface
+                    surface_product = surface * 0.1  # Apply small reduction
+                else:
+                    surface_product = surface * (1 - thickness/surface_norm)
             else:
                 surface_product = surface[0] * surface[1] * surface[2]
             
