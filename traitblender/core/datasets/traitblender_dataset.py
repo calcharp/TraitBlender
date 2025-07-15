@@ -76,7 +76,7 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
     sample: EnumProperty(
         name="Sample",
         description="Select a sample from the dataset",
-        items=lambda self, context: [(name, name, "") for name in self.rownames],
+        items=lambda self, context: [(name, name, "") for name in self.rownames] if bpy.context.scene.traitblender_dataset.csv else [("NONE", "No samples", "")],
         default=0
     )
     
