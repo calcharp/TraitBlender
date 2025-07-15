@@ -2,7 +2,7 @@ from .morphospace.contreras_morphospace import Contreras_MORPHOSPACE
 from .morphospace_sample.contreras_morphospace_sample import Contreras_MORPHOSPACE_SAMPLE
 
 def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0, 
-           c_depth=0.1, c_n=70, n_depth=0, n=0, t=20, time_step=0.25/30, 
+           c_depth=0, c_n=0, n_depth=0, n=0, t=10, time_step=1/30, 
            points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
     """
     Generate a shell sample using the Contreras morphospace model.
