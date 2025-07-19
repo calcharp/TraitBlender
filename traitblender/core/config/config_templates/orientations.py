@@ -12,6 +12,13 @@ class OrientationsConfig(TraitBlenderConfig):
         default=0
     )
     
+    object_rotation_origin: bpy.props.EnumProperty(
+        name="Object Rotation Origin",
+        description="Select the origin type for object rotation",
+        items=lambda self, context: self._get_origin_items(),
+        default=0
+    )
+    
     location_shift_axes: bpy.props.EnumProperty(
         name="Location Shift Axes",
         description="Select which axes to apply location shifts to",

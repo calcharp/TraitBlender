@@ -155,6 +155,10 @@ class TRAITBLENDER_PT_orientations_panel(Panel):
         row = layout.row(align=True)
         row.prop(config.orientations, "object_location_origin", text="Object Location Origin")
         
+        # Object Rotation Origin dropdown
+        row = layout.row(align=True)
+        row.prop(config.orientations, "object_rotation_origin", text="Object Rotation Origin")
+        
         # Location Shift Axes dropdown
         row = layout.row(align=True)
         row.prop(config.orientations, "location_shift_axes", text="Location Shift Axes")
