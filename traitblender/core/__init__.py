@@ -39,9 +39,11 @@ from .positioning import (
 # Config
 from .config import CONFIG, register, configs, configure_traitblender
 
-# Config, morphospaces, and datasets (placeholder for future development)
+# Datasets
+from .datasets import launch_csv_viewer_with_string
+
+# Config, morphospaces (placeholder for future development)
 # from .morphospaces import *
-# from .datasets import *
 
 __all__ = [
     # Helper functions
@@ -66,4 +68,7 @@ __all__ = [
     "register",
     "configure_traitblender",
     "configs",
+    
+    # Datasets
+    "launch_csv_viewer_with_string",
 ]

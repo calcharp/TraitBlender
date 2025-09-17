@@ -6,6 +6,7 @@ Contains dataset management functionality for TraitBlender.
 
 import bpy
 from . import traitblender_dataset
+from .csv_viewer_module import launch_csv_viewer_with_string
 
 classes = [
     traitblender_dataset.TRAITBLENDER_PG_dataset,
@@ -30,4 +31,4 @@ def unregister():
         bpy.utils.unregister_class(cls)
 
 
-__all__ = ["register", "unregister"] 
+__all__ = ["register", "unregister", "launch_csv_viewer_with_string"] 

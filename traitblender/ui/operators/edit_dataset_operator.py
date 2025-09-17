@@ -6,7 +6,7 @@ Operator for editing the dataset CSV data using the CSV editor GUI.
 
 import bpy
 from bpy.types import Operator
-from ...core.datasets.csv_editor import gui
+from ...core.datasets.csv_viewer_module import launch_csv_viewer_with_string
 
 class TRAITBLENDER_OT_edit_dataset(Operator):
     """Edit dataset using CSV editor"""
@@ -26,17 +26,17 @@ class TRAITBLENDER_OT_edit_dataset(Operator):
             return {'CANCELLED'}
         
         try:
-            # Call the CSV editor with the current CSV string
-            result = gui(dataset.csv)
-            print(result)
+            # Call the CSV viewer with the current CSV string
+            result = launch_csv_viewer_with_string(dataset.csv, "Edit Dataset")
+            print(f"CSV Viewer result: {result}")
             
             # If result is not None, update the dataset
-            # if result is not None:
-            #     dataset.csv = result
-            #     self.report({'INFO'}, "Dataset updated successfully")
-            # else:
-            #     # User cancelled or chose not to save
-            #     self.report({'INFO'}, "Dataset edit cancelled")
+            if result is not None:
+                dataset.csv = result
+                self.report({'INFO'}, "Dataset updated successfully")
+            else:
+                # User cancelled or chose not to save
+                self.report({'INFO'}, "Dataset edit cancelled")
             
         except Exception as e:
             self.report({'ERROR'}, f"Failed to edit dataset: {str(e)}")
