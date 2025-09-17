@@ -50,6 +50,36 @@ def update_filepath(self, context):
         elif file_ext in ['.xlsx', '.xls']:
             df = pd.read_excel(self.filepath)
         
+        # Apply column reordering (same logic as _get_dataframe)
+        if not df.empty and len(df.columns) > 0:
+            # Define possible species/label column names (case-insensitive)
+            species_column_names = ['species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids']
+            
+            # Check if first column is already a species column
+            first_col_lower = df.columns[0].lower().strip()
+            if first_col_lower not in species_column_names:
+                # Look for species columns in the dataset
+                species_columns = []
+                for col in df.columns:
+                    col_lower = col.lower().strip()
+                    if col_lower in species_column_names:
+                        species_columns.append(col)
+                
+                if species_columns:
+                    # Sort alphabetically and pick the first one
+                    species_columns.sort()
+                    species_col = species_columns[0]
+                    
+                    # Move the species column to the first position
+                    cols = list(df.columns)
+                    species_idx = cols.index(species_col)
+                    
+                    # Reorder columns: species column first, then the rest
+                    new_cols = [species_col] + [col for i, col in enumerate(cols) if i != species_idx]
+                    df = df[new_cols]
+                    
+                    print(f"TraitBlender: Moved '{species_col}' column to first position for species identification")
+        
         # Convert DataFrame to CSV string
         csv_buffer = StringIO()
         df.to_csv(csv_buffer, index=False)

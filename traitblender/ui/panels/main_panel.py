@@ -21,10 +21,6 @@ class TRAITBLENDER_PT_main_panel(Panel):
         # Configure Scene button row
         row = layout.row(align=True)
         row.operator("traitblender.configure_scene", text="Configure Scene")
-        layout.separator()
-        # Available morphospaces row
-        row = layout.row(align=True)
-        row.prop(context.scene.traitblender_setup, "available_morphospaces", text="Morphospace")
 
     # Helper methods for config panel
     def _draw_config_section(self, layout, section_name, section_obj):
