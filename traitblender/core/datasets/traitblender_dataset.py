@@ -5,6 +5,22 @@ import os
 from io import StringIO
 
 
+def update_csv(self, context):
+    """Reset sample selection when CSV data changes"""
+    # Reset sample to first item when CSV changes
+    if hasattr(self, 'sample'):
+        try:
+            # Get the current sample items to see what's available
+            items = self._get_sample_items()
+            if items and len(items) > 0:
+                # Set to the first available item
+                self.sample = items[0][0]  # Use the identifier (first element of tuple)
+            else:
+                self.sample = 0
+        except Exception as e:
+            print(f"TraitBlender: Error updating sample selection: {e}")
+            self.sample = 0
+
 def update_filepath(self, context):
     """Automatically import dataset when filepath changes"""
     if not self.filepath:
@@ -62,7 +78,8 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
     csv: StringProperty(
         name="CSV Data",
         description="CSV dataset content as string",
-        default=""
+        default="",
+        update=update_csv
     )
     
     filepath: StringProperty(
@@ -76,9 +93,29 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
     sample: EnumProperty(
         name="Sample",
         description="Select a sample from the dataset",
-        items=lambda self, context: [(name, name, "") for name in self.rownames] if bpy.context.scene.traitblender_dataset.csv else [("NONE", "No samples", "")],
+        items=lambda self, context: self._get_sample_items(),
         default=0
     )
+    
+    def _get_sample_items(self):
+        """Get sample items for the enum property"""
+        try:
+            if not self.csv:
+                return [("NONE", "No samples", "")]
+            
+            rownames = self.rownames
+            if not rownames:
+                return [("NONE", "No samples", "")]
+            
+            # Create items with proper tuple format
+            items = []
+            for i, name in enumerate(rownames):
+                items.append((name, name, f"Sample {i+1}"))
+            
+            return items
+        except Exception as e:
+            print(f"TraitBlender: Error getting sample items: {e}")
+            return [("NONE", "No samples", "")]
     
     def _get_dataframe(self):
         """Get DataFrame from CSV string"""
@@ -86,10 +123,45 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
             return pd.DataFrame()
         try:
             df = pd.read_csv(StringIO(self.csv))
-            # Use the first column as the index
-            if not df.empty and len(df.columns) > 0:
+            if df.empty or len(df.columns) == 0:
+                return df
+            
+            # Define possible species/label column names (case-insensitive)
+            species_column_names = ['species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids']
+            
+            # Check if first column is already a species column
+            first_col_lower = df.columns[0].lower().strip()
+            if first_col_lower in species_column_names:
+                # First column is already a species column, use it as index
                 df = df.set_index(df.columns[0])
+                return df
+            
+            # Look for species columns in the dataset
+            species_columns = []
+            for col in df.columns:
+                col_lower = col.lower().strip()
+                if col_lower in species_column_names:
+                    species_columns.append(col)
+            
+            if species_columns:
+                # Sort alphabetically and pick the first one
+                species_columns.sort()
+                species_col = species_columns[0]
+                
+                # Move the species column to the first position
+                cols = list(df.columns)
+                species_idx = cols.index(species_col)
+                
+                # Reorder columns: species column first, then the rest
+                new_cols = [species_col] + [col for i, col in enumerate(cols) if i != species_idx]
+                df = df[new_cols]
+                
+                print(f"TraitBlender: Moved '{species_col}' column to first position for species identification")
+            
+            # Use the first column as the index
+            df = df.set_index(df.columns[0])
             return df
+            
         except Exception as e:
             print(f"TraitBlender: Error parsing CSV data: {e}")
             return pd.DataFrame()
