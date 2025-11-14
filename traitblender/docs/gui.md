@@ -1,0 +1,34 @@
+# GUI Documentation
+
+??? note "Operators"
+    
+
+??? note "Panels"
+    
+
+??? note "Properties"
+    
+
+??? note "Events"
+    
+
+??? note "Museum Setup"
+    
+
+??? note "Configuration"
+    
+
+??? note "Morphospaces"
+    
+
+??? note "Datasets"
+    
+
+??? note "Orientations"
+    
+
+??? note "Transforms"
+    
+
+??? note "Imaging"
+    
