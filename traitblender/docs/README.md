@@ -4,67 +4,48 @@
 <img src="./images/shell-specimen.png" alt="Museum-style shell specimen imaging with TraitBlender" width="400"/>
 </div>
 
-Welcome to the TraitBlender documentation! TraitBlender is a Blender add-on for generating museum-style images for morphological datasets, developed by the Imageomics Institute.
+Welcome to the TraitBlender documentation! TraitBlender is a Blender add-on for generating museum-style images for morphological datasets, developed by Caleb Charpentier.
 
 ## Documentation Sections
 
-### 🚀 [Getting Started](./getting-started/)
+### [Getting Started](./getting-started/)
 - [Installation Guide](./getting-started/installation.md)
-- [Quick Start Tutorial](./getting-started/quick-start.md)
-- [System Requirements](./getting-started/requirements.md)
+- [Quick Start (GUI)](./getting-started/quick-start.md) - Learn the graphical interface
+- [Quick Start (API)](./getting-started/quick-start-api.md) - Learn the Python API
+- [Blender Settings](./getting-started/blender-optimization.md) - Performance tips
 
-### 🎨 [User Interface](./ui/)
-- [GUI Overview](./ui/gui-overview.md)
-- [Panel Reference](./ui/panels.md)
-- [Workflow Guide](./ui/workflow.md)
+### [Configuration](./configuration/)
+- [Configuration Files](./configuration/config-files.md) - YAML configuration structure
 
-### 📚 [API Reference](./api/)
-- [Core Classes](./api/core.md)
-- [Scene Assets](./api/scene-assets.md)
-- [Transforms](./api/transforms.md)
-- [Datasets](./api/datasets.md)
-- [Morphospaces](./api/morphospaces.md)
+### [Tutorials](./tutorials/)
+- [Basic Specimen Imaging](./tutorials/basic-imaging.md) - Create your first images
 
-### ⚙️ [Configuration](./configuration/)
-- [Configuration Files](./configuration/config-files.md)
-- [Rendering Settings](./configuration/rendering.md)
-- [Transform Options](./configuration/transforms.md)
-
-### 💻 [Command Line Interface](./cli/)
-- [CLI Usage](./cli/usage.md)
-- [Batch Processing](./cli/batch-processing.md)
-- [Examples](./cli/examples.md)
-
-### 📖 [Tutorials](./tutorials/)
-- [Basic Specimen Imaging](./tutorials/basic-imaging.md)
-- [Advanced Lighting](./tutorials/lighting.md)
-- [Custom Transforms](./tutorials/custom-transforms.md)
-- [Morphospace Visualization](./tutorials/morphospace.md)
-
-### 🔬 [Examples](./examples/)
-- [Sample Configurations](./examples/configs/)
-- [Use Cases](./examples/use-cases.md)
-- [Gallery](./examples/gallery.md)
-
-### 🔧 [Development](./development/)
-- [Contributing Guide](./development/contributing.md)
-- [Architecture Overview](./development/architecture.md)
-- [Extension Development](./development/extensions.md)
-
-### ❓ [Troubleshooting](./troubleshooting/)
-- [Common Issues](./troubleshooting/common-issues.md)
-- [Performance Tips](./troubleshooting/performance.md)
-- [FAQ](./troubleshooting/faq.md)
+### [API Reference](./api/)
+- [Scene Assets](./api/scene-assets.md) - Object positioning and management
 
 ## About TraitBlender
 
-TraitBlender is designed for researchers and institutions working with morphological datasets who need to generate high-quality, standardized images for scientific analysis and museum documentation.
+TraitBlender is a Blender add-on designed for researchers and institutions working with morphological datasets who need to generate high-quality, standardized images for scientific analysis, museum documentation, and neural network training.
 
-Key features:
-- Museum-style specimen imaging
-- Morphospace visualization
-- Configurable transforms and lighting
-- Batch processing capabilities
-- Blender 4.2+ integration
+### Key Features
+
+- **Museum-style specimen imaging** - Professional lighting and camera setups
+- **Morphospace visualization** - Generate 3D specimens from mathematical models (currently CO_Raup shell morphospace)
+- **Dataset integration** - Import CSV/Excel files with automatic species column detection
+- **Statistical transforms** - 10+ probability distributions for data augmentation
+- **Table coordinate system** - Consistent positioning relative to museum table
+- **YAML configuration** - Reproducible, serializable scene settings
+- **Transform pipeline** - Chain multiple statistical transformations
+- **Blender 4.3+ integration** - Modern rendering engines (EEVEE, Cycles)
+
+### Workflow
+
+1. **Setup** - Load museum scene with table, lighting, and camera
+2. **Configure** - Adjust scene settings via GUI or YAML config
+3. **Select Morphospace** - Choose mathematical model (e.g., CO_Raup)
+4. **Import Dataset** - Load CSV/Excel with morphological traits
+5. **Generate Specimens** - Create 3D models from dataset parameters
+6. **Apply Transforms** - Add statistical variation for data augmentation
+7. **Render** - Generate final images
 
 For questions or support, please visit our [GitHub repository](https://github.com/Imageomics/TraitBlender). 

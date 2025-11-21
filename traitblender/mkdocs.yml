@@ -39,7 +39,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -60,42 +64,35 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started:
+    - Blender Settings: getting-started/blender-optimization.md
     - Installation: getting-started/installation.md
-    - Blender Optimization: getting-started/blender-optimization.md
     - Quick Start (GUI): getting-started/quick-start.md
     - Quick Start (API): getting-started/quick-start-api.md
-  - Documentation:
+  - User Documentation:
     - Overview: documentation.md
-    - User Interface:
-      - GUI Overview: ui/gui-overview.md
-      - Panel Reference: ui/panels.md
-      - Workflow Guide: ui/workflow.md
+    - GUI Documentation: gui.md
+    - API Documentation: api.md
+    - Configuration:
       - Configuration Files: configuration/config-files.md
-      - Rendering Settings: configuration/rendering.md
-    - User API:
-      - Core Classes: api/core.md
+    - API Reference:
       - Scene Assets: api/scene-assets.md
-      - Transforms: api/transforms.md
-      - Datasets: api/datasets.md
-      - Morphospaces: api/morphospaces.md
-      - CLI Usage: cli/usage.md
-      - Batch Processing: cli/batch-processing.md
-    - Development:
-      - Transform Options: configuration/transforms.md
-      - CLI Examples: cli/examples.md
+  - Developer Documentation:
+    - Architecture: architecture.md
+    - UI Components:
+      - Operators: developers/operators.md
+      - Panels: developers/panels.md
+      - Properties: developers/properties.md
+      - Events: developers/events.md
+    - Core Systems:
+      - 1 Asset Management: developers/asset-management.md
+      - 2 Configuration System: developers/configuration-system.md
+      - 3 Morphospace System: developers/morphospace-system.md
+      - 4 Dataset Management: developers/dataset-management.md
+      - 5 Positioning System: developers/positioning-system.md
+      - 6 Transform Pipeline: developers/transform-pipeline.md
+      - 7 Imaging: developers/imaging.md
   - Tutorials:
     - Basic Specimen Imaging: tutorials/basic-imaging.md
-    - Advanced Lighting: tutorials/lighting.md
-    - Custom Transforms: tutorials/custom-transforms.md
-    - Morphospace Visualization: tutorials/morphospace.md
-  - Hugging Face:
-    - Sample Configurations: examples/configs.md
-    - Use Cases: examples/use-cases.md
-    - Gallery: examples/gallery.md
-  - Troubleshooting:
-    - Common Issues: troubleshooting/common-issues.md
-    - Performance Tips: troubleshooting/performance.md
-    - FAQ: troubleshooting/faq.md
 
 extra:
   social:
@@ -104,4 +101,4 @@ extra:
     - icon: fontawesome/solid/envelope
       link: mailto:calebcharpentier00@gmail.com
 
-copyright: Copyright &copy; 2025 Imageomics Institute 
+copyright: Copyright &copy; 2025 Caleb Charpentier 

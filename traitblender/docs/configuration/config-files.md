@@ -1,298 +1,333 @@
 # Configuration Files
 
-TraitBlender uses YAML configuration files to define rendering pipelines, transforms, and output settings. This allows for reproducible, automated generation of museum-style morphological images.
+TraitBlender uses YAML configuration files to define scene settings, transforms, and output options. This allows for reproducible, automated generation of museum-style morphological images.
 
 ## Configuration File Structure
 
-Configuration files are organized into several main sections:
+Configuration files are organized into several main sections that correspond to different aspects of the scene. The structure matches the `traitblender_config` PropertyGroup in Blender.
 
 ### Basic Structure
 
 ```yaml
-blender_preferences:
-  use_online_access: True
-
-morphospace: 
-  name: ContrerasMorphospace
-  path: /path/to/morphospace/data
-
-dataset:
-  # Dataset configuration
-
-rendering:
-  render_engine: Cycles
-  compute_device_type: CUDA 
-
-imaging:
-  output_path: /path/to/output/directory
-  images_per_specimen: 1
-  images_per_view: 1
-  views:
-    - bottom
-    - apex
-    - aperture
-
+---
+world:
+  color: [0.0, 0.0, 0.0, 1.0]
+  strength: 1.0
+camera:
+  location: [0.0, 0.0, 1.0]
+  rotation: [0.0, 0.0, 0.0]
+  focal_length: 60.0
+  resolution_x: 1080
+  resolution_y: 1080
+  resolution_percentage: 100
+lamp:
+  location: [0.0, 0.0, 1.0]
+  power: 10.0
+  color: [1.0, 1.0, 1.0]
+mat:
+  color: [0.0, 0.0, 0.0, 1.0]
+  location: [0.0, 0.0, 0.59]
+render:
+  engine: BLENDER_EEVEE_NEXT
+output:
+  output_directory: ""
+  image_format: PNG
 transforms:
-  - GaussianCameraRotation:
-      mu: 0
-      sigma: 0.1
-  - GaussianSpecimenRotation:
-      mu: 0
-      sigma: 0.1
-  # Additional transforms...
+  []
 ```
 
 ## Configuration Sections
 
-### blender_preferences
+### world
 
-Controls Blender-specific settings that affect rendering behavior.
-
-```yaml
-blender_preferences:
-  use_online_access: True  # Allow Blender to access online resources
-```
-
-**Options:**
-- `use_online_access` (boolean): Whether Blender can access online resources for textures, etc.
-
-### morphospace
-
-Defines the morphospace to be used for specimen visualization.
+Controls the world/background settings.
 
 ```yaml
-morphospace: 
-  name: ContrerasMorphospace      # Unique identifier for the morphospace
-  path: /path/to/morphospace/data # Path to morphospace data files
-```
-
-**Required Fields:**
-- `name` (string): Name/identifier for the morphospace
-- `path` (string): File system path to the morphospace data
-
-### dataset
-
-Configuration for the dataset containing specimen information.
-
-```yaml
-dataset:
-  path: /path/to/dataset.csv
-  specimen_column: specimen_id
-  trait_columns:
-    - trait1
-    - trait2
-    - trait3
+world:
+  color: [0.0, 0.0, 0.0, 1.0]  # RGBA background color
+  strength: 1.0                 # Background light strength
 ```
 
 **Fields:**
-- `path` (string): Path to the dataset file
-- `specimen_column` (string): Column name containing specimen identifiers
-- `trait_columns` (list): List of trait columns to include in analysis
+- `color` (list[float, float, float, float]): RGBA color values (0.0-1.0)
+- `strength` (float): Intensity of background lighting
 
-### rendering
+### camera
 
-Controls the Blender rendering engine and performance settings.
-
-```yaml
-rendering:
-  render_engine: Cycles           # Rendering engine (Cycles/Eevee)
-  compute_device_type: CUDA       # GPU acceleration type
-  samples: 128                    # Number of render samples
-  resolution_x: 1920              # Output width in pixels
-  resolution_y: 1080              # Output height in pixels
-  file_format: PNG                # Output file format
-```
-
-**Options:**
-- `render_engine`: 
-  - `Cycles`: Ray-tracing engine for photorealistic results
-  - `Eevee`: Real-time engine for faster rendering
-- `compute_device_type`:
-  - `CUDA`: NVIDIA GPU acceleration
-  - `OPENCL`: OpenCL GPU acceleration
-  - `CPU`: CPU-only rendering
-- `samples` (integer): Render quality (higher = better quality, slower)
-- `resolution_x/y` (integer): Output image dimensions
-- `file_format`: `PNG`, `JPEG`, `TIFF`, `EXR`
-
-### imaging
-
-Defines output settings and camera views for specimen imaging.
+Camera position, rotation, and rendering settings.
 
 ```yaml
-imaging:
-  output_path: /path/to/output/directory
-  images_per_specimen: 3          # Number of images per specimen
-  images_per_view: 1              # Number of images per camera view
-  views:                          # List of camera views
-    - bottom                      # Bottom view (aperture)
-    - apex                        # Top view (apex)
-    - aperture                    # Aperture view
-    - lateral                     # Side view
-    - oblique                     # Angled view
+camera:
+  location: [0.0, 0.0, 1.0]           # Camera position (table coordinates)
+  rotation: [0.0, 0.0, 0.0]          # Camera rotation (Euler angles)
+  focal_length: 60.0                 # Focal length in mm
+  camera_type: PERSP                 # PERSP, ORTHO, or PANO
+  resolution_x: 1920                 # Render width
+  resolution_y: 1080                 # Render height
+  resolution_percentage: 100          # Render resolution percentage
+  aspect_x: 1.0                      # Pixel aspect ratio X
+  aspect_y: 1.0                      # Pixel aspect ratio Y
+  shift_x: 0.0                       # Camera shift X
+  shift_y: 0.0                       # Camera shift Y
+  lens_unit: MILLIMETERS             # MILLIMETERS or FOV
 ```
 
-**Standard Views:**
-- `bottom`: Bottom-up view showing aperture
-- `apex`: Top-down view showing apex
-- `aperture`: Direct aperture view
-- `lateral`: Side profile view
-- `oblique`: 45-degree angled view
+**Fields:**
+- `location` (list[float, float, float]): Position relative to table center (in meters)
+- `rotation` (list[float, float, float]): Euler rotation angles
+- `focal_length` (float): Camera lens focal length
+- `camera_type` (string): `PERSP`, `ORTHO`, or `PANO`
+- `resolution_x/y` (int): Output image dimensions
+- `resolution_percentage` (int): Render resolution percentage (0-100)
+
+### lamp
+
+Lighting configuration.
+
+```yaml
+lamp:
+  location: [0.0, 0.0, 1.0]      # Light position (table coordinates)
+  rotation: [0.0, 0.0, 0.0]      # Light rotation
+  power: 10.0                    # Light power/energy
+  color: [1.0, 1.0, 1.0]         # RGB light color
+  scale: [1.0, 1.0, 1.0]         # Light scale
+  shadow: true                    # Enable shadows
+  beam_size: 1.0                  # Beam size (for area lights)
+  beam_blend: 0.0                 # Beam blend
+  diffuse: 1.0                    # Diffuse light contribution
+  use_soft_falloff: true          # Use soft falloff
+```
+
+### mat
+
+Specimen mat/background surface settings.
+
+```yaml
+mat:
+  color: [0.0, 0.0, 0.0, 1.0]    # Mat color (RGBA)
+  location: [0.0, 0.0, 0.59]      # Mat position
+  rotation: [0.0, 0.0, 0.0]       # Mat rotation
+  scale: [0.125, 0.125, 1.0]      # Mat scale
+  roughness: 0.0                  # Material roughness
+```
+
+### render
+
+Render engine settings.
+
+```yaml
+render:
+  engine: BLENDER_EEVEE_NEXT      # BLENDER_EEVEE_NEXT or CYCLES
+  eevee_use_raytracing: false     # Enable Eevee ray tracing
+```
+
+### output
+
+Output file settings.
+
+```yaml
+output:
+  output_directory: ""            # Output directory path
+  image_format: PNG               # PNG, JPEG, TIFF, etc.
+  output_type: image              # Output type
+  images_per_view: 1              # Images per camera view
+```
+
+### metadata
+
+Information to include in rendered images.
+
+```yaml
+metadata:
+  use_stamp_camera: true          # Include camera info
+  use_stamp_date: true            # Include date
+  use_stamp_filename: true        # Include filename
+  use_stamp_frame: true           # Include frame number
+  use_stamp_render_time: true     # Include render time
+  use_stamp_scene: true           # Include scene name
+  use_stamp_time: true            # Include time
+  stamp_note_text: ""             # Custom note text
+  # Additional stamp options available
+```
+
+### orientations
+
+Object origin and rotation settings.
+
+```yaml
+orientations:
+  object_location_origin: OBJECT  # Origin for location transforms
+  object_rotation_origin: OBJECT  # Origin for rotation transforms
+  location_shift_axes: XYZ         # Axes for location shifts
+```
 
 ### transforms
 
-List of transformations to apply during rendering for data augmentation and variation.
+Transform pipeline for data augmentation. This is a list of transform definitions.
 
 ```yaml
 transforms:
-  - GaussianCameraRotation:       # Random camera rotation
-      mu: 0                       # Mean rotation (radians)
-      sigma: 0.1                  # Standard deviation
-      
-  - GaussianSpecimenRotation:     # Random specimen rotation
+  - property_path: world.color
+    sampler_name: uniform
+    params:
+      low: 0.0
+      high: 1.0
+  - property_path: camera.location
+    sampler_name: normal
+    params:
       mu: 0
-      sigma: 0.1
-      
-  - GaussianSpecimenTranslation:  # Random specimen position
-      mu: 0
-      sigma: 0.1
-      
-  - RandomizeWorldColor:          # Random background color
-      # No parameters needed
-      
-  - RandomLampPlacement:          # Random light positioning
-      # No parameters needed
-      
-  - GaussianLampRotation:         # Random light rotation
-      mu: 0
-      sigma: 0.1
-      
-  - GaussianLampTranslation:      # Random light position
-      mu: 0
-      sigma: 0.1
+      sigma: 0.5
+      n: 3
+  - property_path: world.strength
+    sampler_name: beta
+    params:
+      a: 2
+      b: 5
 ```
+
+**Transform Structure:**
+- `property_path` (string): Relative path to config property (e.g., "world.color", "camera.location")
+- `sampler_name` (string): Statistical distribution to use
+- `params` (dict): Parameters for the sampler function
+
+**Available Samplers:**
+
+| Sampler | Parameters | Description |
+|---------|-----------|-------------|
+| `uniform` | `low`, `high` | Uniform distribution |
+| `normal` | `mu`, `sigma`, optional `n` | Normal (Gaussian) distribution |
+| `beta` | `a`, `b` | Beta distribution |
+| `gamma` | `alpha`, `beta` | Gamma distribution |
+| `dirichlet` | `alphas` (list) | Dirichlet distribution (for color vectors) |
+| `multivariate_normal` | `mu` (list), `cov` (list of lists) | Multivariate normal distribution |
+| `poisson` | `lam` | Poisson distribution |
+| `exponential` | `lambd` | Exponential distribution |
+| `cauchy` | `x0`, `gamma` | Cauchy distribution |
+| `discrete_uniform` | `low`, `high` (integers) | Discrete uniform distribution |
 
 ## Example Configurations
 
 ### Basic Museum Documentation
 
 ```yaml
-blender_preferences:
-  use_online_access: False
-
-morphospace: 
-  name: MuseumCollection2024
-  path: ./data/morphospaces/museum_collection.json
-
-dataset:
-  path: ./data/specimens.csv
-  specimen_column: catalog_number
-  trait_columns:
-    - length_mm
-    - width_mm
-    - height_mm
-
-rendering:
-  render_engine: Cycles
-  compute_device_type: CUDA
-  samples: 256
+---
+world:
+  color: [0.0, 0.0, 0.0, 1.0]
+  strength: 1.0
+camera:
+  location: [0.0, 0.0, 1.0]
+  rotation: [0.0, 0.0, 0.0]
+  focal_length: 60.0
   resolution_x: 2048
   resolution_y: 2048
-  file_format: PNG
-
-imaging:
-  output_path: ./output/museum_docs
-  images_per_specimen: 1
-  images_per_view: 1
-  views:
-    - bottom
-    - apex
-    - lateral
-
+  resolution_percentage: 100
+lamp:
+  location: [0.0, 0.0, 1.0]
+  power: 10.0
+  color: [1.0, 1.0, 1.0]
+render:
+  engine: BLENDER_EEVEE_NEXT
+output:
+  output_directory: "./output/museum_docs"
+  image_format: PNG
 transforms: []  # No transforms for documentation
 ```
 
 ### Research Data Augmentation
 
 ```yaml
-blender_preferences:
-  use_online_access: True
-
-morphospace: 
-  name: ResearchDataset
-  path: ./data/morphospaces/research_data.json
-
-dataset:
-  path: ./data/research_specimens.csv
-  specimen_column: specimen_id
-  trait_columns:
-    - pc1
-    - pc2
-    - pc3
-
-rendering:
-  render_engine: Cycles
-  compute_device_type: CUDA
-  samples: 128
+---
+world:
+  color: [0.0, 0.0, 0.0, 1.0]
+  strength: 1.0
+camera:
+  location: [0.0, 0.0, 1.0]
+  rotation: [0.0, 0.0, 0.0]
+  focal_length: 50.0
   resolution_x: 1024
   resolution_y: 1024
-  file_format: PNG
-
-imaging:
-  output_path: ./output/research_augmented
-  images_per_specimen: 10
-  images_per_view: 2
-  views:
-    - bottom
-    - apex
-    - aperture
-    - lateral
-    - oblique
-
+  resolution_percentage: 100
+lamp:
+  location: [0.0, 0.0, 1.0]
+  power: 10.0
+  color: [1.0, 1.0, 1.0]
+render:
+  engine: BLENDER_EEVEE_NEXT
+output:
+  output_directory: "./output/research_augmented"
+  image_format: PNG
 transforms:
-  - GaussianCameraRotation:
-      mu: 0
-      sigma: 0.05
-  - GaussianSpecimenRotation:
-      mu: 0
-      sigma: 0.1
-  - GaussianSpecimenTranslation:
-      mu: 0
-      sigma: 0.05
-  - RandomizeWorldColor: {}
-  - RandomLampPlacement: {}
-  - GaussianLampRotation:
+  - property_path: world.color
+    sampler_name: dirichlet
+    params:
+      alphas: [1.0, 1.0, 1.0, 1.0]
+  - property_path: camera.location
+    sampler_name: normal
+    params:
       mu: 0
       sigma: 0.2
+      n: 3
+  - property_path: lamp.power
+    sampler_name: gamma
+    params:
+      alpha: 3.0
+      beta: 2.0
 ```
 
 ## Using Configuration Files
 
-### Command Line
+### In Blender GUI
 
-```bash
-# Run with a specific configuration
-traitblender --config ./configs/museum_documentation.yaml
-
-# Override specific settings
-traitblender --config ./configs/base.yaml --output-path ./custom_output
-```
+1. In the **Museum Setup** panel, enter the path to your YAML file in the **Config File** field
+2. Click **Configure Scene** to load the configuration
+3. The configuration will be applied to the current scene
 
 ### Python API
 
 ```python
-from traitblender.core import ConfigLoader
+import bpy
+import yaml
 
-# Load configuration
-config = ConfigLoader.from_file("./configs/research.yaml")
+# Load configuration from YAML file
+with open("my_config.yaml", 'r') as f:
+    config_data = yaml.safe_load(f)
 
-# Access configuration sections
-render_settings = config.rendering
-imaging_settings = config.imaging
+# Apply to scene
+bpy.context.scene.traitblender_config.from_dict(config_data)
 
-# Override settings programmatically
-config.imaging.output_path = "./new_output_path"
+# Export current configuration
+config_dict = bpy.context.scene.traitblender_config.to_dict()
+with open("exported_config.yaml", 'w') as f:
+    yaml.dump(config_dict, f)
+
+# View configuration as YAML string
+config_yaml = str(bpy.context.scene.traitblender_config)
+print(config_yaml)
 ```
+
+### Exporting Configuration
+
+You can export the current configuration from the GUI:
+1. Go to the **Configuration** panel
+2. Click **Export Config as YAML**
+3. Save the file for reuse
+
+## Property Paths
+
+When defining transforms, use relative property paths that match the configuration structure:
+
+- `world.color` - World background color
+- `world.strength` - World background strength
+- `camera.location` - Camera position (3D vector)
+- `camera.rotation` - Camera rotation (3D vector)
+- `camera.focal_length` - Camera focal length
+- `camera.resolution_x` - Render width
+- `camera.resolution_y` - Render height
+- `lamp.location` - Light position
+- `lamp.power` - Light power
+- `lamp.color` - Light color (3D vector)
+- `mat.color` - Mat color
+- `mat.location` - Mat position
 
 ## Best Practices
 
@@ -306,7 +341,6 @@ project/
 │   ├── research_augment.yaml  # Research with augmentation
 │   └── quick_test.yaml        # Fast testing configuration
 ├── data/
-│   ├── morphospaces/
 │   └── specimens.csv
 └── output/
 ```
@@ -317,24 +351,59 @@ project/
 2. **Document Transforms**: Comment your transform parameters for reproducibility
 3. **Version Control**: Keep configuration files in version control
 4. **Validation**: Test configurations with small datasets first
-5. **Performance**: Balance quality (samples) with rendering time for your use case
+5. **Performance**: Balance quality (resolution) with rendering time for your use case
 
 ### Common Patterns
 
 **High Quality Documentation:**
-- High samples (256+)
 - High resolution (2048x2048+)
 - No transforms
-- Standard views only
+- Standard camera settings
 
 **Research Data Augmentation:**
-- Moderate samples (128)
-- Multiple views and variations
-- Gaussian transforms for variation
-- Multiple images per specimen
+- Moderate resolution (1024x1024)
+- Multiple transforms for variation
+- Statistical sampling on multiple properties
 
 **Quick Testing:**
-- Low samples (32-64)
 - Lower resolution (512x512)
-- Single view
-- Minimal transforms 
+- Minimal transforms
+- Fast render engine (EEVEE)
+
+## Transform Examples
+
+### Color Variation
+
+```yaml
+transforms:
+  - property_path: world.color
+    sampler_name: dirichlet
+    params:
+      alphas: [0.8, 0.8, 0.8, 1.0]  # Slight color variation
+```
+
+### Camera Movement
+
+```yaml
+transforms:
+  - property_path: camera.location
+    sampler_name: multivariate_normal
+    params:
+      mu: [0, 0, 0]
+      cov: [[0.1, 0, 0], [0, 0.1, 0], [0, 0, 0.05]]  # Small position variation
+```
+
+### Lighting Variation
+
+```yaml
+transforms:
+  - property_path: lamp.power
+    sampler_name: gamma
+    params:
+      alpha: 3.0
+      beta: 2.0
+  - property_path: lamp.color
+    sampler_name: dirichlet
+    params:
+      alphas: [1.0, 1.0, 1.0]  # Slight color temperature variation
+```

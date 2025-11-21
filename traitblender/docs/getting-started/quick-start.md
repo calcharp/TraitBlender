@@ -3,7 +3,7 @@
 Get up and running with TraitBlender's graphical interface in just a few minutes! This guide will walk you through creating your first museum-style specimen image using Blender's user interface.
 
 !!! note "Alternative Access Methods"
-    This guide covers the GUI interface. TraitBlender operators can also be accessed programmatically via Python API. See the [Quick Start (API)](./quick-start-api.md) guide for code-based workflows.
+    This guide covers the GUI interface. TraitBlender can also be accessed programmatically via Python API. See the [Quick Start (API)](./quick-start-api.md) guide for code-based workflows.
 
 ## Prerequisites
 
@@ -12,90 +12,166 @@ Before starting, ensure you have:
 - ✅ Blender 4.3.0+ installed
 - ✅ TraitBlender add-on installed ([Installation Guide](./installation.md))
 
-## Step 1: Enable TraitBlender
+??? note "Step 1: Enable TraitBlender"
+    1. Open Blender
+    2. Go to **Edit → Preferences → Add-ons**
+    3. Search for "TraitBlender" 
+    4. Enable the checkbox next to **TraitBlender**
+    5. The TraitBlender panel should now appear in the **3D Viewport sidebar** (press `N` if hidden)
 
-1. Open Blender
-2. Go to **Edit → Preferences → Add-ons**
-3. Search for "TraitBlender" 
-4. Enable the checkbox next to **TraitBlender**
-5. The TraitBlender panel should now appear in the **3D Viewport sidebar** (press `N` if hidden)
+    If you want TraitBlender to be activated by default when opening Blender, you must save your preferences after activation with **Edit → ☰ → Save Preferences**.
 
-If you want TraitBlender to be activated by default when opening Blender, you must save your prefernces after activation, with Edit  ->  ☰  ->  Save Preferences.
+??? note "Step 2: Open the Museum Scene"
+    1. In the TraitBlender panel, find the **"1 Museum Setup"** panel
+    2. Click the **"Import Museum"** button
+    3. After a moment, the scene will load with a museum table, lighting, and camera setup
+    4. Press `0` on your numpad (or `0` with Emulate Numpad enabled) to switch to Camera View
+    5. You should now be looking through the camera at the empty mat lying on the table
 
-## Step 2: Open the Museum Scene
+    !!! tip "Emulate Numpad"
+        If you don't have a numpad, go to **Edit → Preferences → Input** and check **Emulate Numpad**. This allows you to use the number keys at the top of your keyboard as a numpad.
 
-1. In the TraitBlender panel, click the **Museum Setup** dropdown, and click **Import Museum**
-2. After a second or two, the screen will get dark. Press 0 on your keyboard to switch to Camera View. You should now be looking through the camera at the empty mat lying on the table.
-    If you do not have a standard numpad on your keyboard and rely on the number keys at the top, go to Edit -> Preferences -> Input, and check the box for **Emulate Numpad**. This will allow you to use the number keys at the top of your keyboard as a numpad, and you can then press 0 to switch to Camera View.
+??? note "Step 3: Configure the Scene"
+    Collapse the **Museum Setup** panel and expand the **"2 Configuration"** panel.
 
-## Step 3: Alter the configuration of the scene and its layout
+    The configuration system stores all scene settings (camera, lighting, world, materials, etc.) as a structured PropertyGroup at `bpy.context.scene.traitblender_config`. The Configuration Panel provides a visual interface for these settings.
 
-Collapse the **Museum Setup** dropdown, and press the dropdown arrow for the **Configuration Panel**.
+    In this panel, you'll see several collapsible sections:
 
-Internally, Blender is storing the TraitBlender configuration data as a [PropertyGroup](https://docs.blender.org/api/current/bpy.types.PropertyGroup.html), at `bpy.context.scene.tb_config`. The **Configuration Panel** serves as a visual interface for this object.
+    - **World** - Background color and lighting strength
+    - **Camera** - Position, rotation, focal length, resolution
+    - **Lamp** - Lighting position, color, power, and properties
+    - **Mat** - Specimen mat color, position, and scale
+    - **Render** - Render engine settings
+    - **Output** - Image output format and directory
+    - **Metadata** - Information to include in rendered images
 
-In this panel, you will see a number of sections:
+    Click the arrow next to any section to expand it and adjust settings. Changes are immediately reflected in the scene.
 
-- **Camera**
-- **Lamp**
-- **Mat**
-- **Metadata**
-- **Output**
-- **Render**
-- **World**
+    ### Viewing and Exporting Configuration
 
-These sections can be used for altering different aspects of the scene, such as the position and focal length of the camera, the color and size of the mat, metadata information to include with images for rendering, and more. Any updates you make here will be changed in the underlying configuration object. 
+    - **Show Configuration**: Click this button to see all configuration values in a popup window
+    - **Export Config as YAML**: Export your current configuration to a YAML file for reuse
 
-To see all of the configuration settings, press the **Show Configuration** button at the bottom of the panel. A popup with all of the configuration settings will appear.
+    ### Importing Configuration
 
-You may also export your configuration settings to a YAML file with the **Export Config as YAML** button, and import external configurations in the Museum Setup dropdown, with the YAML path in the **Config File** field, and pressing **Configure Scene**. 
+    1. In the **Museum Setup** panel, enter a path to a YAML config file in the **Config File** field
+    2. Click **Configure Scene** to load the configuration
 
-Note that this import will only work if the original **Import Museum** button has been pressed, and none of the default objects/materials/etc... have been deleted. If you run into import problems, you may emptying the scene with the **Clear Scene** button, and re-importing the museum scene.
-    
+    !!! warning "Scene Requirements"
+        Configuration import only works if the museum scene has been loaded (via **Import Museum**). If you encounter issues, click **Clear Scene** and re-import the museum scene.
 
-## Step 4: View and Select Morphospaces
+??? note "Step 4: Select a Morphospace"
+    Expand the **"3 Morphospaces"** panel.
 
-The primary goal of TraitBlender is to simulate image datasets of organisms from theoretical morphospaces. 
+    TraitBlender generates 3D specimens from mathematical models called morphospaces. By default, TraitBlender includes the **CO_Raup** morphospace, which combines:
+    - The morphospace developed by [Contreras-Figueroa and Aragón](https://www.mdpi.com/1424-2818/15/3/431) (a generalization of Raup's classic shell space)
+    - [Okabe and Yoshimura's](https://doi.org/10.1038/srep42445) allometric shell thickness function
 
-By default, TraitBlender comes with one pre-built morphospace, called **CO_Raup**. The combines the morphospace developed by [Contreras-Figueroa and Aragón](https://www.mdpi.com/1424-2818/15/3/431) (a generalization of Raup's classic space) with [Okabe and Yoshimura's](https://doi.org/10.1038/srep42445) allometric shell thickness function to make fully 3D models of molluscan shells.
+    This creates fully 3D models of molluscan shells with realistic geometry.
 
-*In the future, users will be able to install their own morphospaces as well, by creating Python modules which export a 'sample' function*.
+    Select **CO_Raup** from the dropdown (it should be the only option by default).
 
-## Step 5: Manage Datasets
+??? note "Step 5: Import and Manage Datasets"
+    Expand the **"4 Datasets"** panel.
 
-After selecting a morphospace, the next step is to import or create a dataset that individuals can be sampled from.
+    ### Import a Dataset
 
-Under **Datasets**, select the path to a dataset file (.csv, .tsv, or .xlsx). 
+    1. Click the folder icon next to **Dataset File**
+    2. Select a CSV, TSV, or Excel (.xlsx, .xls) file containing your morphological data
+    3. TraitBlender will automatically:
+       - Detect the species/label column (looks for: species, label, tips, name, id, etc.)
+       - Move the species column to the first position
+       - Load the data into the system
 
-TraitBlender assumes that the first column of the dataset represents the names of organisms that will be sampled, and the remaining columns coorespond to organismal traits (the parameters in the sample function of the morphospace being used).
+    ### Dataset Format
 
-A list of the traits and scales for the default CO_Raup space can be found [here]().
+    Your dataset should have:
+    - **First column**: Species/specimen names (automatically detected)
+    - **Remaining columns**: Morphological traits that map to morphospace parameters
 
-After a dataset file is selected, the names of the organisms from the morphospace should appear in the dropdown box next to **Sample**. To generate a sample, simply press the **Generate Sample** button, and the sample corresponding the selected individual will be placed as the center of the table.
+    For CO_Raup, the parameters include: `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `time_step`, `points_in_circle`, `eps`, `h_0`, `length`
 
-*Users may also be interested in creating datasets from scratch, or editing/viewing existing ones. The Edit Dataset button creates and incomplete popup, that will eventually be a simple dataset editor*
+    ### Generate a Specimen
 
-## Step 6: Orientation
+    1. After importing, select a specimen from the **Sample** dropdown
+    2. Click **Generate Sample**
+    3. A 3D shell will be generated and placed at the center of the table
+    4. Use the **Sample Controls** section to adjust the specimen's position and rotation
 
-When imaging real organisms, 'standard views' are often define, which specify procedures for orienting and placing specimens down to be imaged. TraitBlender allows for organisms to be placed in this way by defing standard rotation and translation optimizations which interact with specimens in complex ways to allow for standard views.
+    ### Edit Dataset
 
-*In the future, this views will serializable in the config, so they can be easily repeated*
+    Click **Edit Dataset** to open the CSV viewer (DearPyGui). This allows you to:
+    - View and filter your data
+    - Sort by columns
+    - Edit values
+    - Export changes back to TraitBlender
 
-## Step 7: Transforms
+??? note "Step 6: Adjust Orientations"
+    Expand the **"5 Orientations"** panel.
 
-Real images are often messy in ways that are difficult to control, but nonetheless may effect the inferences/predictions of models which use them.
+    This panel controls how specimens are oriented relative to the table. The orientation system is designed to help align specimens consistently, similar to Procrustes alignment for 2D images.
 
-TraitBlender implements a transformation pipeline that allows users to specify random noise in their images.
+    !!! note "Work in Progress"
+        The orientation system is currently under development. Basic positioning works well using the table coordinate system (`tb_coords`), but automatic alignment for consistent specimen rotation is still being refined.
 
-In the Tranforms menu, users may select the path to a property which they want to transforms, and a sampler which they want to transform their property by (these are just functions which draw samples from some selected distribution).
+??? note "Step 7: Configure Transforms"
+    Expand the **"6 Transforms"** panel.
 
-*In the future, distribution parameters will be added to the GUI, for users to better implements transformations*
+    Transforms allow you to add statistical variation to your images for data augmentation. This is useful for training neural networks or simulating real-world imaging conditions.
 
-*Transformations are currently serializable and can be specifed from a config file, but I need to add docs to explain this in more detail*
+    ### Building a Transform Pipeline
 
-## Step 8: Render an Image Dataset
+    1. **Select Property**: Choose a configuration section (e.g., "world") and a property (e.g., "color")
+    2. **Select Sampler**: Choose a statistical distribution (uniform, normal, beta, gamma, etc.)
+    3. **Add Transform**: The transform is added to the pipeline (currently requires Python API - GUI coming soon)
 
-...
+    ### Available Samplers
+
+    - **uniform**: Uniform distribution between low and high
+    - **normal**: Normal (Gaussian) distribution
+    - **beta**: Beta distribution
+    - **gamma**: Gamma distribution
+    - **dirichlet**: Dirichlet distribution (for color vectors)
+    - **multivariate_normal**: Multivariate normal distribution
+    - **poisson**: Poisson distribution
+    - **exponential**: Exponential distribution
+    - **cauchy**: Cauchy distribution
+    - **discrete_uniform**: Discrete uniform distribution
+
+    ### Running the Pipeline
+
+    - **Run Pipeline**: Execute all transforms in sequence
+    - **Undo Pipeline**: Revert all changes back to original values
+
+    !!! note "Transform GUI"
+        A full DearPyGui interface for building transforms is in development. Currently, transforms can be built programmatically via Python API or by editing the YAML configuration directly.
+
+??? note "Step 8: Render Images"
+    Expand the **"7 Imaging"** panel.
+
+    1. Configure your output settings in the **Configuration** panel (Output section)
+    2. Click **Run Imaging Pipeline** to render images
+
+    The imaging pipeline will:
+    - Apply any configured transforms
+    - Render from the current camera view
+    - Save images to the specified output directory
+    - Include metadata if configured
+
+## Next Steps
+
+Congratulations! You've completed the basic workflow. Now you can:
+
+- **Explore the API**: ([Quick Start API](./quick-start-api.md))
+- **Customize Configurations**: Create and save YAML configs for different imaging setups
+- **Build Transform Pipelines**: Use the Python API to create complex data augmentation pipelines
+- **Work with Multiple Specimens**: Process entire datasets programmatically
+
+For more detailed information, see:
+- [Configuration Files](../configuration/config-files.md) - Understanding YAML configs
+- [API Reference](../api/) - Complete API documentation
+- [Tutorials](../tutorials/) - Advanced techniques and workflows
 
 
 

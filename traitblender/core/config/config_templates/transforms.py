@@ -6,11 +6,6 @@ from ..register_config import register, TraitBlenderConfig
 
 @register("transforms")
 class TransformPipelineConfig(TraitBlenderConfig):
-    pipeline_yaml: StringProperty(
-        name="Pipeline YAML",
-        description="Serialized TransformPipeline (YAML or JSON)",
-        default=""
-    )
     pipeline_state: StringProperty(
         name="Pipeline State",
         description="Serialized state of the pipeline (including undo history)",

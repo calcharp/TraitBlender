@@ -1,6 +1,6 @@
 # Quick Start Guide (API)
 
-Learn how to use TraitBlender programmatically through Python scripts and Blender's API. This approach is ideal for batch processing, automation, and integration into larger workflows.
+Learn how to use TraitBlender programmatically through Python scripts in Blender's Python console or script editor. This approach is ideal for batch processing, automation, and integration into larger workflows.
 
 !!! note "GUI Alternative"
     This guide covers the Python API. If you prefer a graphical interface, see the [Quick Start (GUI)](./quick-start.md) guide.
@@ -10,221 +10,299 @@ Learn how to use TraitBlender programmatically through Python scripts and Blende
 Before starting, ensure you have:
 
 - ✅ Blender 4.3.0+ installed
-- ✅ TraitBlender add-on installed ([Installation Guide](./installation.md))
+- ✅ TraitBlender add-on installed and enabled ([Installation Guide](./installation.md))
 - ✅ Basic Python knowledge (helpful but not required)
 
 ## Basic API Usage
 
-### 1. Enable TraitBlender in Script
+### 1. Setup Museum Scene
 
 ```python
 import bpy
 
-# Enable TraitBlender add-on if not already enabled
-bpy.ops.preferences.addon_enable(module="traitblender")
-
-# Import TraitBlender modules
-from traitblender.core import SceneAsset
-from traitblender.operators import GenerateImageOperator
+# Load the museum scene
+bpy.ops.traitblender.setup_scene()
 ```
 
-### 2. Load a Specimen
+This loads the pre-configured museum scene with table, lighting, and camera.
+
+### 2. Work with Datasets
 
 ```python
-# Clear existing scene
-bpy.ops.object.select_all(action='SELECT')
-bpy.ops.object.delete(use_global=False)
+# Get the dataset property
+dataset = bpy.context.scene.traitblender_dataset
 
-# Import a specimen model
-specimen_path = "/path/to/your/specimen.obj"
-bpy.ops.import_scene.obj(filepath=specimen_path)
+# Set dataset filepath (auto-imports)
+dataset.filepath = "/path/to/your/data.csv"
 
-# Get the imported object
-specimen = bpy.context.selected_objects[0]
-specimen.name = "specimen"
+# Access dataset rows
+row = dataset.loc("species_name")  # Get row by species name
+print(row)  # Shows all trait values for that species
+
+# Get dataset info
+print(f"Dataset shape: {dataset.shape}")
+print(f"Columns: {dataset.colnames}")
+print(f"Rows: {dataset.rownames}")
 ```
 
-### 3. Apply Scene Configuration
+### 3. Generate Morphospace Samples
 
 ```python
-# Create a museum-style scene
-scene_config = {
-    "lighting": "museum_standard",
-    "background": {"color": (1.0, 1.0, 1.0, 1.0)},  # White background
-    "camera": {
-        "view": "lateral",
-        "distance": 5.0
-    }
-}
+# Set morphospace (must match folder name in assets/morphospace_modules/)
+setup = bpy.context.scene.traitblender_setup
+setup.available_morphospaces = "CO_Raup"
 
-# Apply scene settings
-scene_asset = SceneAsset(**scene_config)
-scene_asset.apply()
+# Select a sample from dataset
+dataset = bpy.context.scene.traitblender_dataset
+dataset.sample = "species_name"  # Use actual species name from your dataset
+
+# Generate the 3D specimen
+bpy.ops.traitblender.generate_morphospace_sample()
 ```
 
-### 4. Configure Rendering
+The specimen will be generated and placed at the center of the table.
+
+### 4. Configure Scene Properties
 
 ```python
-# Set render properties
-scene = bpy.context.scene
-scene.render.resolution_x = 1920
-scene.render.resolution_y = 1080
-scene.render.filepath = "/path/to/output/specimen_image.png"
+# Access configuration
+config = bpy.context.scene.traitblender_config
 
-# Configure render engine for quality
-scene.render.engine = 'CYCLES'
-scene.cycles.samples = 128
+# Modify camera settings
+config.camera.location = (0.0, 0.0, 1.0)
+config.camera.focal_length = 50.0
+config.camera.resolution_x = 1920
+config.camera.resolution_y = 1080
+
+# Modify world settings
+config.world.color = (0.0, 0.0, 0.0, 1.0)  # Black background
+config.world.strength = 1.0
+
+# Modify lamp settings
+config.lamp.location = (0.0, 0.0, 1.0)
+config.lamp.power = 10.0
+config.lamp.color = (1.0, 1.0, 1.0)
 ```
 
-### 5. Generate Image
+### 5. Build Transform Pipeline
 
 ```python
-# Render the image
-bpy.ops.render.render(write_still=True)
+# Get transforms config
+transforms = bpy.context.scene.traitblender_config.transforms
 
-print("Image rendered successfully!")
+# Add transforms to pipeline
+transforms.add_transform("world.color", "uniform", {"low": 0.0, "high": 1.0})
+transforms.add_transform("camera.location", "normal", {"mu": 0, "sigma": 0.5, "n": 3})
+transforms.add_transform("world.strength", "beta", {"a": 2, "b": 5})
+
+# Run the pipeline
+transforms.run()
+
+# Undo if needed
+transforms.undo()
+```
+
+### 6. Position Objects Using Table Coordinates
+
+```python
+# Get generated specimen object
+specimen = bpy.data.objects["species_name"]
+
+# Position relative to table center
+specimen.tb_coords = (0.0, 0.0, 0.0)  # Center of table
+specimen.tb_rotation = (0.0, 0.0, 0.0)  # Aligned with table
+
+# Move to different position
+specimen.tb_coords = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
+```
+
+### 7. Export/Import Configuration
+
+```python
+import yaml
+
+# Export current configuration to dict
+config_dict = bpy.context.scene.traitblender_config.to_dict()
+
+# Save to YAML file
+with open("my_config.yaml", 'w') as f:
+    yaml.dump(config_dict, f)
+
+# Load configuration from YAML
+with open("my_config.yaml", 'r') as f:
+    config_data = yaml.safe_load(f)
+    bpy.context.scene.traitblender_config.from_dict(config_data)
 ```
 
 ## Complete Example Script
 
-Here's a complete script that processes a specimen:
+Here's a complete script that processes a dataset:
 
 ```python
 import bpy
-import os
+import yaml
 
-def process_specimen(input_path, output_path):
-    """
-    Process a single specimen and generate museum-style image
-    
-    Args:
-        input_path (str): Path to specimen model file
-        output_path (str): Path for output image
-    """
-    
-    # Clear scene
-    bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.object.delete(use_global=False)
-    
-    # Import specimen
-    bpy.ops.import_scene.obj(filepath=input_path)
-    specimen = bpy.context.selected_objects[0]
-    
-    # Center and scale specimen
-    bpy.ops.object.origin_set(type='GEOMETRY_ORIGIN', center='BOUNDS')
-    specimen.location = (0, 0, 0)
-    
-    # Setup camera
-    bpy.ops.object.camera_add(location=(3, -3, 2))
-    camera = bpy.context.object
-    camera.rotation_euler = (1.1, 0, 0.785)
-    
-    # Setup lighting
-    bpy.ops.object.light_add(type='SUN', location=(2, 2, 5))
-    sun = bpy.context.object
-    sun.data.energy = 3.0
-    
-    # Configure render settings
-    scene = bpy.context.scene
-    scene.camera = camera
-    scene.render.resolution_x = 2048
-    scene.render.resolution_y = 2048
-    scene.render.filepath = output_path
-    scene.render.image_settings.file_format = 'PNG'
-    
-    # Render
-    bpy.ops.render.render(write_still=True)
-    
-    return True
+# Setup museum scene
+bpy.ops.traitblender.setup_scene()
 
-# Example usage
-if __name__ == "__main__":
-    input_file = "/path/to/specimen.obj"
-    output_file = "/path/to/output/specimen.png"
+# Configure scene
+config = bpy.context.scene.traitblender_config
+config.camera.resolution_x = 1920
+config.camera.resolution_y = 1920
+config.world.color = (0.0, 0.0, 0.0, 1.0)
+
+# Load dataset
+dataset = bpy.context.scene.traitblender_dataset
+dataset.filepath = "/path/to/your/dataset.csv"
+
+# Set morphospace
+setup = bpy.context.scene.traitblender_setup
+setup.available_morphospaces = "CO_Raup"
+
+# Process each species in dataset
+for species_name in dataset.rownames:
+    print(f"Processing {species_name}...")
     
-    process_specimen(input_file, output_file)
-    print(f"Processed {input_file} -> {output_file}")
+    # Select and generate specimen
+    dataset.sample = species_name
+    bpy.ops.traitblender.generate_morphospace_sample()
+    
+    # Position on table
+    specimen = bpy.data.objects[species_name]
+    specimen.tb_coords = (0.0, 0.0, 0.0)
+    
+    # Optional: Apply transforms for variation
+    transforms = config.transforms
+    if len(transforms) > 0:
+        transforms.run()
+    
+    # Render (configure output path first)
+    config.output.output_directory = f"/path/to/output/{species_name}.png"
+    bpy.ops.traitblender.imaging_pipeline()
+    
+    # Clean up for next iteration
+    bpy.data.objects.remove(specimen, do_unlink=True)
+    if len(transforms) > 0:
+        transforms.undo()
+
+print("Batch processing complete!")
 ```
 
-## Batch Processing Multiple Specimens
+## Working with Transform Pipelines
+
+### Building Complex Pipelines
 
 ```python
-import os
-import glob
+transforms = bpy.context.scene.traitblender_config.transforms
 
-def batch_process_specimens(input_dir, output_dir):
-    """
-    Process all specimen files in a directory
-    """
-    # Supported file formats
-    extensions = ['*.obj', '*.ply', '*.blend']
-    
-    for ext in extensions:
-        pattern = os.path.join(input_dir, ext)
-        files = glob.glob(pattern)
-        
-        for file_path in files:
-            filename = os.path.basename(file_path)
-            name, _ = os.path.splitext(filename)
-            output_path = os.path.join(output_dir, f"{name}.png")
-            
-            print(f"Processing: {filename}")
-            process_specimen(file_path, output_path)
-            print(f"Completed: {output_path}")
+# Clear any existing transforms
+transforms.clear()
 
-# Batch process example
-batch_process_specimens("/specimens/", "/output_images/")
+# Add multiple transforms
+transforms.add_transform("world.color", "dirichlet", {"alphas": [1.0, 1.0, 1.0, 1.0]})
+transforms.add_transform("camera.location", "multivariate_normal", {
+    "mu": [0, 0, 0],
+    "cov": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+})
+transforms.add_transform("lamp.power", "gamma", {"alpha": 2.0, "beta": 1.0})
+
+# Serialize pipeline to YAML
+pipeline_yaml = transforms.pipeline_state
+print(pipeline_yaml)
+
+# Pipeline is automatically saved in config
+```
+
+### Accessing Pipeline Data
+
+```python
+import yaml
+
+# Get pipeline as YAML string
+yaml_string = bpy.context.scene.traitblender_config.transforms.pipeline_state
+
+# Parse to Python objects
+pipeline_data = yaml.safe_load(yaml_string)
+print(f"Pipeline has {len(pipeline_data)} transforms")
+
+# Access individual transforms
+for i, transform in enumerate(pipeline_data):
+    print(f"Transform {i+1}: {transform['property_path']} ~ {transform['sampler_name']}")
 ```
 
 ## Running Scripts
 
-### Method 1: Blender GUI Script Editor
+### Method 1: Blender Script Editor
 1. Open Blender
 2. Switch to **Scripting** workspace
 3. Paste your script in the text editor
-4. Click **Run Script**
+4. Click **Run Script** (or press `Alt+P`)
 
-### Method 2: Command Line
+### Method 2: Blender Python Console
+1. Open Blender
+2. Open the **Python Console** (usually in bottom panel)
+3. Paste and execute code line by line, or:
+```python
+exec(open("/path/to/your_script.py").read())
+```
+
+### Method 3: Command Line (Background)
 ```bash
 # Run Blender in background with script
 blender --background --python your_script.py
 
-# With additional arguments
-blender --background --python process_specimens.py -- --input /data --output /results
-```
-
-### Method 3: Within Blender Python Console
-```python
-# In Blender's Python console
-exec(open("/path/to/your_script.py").read())
+# With a specific blend file
+blender --background my_scene.blend --python your_script.py
 ```
 
 ## Advanced Features
 
-### Custom Transforms
-```python
-from traitblender.transforms import MorphologicalTransform
+### Custom Morphospace Integration
 
-# Apply custom morphological transform
-transform = MorphologicalTransform(
-    scale_factor=1.2,
-    orientation="dorsal",
-    standardize=True
-)
-transform.apply(specimen)
+```python
+# Morphospaces are loaded dynamically from assets/morphospace_modules/
+# Each morphospace must have:
+# - A 'sample' function that takes parameters and returns a sample object
+# - The sample object must have a 'to_blender()' method
+
+# The system automatically maps dataset columns to morphospace parameters
+# Column names are converted to lowercase with spaces replaced by underscores
 ```
 
-### Configuration Files
+### Dataset Manipulation
+
 ```python
-import yaml
+dataset = bpy.context.scene.traitblender_dataset
 
-# Load configuration from YAML
-with open("specimen_config.yaml", 'r') as f:
-    config = yaml.safe_load(f)
+# Access specific values
+row = dataset.loc("species_name")
+trait_value = row["trait_column_name"]
 
-# Apply configuration
-for key, value in config['scene'].items():
-    setattr(scene_asset, key, value)
+# Use pandas-like indexing
+first_five = dataset.head(5)
+last_five = dataset.tail(5)
+
+# Iterate over dataset
+for species_name in dataset.rownames:
+    row_data = dataset.loc(species_name)
+    print(f"{species_name}: {row_data}")
+```
+
+### Configuration Management
+
+```python
+# View all configuration sections
+config = bpy.context.scene.traitblender_config
+sections = config.get_config_sections()
+print(f"Available sections: {list(sections.keys())}")
+
+# Access nested properties
+world_color = config.world.color
+camera_location = config.camera.location
+
+# Export full configuration
+config_yaml = str(config)  # Returns YAML string
+print(config_yaml)
 ```
 
 ## Next Steps
@@ -232,15 +310,16 @@ for key, value in config['scene'].items():
 🎉 **Congratulations!** You can now use TraitBlender programmatically.
 
 ### Explore More:
-- **[API Reference](../api/core.md)**: Complete API documentation
-- **[CLI Usage](../cli/usage.md)**: Command-line batch processing
-- **[Configuration Files](../configuration/config-files.md)**: YAML-based configurations
+- **[Configuration Files](../configuration/config-files.md)**: Understanding YAML config structure
+- **[API Reference](../api/)**: Complete API documentation (coming soon)
+- **[Tutorials](../tutorials/)**: Advanced techniques and workflows
 
 ### Tips for API Usage:
-- Always clear the scene before importing new specimens
+- Always run `setup_scene()` before using other features
+- Use table coordinates (`tb_coords`) for consistent positioning
+- Serialize configurations to YAML for reproducibility
+- Test transforms on single specimens before batch processing
 - Use try/except blocks for robust error handling
-- Save scene configurations for consistency across specimens
-- Consider memory management for large batch operations
 
 ## Troubleshooting
 
@@ -248,7 +327,7 @@ Having issues with the API? Check our [troubleshooting guide](../troubleshooting
 
 ---
 
-**Estimated time**: 10-15 minutes to set up your first script  
+**Estimated time**: 15-20 minutes to set up your first script  
 **Skill level**: Intermediate  
 **Output**: Automated specimen image generation pipeline
 

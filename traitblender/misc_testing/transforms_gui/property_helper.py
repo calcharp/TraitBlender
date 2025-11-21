@@ -118,3 +118,43 @@ def parse_property_path(property_path):
     parts = property_path.split(".", 1)
     return parts[0], parts[1]
 
+
+def get_available_samplers():
+    """
+    Get list of available sampler functions.
+    In standalone mode, returns common samplers.
+    When integrated, will use the TRANSFORMS registry.
+    
+    Returns:
+        list: List of tuples (sampler_name, display_name)
+    """
+    try:
+        # Try to import from TraitBlender
+        import sys
+        import os
+        # Add parent directories to path if needed
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+        
+        from core.transforms.registry import TRANSFORMS
+        return [
+            (sampler_name, sampler_name.replace('_', ' ').title())
+            for sampler_name in sorted(TRANSFORMS.keys())
+        ]
+    except (ImportError, AttributeError):
+        # Standalone mode - return actual samplers from registry
+        return [
+            ("uniform", "Uniform"),
+            ("normal", "Normal"),
+            ("beta", "Beta"),
+            ("gamma", "Gamma"),
+            ("dirichlet", "Dirichlet"),
+            ("multivariate_normal", "Multivariate Normal"),
+            ("poisson", "Poisson"),
+            ("exponential", "Exponential"),
+            ("cauchy", "Cauchy"),
+            ("discrete_uniform", "Discrete Uniform"),
+        ]
+

@@ -1,304 +1,277 @@
 # Basic Specimen Imaging Tutorial
 
-This tutorial will guide you through creating your first museum-style specimen images using TraitBlender. By the end, you'll be able to import specimens, set up cameras, and generate high-quality images suitable for scientific documentation.
+This tutorial will guide you through creating your first museum-style specimen images using TraitBlender. By the end, you'll be able to import datasets, generate 3D specimens, and render high-quality images.
 
 ## Prerequisites
 
-- TraitBlender installed and enabled in Blender 4.2+
+- TraitBlender installed and enabled in Blender 4.3+
 - Basic familiarity with Blender interface
-- A 3D specimen model (`.obj`, `.ply`, or `.blend` format)
+- A CSV/Excel file with morphological data (or use the example format below)
 
 ## Tutorial Overview
 
-We'll create a simple imaging setup to photograph a specimen from multiple angles, similar to museum documentation standards.
+We'll create a complete workflow to:
+1. Load the museum scene
+2. Import a morphological dataset
+3. Generate 3D specimens from the dataset
+4. Configure camera and lighting
+5. Render museum-style images
 
-## Step 1: Prepare Your Scene
+## Step 1: Setup Museum Scene
 
-### 1.1 Open Blender and Clear Default Scene
+### 1.1 Load the Museum Scene
 
 ```python
 import bpy
 
-# Clear default scene (optional)
-bpy.ops.object.select_all(action='SELECT')
-bpy.ops.object.delete(use_global=False)
+# Load the pre-configured museum scene
+bpy.ops.traitblender.setup_scene()
 ```
 
-### 1.2 Import Your Specimen
+This loads:
+- Museum table
+- Camera with proper positioning
+- Lighting setup
+- Specimen mat
+- Default configuration
 
-1. **File > Import > [Your Format]** (e.g., Wavefront OBJ)
-2. Navigate to your specimen file and import it
-3. Your specimen should appear in the 3D viewport
-
-Alternatively, using Python:
-```python
-# Import an OBJ file
-bpy.ops.import_scene.obj(filepath="/path/to/your/specimen.obj")
-```
-
-## Step 2: Set Up TraitBlender Scene Assets
-
-### 2.1 Create a Scene Asset for Your Specimen
+### 1.2 Verify Scene Setup
 
 ```python
-from traitblender.core.positioning import GenericAsset
-
-# Create an asset for your imported specimen
-# Replace "SpecimenName" with your actual object name
-specimen = GenericAsset("SpecimenName")
-
-# Set the origin to bottom center for proper placement
-specimen.origin_set(type="BOTTOM_CENTER")
+# Check that key objects exist
+required_objects = ["Table", "Camera", "Mat"]
+for obj_name in required_objects:
+    if obj_name in bpy.data.objects:
+        print(f"✓ {obj_name} loaded")
+    else:
+        print(f"✗ {obj_name} missing")
 ```
 
-### 2.2 Create a Surface for Specimen Placement
+## Step 2: Prepare Your Dataset
+
+### 2.1 Dataset Format
+
+Your dataset should be a CSV or Excel file with:
+- **First column**: Species/specimen names (automatically detected)
+- **Remaining columns**: Morphological traits that map to morphospace parameters
+
+Example CSV format for CO_Raup morphospace:
+
+```csv
+species,b,d,z,a,phi,psi,c_depth,c_n,n_depth,n,t,length
+species1,0.1,4,0,1,0,0,0.1,70,0,0,20,0.015
+species2,0.15,5,0,1.2,0.1,0.2,0.15,80,0.05,5,25,0.02
+species3,0.08,3.5,0,0.9,0,0,0.08,60,0,0,18,0.012
+```
+
+### 2.2 Import Dataset
 
 ```python
-from traitblender.core.positioning import SurfaceAsset
+# Get dataset property
+dataset = bpy.context.scene.traitblender_dataset
 
-# Add a plane as a base/table
-bpy.ops.mesh.primitive_plane_add(size=10, location=(0, 0, 0))
-bpy.context.active_object.name = "SpecimenTable"
+# Set filepath (auto-imports)
+dataset.filepath = "/path/to/your/dataset.csv"
 
-# Create a surface asset
-table = SurfaceAsset("SpecimenTable")
+# Verify import
+print(f"Dataset shape: {dataset.shape}")
+print(f"Columns: {dataset.colnames}")
+print(f"Species: {dataset.rownames[:5]}")  # First 5 species
 ```
 
-### 2.3 Place Specimen on Surface
+## Step 3: Select Morphospace
 
 ```python
-# Place the specimen at the center of the table
-table.place(specimen, (0, 0))
+# Set morphospace type
+setup = bpy.context.scene.traitblender_setup
+setup.available_morphospaces = "CO_Raup"
+
+print(f"Selected morphospace: {setup.available_morphospaces}")
 ```
 
-## Step 3: Configure Lighting
+## Step 4: Generate a Specimen
 
-### 3.1 Add Museum-Style Lighting
+### 4.1 Select and Generate
 
 ```python
-# Add a key light (main light source)
-bpy.ops.object.light_add(type='AREA', location=(2, -2, 3))
-key_light = bpy.context.active_object
-key_light.name = "KeyLight"
-key_light.data.energy = 50
-key_light.data.size = 2
+# Select a species from dataset
+dataset = bpy.context.scene.traitblender_dataset
+dataset.sample = "species1"  # Use actual name from your dataset
 
-# Add a fill light (softer secondary light)
-bpy.ops.object.light_add(type='AREA', location=(-1, 1, 2))
-fill_light = bpy.context.active_object
-fill_light.name = "FillLight"
-fill_light.data.energy = 20
-fill_light.data.size = 3
+# Generate the 3D specimen
+bpy.ops.traitblender.generate_morphospace_sample()
 
-# Add a rim light (for edge definition)
-bpy.ops.object.light_add(type='SPOT', location=(0, 3, 1))
-rim_light = bpy.context.active_object
-rim_light.name = "RimLight"
-rim_light.data.energy = 30
+# Verify generation
+if dataset.sample in bpy.data.objects:
+    specimen = bpy.data.objects[dataset.sample]
+    print(f"✓ Generated {dataset.sample}")
+    print(f"  Location: {specimen.location}")
+    print(f"  Table coords: {specimen.tb_coords}")
 ```
 
-### 3.2 Set Up Environment
+### 4.2 Position Specimen
 
 ```python
-# Set up world background
-world = bpy.context.scene.world
-world.use_nodes = True
-bg_node = world.node_tree.nodes["Background"]
-bg_node.inputs[0].default_value = (0.9, 0.9, 0.9, 1)  # Light gray background
-bg_node.inputs[1].default_value = 0.5  # Strength
+# Get the generated specimen
+specimen = bpy.data.objects[dataset.sample]
+
+# Position at table center (default)
+specimen.tb_coords = (0.0, 0.0, 0.0)
+
+# Or position elsewhere
+specimen.tb_coords = (0.2, 0.0, 0.0)  # Move along table X axis
 ```
 
-## Step 4: Set Up Cameras for Standard Views
+## Step 5: Configure Camera and Scene
 
-### 4.1 Create Camera Positions
+### 5.1 Adjust Camera Settings
 
 ```python
-import math
+# Access configuration
+config = bpy.context.scene.traitblender_config
 
-def create_camera_view(name, location, rotation):
-    """Create a camera with specific position and rotation"""
-    bpy.ops.object.camera_add(location=location, rotation=rotation)
-    camera = bpy.context.active_object
-    camera.name = name
-    return camera
+# Camera position (relative to table)
+config.camera.location = (0.0, 0.0, 1.0)  # 1 meter above table center
 
-# Standard museum views
-cameras = {
-    "aperture": create_camera_view(
-        "Camera_Aperture", 
-        (0, 0, -3),  # Below specimen, looking up
-        (0, 0, 0)
-    ),
-    "apex": create_camera_view(
-        "Camera_Apex", 
-        (0, 0, 3),   # Above specimen, looking down
-        (math.pi, 0, 0)
-    ),
-    "lateral": create_camera_view(
-        "Camera_Lateral", 
-        (3, 0, 0),   # Side view
-        (math.pi/2, 0, math.pi/2)
-    ),
-}
+# Camera rotation
+config.camera.rotation = (0.0, 0.0, 0.0)
+
+# Focal length
+config.camera.focal_length = 60.0  # 60mm lens
+
+# Resolution
+config.camera.resolution_x = 1920
+config.camera.resolution_y = 1920
+config.camera.resolution_percentage = 100
 ```
 
-### 4.2 Configure Camera Settings
+### 5.2 Configure Lighting
 
 ```python
-for camera_name, camera in cameras.items():
-    camera.data.lens = 50  # 50mm lens for natural perspective
-    camera.data.clip_end = 100  # Extend render distance
-    
-    # Point camera at specimen
-    constraint = camera.constraints.new(type='TRACK_TO')
-    constraint.target = specimen.object
-    constraint.track_axis = 'TRACK_NEGATIVE_Z'
-    constraint.up_axis = 'UP_Y'
+# Lamp position
+config.lamp.location = (0.0, 0.0, 1.0)
+
+# Lamp power
+config.lamp.power = 10.0
+
+# Lamp color
+config.lamp.color = (1.0, 1.0, 1.0)  # White light
 ```
 
-## Step 5: Configure Rendering Settings
-
-### 5.1 Set Render Engine and Quality
+### 5.3 Set Background
 
 ```python
-# Set rendering engine to Cycles for high quality
-bpy.context.scene.render.engine = 'CYCLES'
-
-# Configure quality settings
-bpy.context.scene.cycles.samples = 128  # Good balance of quality/speed
-bpy.context.scene.render.resolution_x = 1920
-bpy.context.scene.render.resolution_y = 1920  # Square format for specimens
-
-# Enable GPU rendering if available
-bpy.context.preferences.addons['cycles'].preferences.compute_device_type = 'CUDA'
-bpy.context.scene.cycles.device = 'GPU'
+# World background
+config.world.color = (0.0, 0.0, 0.0, 1.0)  # Black background
+config.world.strength = 1.0
 ```
 
-### 5.2 Set Output Format
+## Step 6: Configure Rendering
+
+### 6.1 Set Render Engine
 
 ```python
-# Configure output settings
-bpy.context.scene.render.image_settings.file_format = 'PNG'
-bpy.context.scene.render.image_settings.color_mode = 'RGBA'
-bpy.context.scene.render.filepath = "/path/to/output/directory/"
+# Use EEVEE for faster rendering
+config.render.engine = "BLENDER_EEVEE_NEXT"
+
+# Or Cycles for higher quality
+# config.render.engine = "CYCLES"
 ```
 
-## Step 6: Render Images
+### 6.2 Set Output Path
 
-### 6.1 Render Each View
+```python
+# Output directory
+config.output.output_directory = "/path/to/output/directory"
+config.output.image_format = "PNG"
+```
+
+## Step 7: Render Image
+
+### 7.1 Single Image
+
+```python
+# Set output filename
+import os
+output_dir = "/path/to/output"
+species_name = dataset.sample
+output_path = os.path.join(output_dir, f"{species_name}.png")
+
+# Update output directory
+config.output.output_directory = output_path
+
+# Render
+bpy.ops.traitblender.imaging_pipeline()
+```
+
+### 7.2 Batch Render Multiple Specimens
 
 ```python
 import os
 
-output_dir = "/path/to/your/output/directory"
-specimen_name = "MySpecimen"
+# Setup
+output_dir = "/path/to/output"
+os.makedirs(output_dir, exist_ok=True)
 
-for view_name, camera in cameras.items():
-    # Set active camera
-    bpy.context.scene.camera = camera
+# Process each species
+for species_name in dataset.rownames:
+    print(f"Processing {species_name}...")
     
-    # Set output filename
-    filename = f"{specimen_name}_{view_name}.png"
-    bpy.context.scene.render.filepath = os.path.join(output_dir, filename)
+    # Select and generate
+    dataset.sample = species_name
+    bpy.ops.traitblender.generate_morphospace_sample()
     
-    # Render the image
-    bpy.ops.render.render(write_still=True)
+    # Position
+    specimen = bpy.data.objects[species_name]
+    specimen.tb_coords = (0.0, 0.0, 0.0)
     
-    print(f"Rendered {filename}")
+    # Render
+    output_path = os.path.join(output_dir, f"{species_name}.png")
+    config.output.output_directory = output_path
+    bpy.ops.traitblender.imaging_pipeline()
+    
+    # Clean up
+    bpy.data.objects.remove(specimen, do_unlink=True)
+    
+    print(f"✓ Rendered {species_name}")
+
+print("Batch rendering complete!")
 ```
 
-### 6.2 Using TraitBlender Configuration (Alternative)
+## Step 8: Add Data Augmentation (Optional)
 
-Create a configuration file `basic_imaging.yaml`:
+### 8.1 Build Transform Pipeline
 
-```yaml
-blender_preferences:
-  use_online_access: False
-
-rendering:
-  render_engine: Cycles
-  compute_device_type: CUDA
-  samples: 128
-  resolution_x: 1920
-  resolution_y: 1920
-  file_format: PNG
-
-imaging:
-  output_path: ./output/basic_tutorial
-  images_per_specimen: 1
-  images_per_view: 1
-  views:
-    - aperture
-    - apex
-    - lateral
-
-transforms: []  # No transforms for basic documentation
-```
-
-Then run:
 ```python
-from traitblender.core import ConfigLoader, ImageRenderer
+# Get transforms config
+transforms = config.transforms
 
-config = ConfigLoader.from_file("basic_imaging.yaml")
-renderer = ImageRenderer(config)
-renderer.render_specimen(specimen)
+# Clear any existing transforms
+transforms.clear()
+
+# Add transforms for variation
+transforms.add_transform("world.color", "uniform", {"low": 0.0, "high": 0.1})
+transforms.add_transform("camera.location", "normal", {"mu": 0, "sigma": 0.1, "n": 3})
+transforms.add_transform("lamp.power", "gamma", {"alpha": 2.0, "beta": 1.0})
+
+print(f"Pipeline has {len(transforms)} transforms")
 ```
 
-## Step 7: Review Results
+### 8.2 Apply Transforms Before Rendering
 
-Your output directory should now contain:
-- `MySpecimen_aperture.png` - Bottom view showing aperture
-- `MySpecimen_apex.png` - Top view showing apex  
-- `MySpecimen_lateral.png` - Side profile view
+```python
+# Generate specimen
+bpy.ops.traitblender.generate_morphospace_sample()
 
-## Tips for Better Results
+# Apply transforms for variation
+transforms.run()
 
-### Lighting Optimization
+# Render with variation
+bpy.ops.traitblender.imaging_pipeline()
 
-1. **Adjust light positions** based on your specimen's features
-2. **Use 3-point lighting** (key, fill, rim) for professional results
-3. **Soften shadows** by increasing light size values
-4. **Balance light intensities** to avoid overexposure
-
-### Camera Positioning
-
-1. **Frame your specimen** to fill ~70% of the image
-2. **Use orthographic projection** for technical documentation
-3. **Maintain consistent distances** across views
-4. **Include a scale reference** if needed
-
-### Rendering Quality
-
-1. **Start with low samples** (64) for testing
-2. **Increase samples** (256+) for final images
-3. **Use denoising** for cleaner results with fewer samples
-4. **Consider render time vs. quality** tradeoffs
-
-## Common Issues and Solutions
-
-### Specimen Too Dark
-- Increase light energy values
-- Add more light sources
-- Check material properties (may be too dark)
-
-### Noisy Renders
-- Increase sample count
-- Enable denoising in render properties
-- Improve lighting setup
-
-### Camera Not Focused on Specimen
-- Check Track-To constraints
-- Manually adjust camera positions
-- Ensure specimen is at world origin
-
-## Next Steps
-
-Once you're comfortable with basic imaging:
-
-1. Try the [Advanced Lighting Tutorial](./lighting.md)
-2. Learn about [Custom Transforms](./custom-transforms.md)
-3. Explore [Morphospace Visualization](./morphospace.md)
-4. Set up [Batch Processing](../cli/batch-processing.md) for multiple specimens
+# Undo if needed
+transforms.undo()
+```
 
 ## Complete Example Script
 
@@ -306,70 +279,103 @@ Here's a complete script that implements this tutorial:
 
 ```python
 import bpy
-import math
 import os
-from traitblender.core.positioning import GenericAsset
 
-def setup_basic_specimen_imaging(specimen_path, output_dir):
-    # Clear scene
-    bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.object.delete(use_global=False)
-    
-    # Import specimen
-    bpy.ops.import_scene.obj(filepath=specimen_path)
-    specimen_obj = bpy.context.selected_objects[0]
-    specimen_obj.name = "Specimen"
-    
-    # Create specimen asset
-    specimen = GenericAsset("Specimen")
-    specimen.origin_set(type="BOTTOM_CENTER")
-    
-    # Create table
-    bpy.ops.mesh.primitive_plane_add(size=10, location=(0, 0, 0))
-    bpy.context.active_object.name = "Table"
-    table = SurfaceAsset("Table")
-    
-    # Place specimen
-    table.place(specimen, (0, 0))
-    
-    # Set up lighting
-    bpy.ops.object.light_add(type='AREA', location=(2, -2, 3))
-    key_light = bpy.context.active_object
-    key_light.data.energy = 50
-    key_light.data.size = 2
-    
-    # Set up cameras and render
-    cameras = {
-        "aperture": (0, 0, -3, 0, 0, 0),
-        "apex": (0, 0, 3, math.pi, 0, 0),
-        "lateral": (3, 0, 0, math.pi/2, 0, math.pi/2)
-    }
-    
-    # Configure rendering
-    bpy.context.scene.render.engine = 'CYCLES'
-    bpy.context.scene.cycles.samples = 128
-    bpy.context.scene.render.resolution_x = 1920
-    bpy.context.scene.render.resolution_y = 1920
-    
-    # Render each view
-    for view_name, (x, y, z, rx, ry, rz) in cameras.items():
-        bpy.ops.object.camera_add(location=(x, y, z), rotation=(rx, ry, rz))
-        camera = bpy.context.active_object
-        bpy.context.scene.camera = camera
-        
-        filename = f"specimen_{view_name}.png"
-        bpy.context.scene.render.filepath = os.path.join(output_dir, filename)
-        bpy.ops.render.render(write_still=True)
-        
-        bpy.data.objects.remove(camera)  # Clean up
-    
-    print("Basic imaging complete!")
+# Step 1: Setup
+bpy.ops.traitblender.setup_scene()
 
-# Usage
-setup_basic_specimen_imaging(
-    "/path/to/specimen.obj", 
-    "/path/to/output/directory"
-)
+# Step 2: Configure scene
+config = bpy.context.scene.traitblender_config
+config.camera.resolution_x = 1920
+config.camera.resolution_y = 1920
+config.camera.focal_length = 60.0
+config.world.color = (0.0, 0.0, 0.0, 1.0)
+
+# Step 3: Load dataset
+dataset = bpy.context.scene.traitblender_dataset
+dataset.filepath = "/path/to/your/dataset.csv"
+
+# Step 4: Set morphospace
+setup = bpy.context.scene.traitblender_setup
+setup.available_morphospaces = "CO_Raup"
+
+# Step 5: Setup output
+output_dir = "/path/to/output"
+os.makedirs(output_dir, exist_ok=True)
+
+# Step 6: Process each species
+for species_name in dataset.rownames:
+    print(f"Processing {species_name}...")
+    
+    # Generate specimen
+    dataset.sample = species_name
+    bpy.ops.traitblender.generate_morphospace_sample()
+    
+    # Position on table
+    specimen = bpy.data.objects[species_name]
+    specimen.tb_coords = (0.0, 0.0, 0.0)
+    
+    # Render
+    output_path = os.path.join(output_dir, f"{species_name}.png")
+    config.output.output_directory = output_path
+    bpy.ops.traitblender.imaging_pipeline()
+    
+    # Clean up
+    bpy.data.objects.remove(specimen, do_unlink=True)
+
+print("Tutorial complete!")
 ```
 
-This tutorial provides a solid foundation for specimen imaging with TraitBlender. Practice with different specimens and lighting setups to develop your skills! 
+## Tips for Better Results
+
+### Camera Positioning
+
+- **Distance**: Adjust `camera.location.z` to frame your specimen properly
+- **Angle**: Use `camera.rotation` to change viewing angle
+- **Focal Length**: Longer focal lengths (85mm+) reduce perspective distortion
+
+### Lighting
+
+- **Power**: Start with 10.0 and adjust based on specimen size
+- **Position**: Place lights to highlight specimen features
+- **Color**: Slight color temperature variation can add realism
+
+### Specimen Positioning
+
+- **Table coordinates**: Always use `tb_coords` for consistent placement
+- **Rotation**: Use `tb_rotation` for table-relative orientation
+- **Multiple specimens**: Space them using different `tb_coords` values
+
+## Common Issues and Solutions
+
+### Specimen Not Visible
+
+- Check that morphospace generation completed successfully
+- Verify specimen is positioned above table: `specimen.tb_coords.z >= 0`
+- Ensure camera is looking at the right location
+
+### Dataset Import Fails
+
+- Verify file format (CSV, TSV, or Excel)
+- Check that species column is detected (should be first column)
+- Ensure column names match morphospace parameter names
+
+### Rendering Issues
+
+- Check output directory exists and is writable
+- Verify render engine is set correctly
+- Ensure camera is active: `bpy.context.scene.camera = camera_object`
+
+## Next Steps
+
+Once you're comfortable with basic imaging:
+
+1. **Explore Transforms**: Learn to add statistical variation ([Transform Documentation](../configuration/config-files.md#transforms))
+2. **Custom Configurations**: Create and save YAML configs for different setups
+3. **Batch Processing**: Process entire datasets programmatically
+4. **Advanced Techniques**: Experiment with different morphospace parameters
+
+For more information, see:
+- [Quick Start API Guide](../getting-started/quick-start-api.md)
+- [Configuration Files](../configuration/config-files.md)
+- [API Reference](../api/)

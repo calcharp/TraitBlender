@@ -188,6 +188,10 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         row.label(text="Sampler:")
         row.prop(transforms_config, "selected_sampler", text="", emboss=True)
 
+        # Edit transforms button
+        row = box.row(align=True)
+        row.operator("traitblender.edit_transforms", text="Edit Transform Pipeline", icon='PREFERENCES')
+        
         # Pipeline control buttons
         row = box.row(align=True)
         row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')

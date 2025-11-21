@@ -285,8 +285,141 @@ Samplers have defaults (e.g., `n: int = None`). The GUI should:
 - `transforms_editor.py` - Main application coordinator
 - `transforms_manager.py` - Manages transform pipeline data and operations
 - `ui_manager.py` - Handles GUI creation and Blender-like theming
+- `property_helper.py` - Helper for getting available sections/properties (standalone + integrated)
+- `sampler_helper.py` - Helper for extracting sampler signatures and validating parameters
+- `property_dimension_helper.py` - Helper for determining property dimensions and auto-setting 'n' parameter
 - `test_app.py` - Standalone test script
 - `README.md` - This file
+
+## Property & Sampler Selection System
+
+The GUI uses dropdown menus for property path and sampler selection, matching the current TraitBlender GUI:
+
+### How It Works
+
+1. **Section Dropdown** - Select a configuration section (world, camera, lamp, etc.)
+2. **Property Dropdown** - Select a property within that section (auto-updates when section changes)
+3. **Sampler Dropdown** - Select a statistical sampler function
+
+### Implementation
+
+`property_helper.py` provides functions that work both standalone and when integrated:
+
+- `get_available_sections()` - Returns list of sections
+  - Standalone: Returns hardcoded common sections
+  - Integrated: Uses `bpy.context.scene.traitblender_config.get_config_sections()`
+  
+- `get_properties_for_section(section_name)` - Returns properties for a section
+  - Standalone: Returns hardcoded common properties per section
+  - Integrated: Uses section object's `__annotations__` to get actual properties
+
+- `get_available_samplers()` - Returns list of available samplers
+  - Standalone: Returns hardcoded common samplers
+  - Integrated: Uses `core.transforms.registry.TRANSFORMS` registry
+  
+- `build_property_path(section, property)` - Constructs full path (e.g., "world.color")
+- `parse_property_path(path)` - Parses path back to (section, property)
+
+### Usage in Cards
+
+Each transform card displays:
+- **Property:** Two cascading dropdowns for section and property selection
+- **Sampler:** Dropdown for sampler function selection
+
+When a selection changes:
+- The transform's `property_path` or `sampler_name` is automatically updated
+- When sampler changes, parameters are cleared and new input fields are generated based on the new sampler's signature
+
+## Dynamic Parameter System
+
+The GUI automatically generates parameter input fields based on the sampler's function signature.
+
+### How It Works
+
+1. **Signature Extraction** (`sampler_helper.py`)
+   - Uses Python's `inspect.signature()` to extract parameter info from sampler functions
+   - Extracts: parameter name, type hint, default value, required/optional status
+   - Works standalone (mock signatures) and integrated (actual TRANSFORMS registry)
+
+2. **Automatic `n` Parameter** (`property_dimension_helper.py`)
+   - The `n` parameter is **automatically determined** from the property type and dimension
+   - **NOT shown in the UI** - users don't need to set it manually
+   - **Scalar properties** (FloatProperty): `n = None` (single value)
+   - **Vector properties** (FloatVectorProperty): `n = len(property)` (e.g., 3 for camera.location, 4 for world.color)
+   - **Auto-updates** when property path changes
+   - Uses `get_property_type()` to determine if property is scalar or vector
+   - Evaluates property to get actual dimension using `len()`
+
+3. **Type-Appropriate Widgets**
+   - `float` / `int` → Single input box (width: 100px)
+   - `list[float]` / `list[int]` → **Row of input boxes** (one per element, sized by property dimension)
+   - `list[list[float]]` → **Grid of input boxes** (matrix layout, sized by property dimension)
+
+4. **Real-Time Validation**
+   - As you type, values are validated against the expected type
+   - **Valid**: White text, value saved to transform
+   - **Invalid**: Red text, error logged to console
+   - Uses `validate_parameter_value()` to parse and convert strings to proper types
+
+5. **Parameter Display**
+   - Shows parameter name, type hint, and required indicator (*)
+   - Required parameters: Bright white label
+   - Optional parameters: Dim gray label
+   - Default values automatically applied by sampler
+   - **`n` parameter hidden** - auto-managed by the system
+
+### Examples
+
+**Uniform sampler** (for scalar property like `lamp.power`):
+```
+  low (float) *     [___100___]
+  high (float) *    [___100___]
+  (n auto-set to None for scalar)
+```
+
+**Uniform sampler** (for vector property like `camera.location`):
+```
+  low (float) *     [___100___]
+  high (float) *    [___100___]
+  (n auto-set to 3 for 3D vector)
+```
+
+**Dirichlet sampler** (for color property like `world.color`):
+```
+  alphas (list[float]) *   [0.3] [0.3] [0.3] [1.0]
+  (n auto-set to 4 for RGBA)
+```
+
+**Multivariate Normal sampler** (for 3D vector):
+```
+  mu (list[float]) *        [0] [0] [0]
+  
+  cov (list[list[float]]) * [1] [0] [0]
+                            [0] [1] [0]
+                            [0] [0] [1]
+  (n auto-set to 3 based on property)
+```
+
+### Validation Rules
+
+- **float**: Must parse as float (e.g., "1.5", "2", "-0.3")
+- **int**: Must parse as integer (e.g., "3", "-5", "0")
+- **list[float]**: Each box must be a valid float
+- **list[int]**: Each box must be a valid integer
+- **list[list[float]]**: Each box in the grid must be a valid float
+
+Empty fields for optional parameters (with defaults) are allowed.
+
+### Grid Sizing
+
+- **Vector inputs**: Number of boxes matches property dimension
+  - `camera.location` (3D) → 3 boxes
+  - `world.color` (RGBA) → 4 boxes
+  
+- **Matrix inputs**: Grid size matches property dimension
+  - 3D property → 3×3 grid
+  - 4D property (color) → 4×4 grid
+  - Defaults to identity matrix if no value provided
 
 ## Testing the App
 
@@ -315,15 +448,25 @@ This will launch the app with sample transform data. You can:
 - Clear all functionality
 - Export checkbox logic
 - Standalone testing capability
+- Drag-and-drop reordering of transforms
+- Property path selection using section + property dropdowns
+- Property helper module (works standalone and integrated)
+- Cascading dropdowns (section selection updates property dropdown)
+- Property path editing per transform
+- Sampler dropdown per transform
+- Sampler selection with automatic parameter clearing
+- **Dynamic parameter input generation based on sampler signature**
+- **Parameter type checking and validation with visual feedback**
+- **Grid-based input system for vectors and matrices**
+- **Automatic grid sizing based on property dimension**
+- **Real-time parameter validation (red text for errors)**
+- **Automatic `n` parameter determination based on property dimension**
+- **Property dimension detection (scalar vs vector, vector length)**
 
 ❌ **TODO:**
-- Add transform dialog with property/sampler selection
-- Dynamic parameter input generation based on sampler signature
-- Edit existing transform functionality
-- Reorder transforms (drag or up/down buttons)
-- Parameter validation
-- Property path validation
+- Add transform dialog for creating new transforms
 - Integration with Blender operator
+- Improve parameter input UX (hints, tooltips, default value buttons)
 
 ## Status
 

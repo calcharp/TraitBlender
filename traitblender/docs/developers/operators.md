@@ -18,7 +18,7 @@ Operators are the standard way all Blender add-ons provide functionality. Instea
 
 5. **Modal Operations**: Operators support modal execution for interactive operations (file browsers, confirmation dialogs, etc.).
 
-**TraitBlender Convention**: TraitBlender follows this standard Blender pattern. All TraitBlender functionality that needs to be accessible from both GUI and API is implemented as operators, accessed through `bpy.ops.traitblender.*`.
+**TraitBlender Convention**: TraitBlender follows this standard Blender pattern. All TraitBlender functionality that needs to be user-accessible from both GUI and API is implemented as operators, accessed through `bpy.ops.traitblender.*`.
 
 ### Architecture: Operators as Thin Wrappers
 
@@ -29,7 +29,7 @@ TraitBlender's architecture separates core business logic from user-facing opera
 
 Operators in `ui/operators/` typically follow this pattern:
 
-1. **Access TraitBlender data** through `context.scene.traitblender_*`
+1. **Access TraitBlender data** through `bpy.context.scene.traitblender_*`
 2. **Call methods or functions** from `core/` modules
 3. **Handle error reporting** and return status codes
 

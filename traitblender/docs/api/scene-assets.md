@@ -1,267 +1,195 @@
 # Scene Assets API Reference
 
-The Scene Assets module provides high-level interfaces for managing Blender objects with enhanced transformation capabilities, specifically designed for museum-style morphological visualizations.
+The positioning system provides a custom coordinate system relative to the museum table for consistent object placement.
 
-## Overview
+## Table Coordinates System
 
-Scene Assets are the core building blocks of TraitBlender, providing object-oriented access to Blender objects with enhanced transform operations and origin management.
+TraitBlender uses a custom coordinate system (`tb_coords`) that positions objects relative to the table's top surface center. This ensures consistent placement regardless of table orientation or position.
 
-## Classes
+### Table Coordinates Property
 
-### SceneAsset (Abstract Base Class)
-
-Abstract base class for managing Blender objects with enhanced transformation capabilities.
+All Blender objects have a `tb_coords` property that provides table-relative positioning:
 
 ```python
-from traitblender.core.positioning import SceneAsset
+# Get an object
+obj = bpy.data.objects["MyObject"]
+
+# Position relative to table center
+obj.tb_coords = (0.0, 0.0, 0.0)  # Center of table
+obj.tb_coords = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
+obj.tb_coords = (0.0, 0.5, 0.1)  # Offset in X, Y, and Z
+
+# Get current table coordinates
+current_pos = obj.tb_coords
+print(f"Table coordinates: {current_pos}")
 ```
 
-#### Constructor
+### Table Rotation Property
+
+Objects also have a `tb_rotation` property for table-relative rotation:
 
 ```python
-def __init__(self, name: str)
+# Rotate relative to table orientation
+obj.tb_rotation = (0.0, 0.0, 0.0)  # Aligned with table
+obj.tb_rotation = (0.0, 0.0, 1.57)  # 90 degrees around table's Z axis
+```
+
+## Coordinate Conversion Functions
+
+### world_to_table_coords
+
+Convert a world-space point to table coordinates.
+
+```python
+from core.positioning import world_to_table_coords
+from mathutils import Vector
+
+# Convert world position to table coordinates
+world_point = Vector((1.0, 2.0, 3.0))
+table_coords = world_to_table_coords(world_point)
+print(f"Table coordinates: {table_coords}")
 ```
 
 **Parameters:**
-- `name` (str): The name of the corresponding Blender object
-
-#### Properties
-
-##### object
-```python
-@property
-def object(self) -> bpy.types.Object
-```
-Returns the Blender object with the same name as this asset.
-
-**Raises:**
-- `ValueError`: If no object with the specified name exists in the scene
-
-##### location
-```python
-@property
-def location(self) -> Vector
-
-@location.setter
-def location(self, value: Vector | tuple[float, float, float] | tuple[Vector | tuple[float, float, float], str])
-```
-Gets or sets the location of the object.
-
-**Setter Parameters:**
-- `value`: Can be:
-  - `Vector` or `(x,y,z)` tuple (uses default origin_type="BOTTOM_CENTER")
-  - `(Vector or (x,y,z) tuple, origin_type)` tuple to specify custom origin
-
-**Example:**
-```python
-asset = GenericAsset("Suzanne")
-asset.location = (0, 0, 5)  # Places at world origin + 5 units up
-asset.location = ((1, 2, 3), "GEOMETRY_ORIGIN")  # Custom origin
-```
-
-##### rotation_euler
-```python
-@property
-def rotation_euler(self) -> Euler
-
-@rotation_euler.setter
-def rotation_euler(self, value: Euler | tuple[float, float, float] | tuple[Euler | tuple[float, float, float], str])
-```
-Gets or sets the rotation of the object using Euler angles.
-
-**Setter Parameters:**
-- `value`: Can be:
-  - `Euler` or `(x,y,z)` tuple (uses default origin_type="GEOMETRY_ORIGIN")
-  - `(Euler or (x,y,z) tuple, origin_type)` tuple to specify custom origin
-
-**Example:**
-```python
-import math
-asset.rotation_euler = (0, 0, math.pi/4)  # 45 degrees around Z-axis
-```
-
-##### scale
-```python
-@property
-def scale(self) -> Vector
-
-@scale.setter
-def scale(self, value: Vector | tuple[float, float, float] | tuple[Vector | tuple[float, float, float], str])
-```
-Gets or sets the scale of the object.
-
-**Example:**
-```python
-asset.scale = (2, 2, 2)  # Doubles the size uniformly
-```
-
-##### dimensions
-```python
-@property
-def dimensions(self) -> Vector
-
-@dimensions.setter
-def dimensions(self, value: Vector | tuple[float, float, float])
-```
-Gets or sets the dimensions (size) of the object.
-
-#### Methods
-
-##### origin_set
-```python
-def origin_set(self, type: str = "GEOMETRY_ORIGIN", center: str = "MEDIAN")
-```
-Set the object's origin with extended options beyond standard Blender functionality.
-
-**Parameters:**
-- `type` (str): Origin type. Options include:
-  - `"GEOMETRY_ORIGIN"`: Use the geometry's origin (default)
-  - `"BOTTOM_CENTER"`: Place at bottom center using actual mesh vertices
-  - Standard Blender options: `"ORIGIN_GEOMETRY"`, `"ORIGIN_CURSOR"`, etc.
-- `center` (str): Center type for Blender's origin_set (only used for standard Blender options)
-
----
-
-### GenericAsset
-
-A concrete implementation of SceneAsset that can be instantiated directly.
-
-```python
-from traitblender.core.positioning import GenericAsset
-
-# Create an asset for an existing Blender object
-asset = GenericAsset("Suzanne")
-```
-
-**Use Case:** General-purpose scene asset for any Blender object that needs enhanced transform capabilities.
-
----
-
-### SurfaceAsset
-
-A specialized SceneAsset that provides a surface interface for placing other objects. The surface is defined by the upper face of the object's bounding box with a -1 to 1 coordinate grid.
-
-```python
-from traitblender.core.positioning import SurfaceAsset
-
-# Create a surface asset (typically for tables, platforms, etc.)
-table = SurfaceAsset("Cube")
-```
-
-#### Additional Properties
-
-##### surface
-```python
-@property
-def surface(self) -> tuple[Vector, Vector, Vector, Vector]
-```
-Returns the four corners of the surface in world space, ordered as:
-`[min_x,min_y, min_x,max_y, max_x,max_y, max_x,min_y]`
-
-##### surface_normal
-```python
-@property
-def surface_normal(self) -> Vector
-```
-Returns the normal vector of the surface in world space.
-
-#### Additional Methods
-
-##### surface_to_world
-```python
-def surface_to_world(self, coords: tuple[float, float]) -> Vector
-```
-Convert surface coordinates (-1 to 1) to world position.
-
-**Parameters:**
-- `coords` (tuple[float, float]): (x, y) coordinates in surface space, each from -1 to 1
+- `world_point` (Vector): World-space position
+- `precision` (int, optional): Decimal places for rounding (default: 4)
 
 **Returns:**
-- `Vector`: World space position on the surface
+- `tuple[float, float, float]`: Table coordinates (x, y, z)
 
-**Raises:**
-- `ValueError`: If coordinates are outside the -1 to 1 range
+### get_table_top_center
 
-##### place
+Get the world-space center of the table's top face.
+
 ```python
-def place(self, asset: SceneAsset, coords: tuple[float, float])
+from core.positioning import get_table_top_center
+
+center = get_table_top_center()
+print(f"Table center: {center}")
 ```
-Place an asset on the surface at the given coordinates. The asset will be positioned with its bottom center at the specified point, rotated to align with the surface normal, and parented to this surface.
+
+**Returns:**
+- `Vector`: World-space position of table top center
+
+### z_dist_to_lowest
+
+Calculate the distance from an object's origin to its lowest vertex.
+
+```python
+from core.positioning import z_dist_to_lowest
+
+obj = bpy.data.objects["MyObject"]
+distance = z_dist_to_lowest(obj)
+print(f"Distance to lowest point: {distance}")
+```
 
 **Parameters:**
-- `asset` (SceneAsset): The SceneAsset to place
-- `coords` (tuple[float, float]): (x, y) coordinates in surface space, each from -1 to 1
+- `obj` (bpy.types.Object): Blender object
+
+**Returns:**
+- `float`: Distance from origin to lowest vertex (0 for non-mesh objects)
 
 ## Usage Examples
 
-### Basic Asset Manipulation
+### Positioning Specimens on Table
+
 ```python
-from traitblender.core.positioning import GenericAsset
-import math
+import bpy
 
-# Create an asset for an existing object
-specimen = GenericAsset("SpecimenMesh")
+# Generate a specimen (from morphospace)
+bpy.ops.traitblender.generate_morphospace_sample()
+
+# Get the generated object
+specimen = bpy.data.objects["species_name"]
+
+# Position at table center
+specimen.tb_coords = (0.0, 0.0, 0.0)
+
+# Move to different position
+specimen.tb_coords = (0.3, 0.0, 0.0)  # 0.3 units along table X axis
 ```
 
-# Position and orient the specimen
-specimen.location = (0, 0, 2)
-specimen.rotation_euler = (0, 0, math.pi/6)  # 30 degrees
-specimen.scale = (1.5, 1.5, 1.5)
+### Converting Between Coordinate Systems
 
-# Set custom origin for precise placement
-specimen.origin_set(type="BOTTOM_CENTER")
-```
-
-### Surface Placement
 ```python
-from traitblender.core.positioning import SurfaceAsset, GenericAsset
+from core.positioning import world_to_table_coords, get_table_top_center
+from mathutils import Vector
 
-# Create surface and objects
-table = SurfaceAsset("TableMesh")
-specimen1 = GenericAsset("Specimen1")
-specimen2 = GenericAsset("Specimen2")
+# Get table center in world space
+table_center = get_table_top_center()
 
-# Place specimens on the surface
-table.place(specimen1, (-0.5, -0.5))  # Bottom-left quadrant
-table.place(specimen2, (0.5, 0.5))    # Top-right quadrant
+# Convert world position to table coordinates
+world_pos = Vector((1.5, 2.0, 0.5))
+table_pos = world_to_table_coords(world_pos)
 
-# Get surface properties
-corners = table.surface
-normal = table.surface_normal
-world_pos = table.surface_to_world((0, 0))  # Center of surface
+# Use table coordinates to position object
+obj = bpy.data.objects["MyObject"]
+obj.tb_coords = table_pos
 ```
 
-### Origin Management
+### Working with Multiple Objects
+
 ```python
-asset = GenericAsset("ComplexMesh")
+# Position multiple specimens on table
+specimens = ["specimen1", "specimen2", "specimen3"]
+positions = [
+    (-0.3, 0.0, 0.0),  # Left
+    (0.0, 0.0, 0.0),   # Center
+    (0.3, 0.0, 0.0),   # Right
+]
 
-# Different origin types for different use cases
-asset.origin_set(type="BOTTOM_CENTER")     # For placing on surfaces
-asset.origin_set(type="GEOMETRY_ORIGIN")   # For rotation around geometry center
-asset.origin_set(type="ORIGIN_CURSOR")     # For manual cursor-based placement
+for name, pos in zip(specimens, positions):
+    if name in bpy.data.objects:
+        obj = bpy.data.objects[name]
+        obj.tb_coords = pos
 ```
+
+## How Table Coordinates Work
+
+The table coordinate system:
+
+1. **Origin**: Center of the table's top face
+2. **Axes**: Aligned with the table's local coordinate system
+3. **Z-axis**: Normal to the table surface (upward)
+4. **Automatic lift**: Accounts for object's lowest vertex to place on table surface
+
+When you set `obj.tb_coords = (x, y, z)`:
+- `x, y`: Position along table surface
+- `z`: Height above/below table surface
+- The object is automatically lifted so its bottom touches the table
+
+## Integration with Morphospace Generation
+
+When you generate a morphospace sample, it's automatically positioned using table coordinates:
+
+```python
+# Generate sample
+bpy.ops.traitblender.generate_morphospace_sample()
+
+# The specimen is automatically set to table center
+specimen = bpy.data.objects[dataset.sample]
+print(f"Initial position: {specimen.tb_coords}")  # (0.0, 0.0, 0.0)
+
+# Adjust position
+specimen.tb_coords = (0.2, 0.0, 0.0)  # Move along table X axis
+```
+
+## Best Practices
+
+1. **Always use table coordinates** for positioning specimens - ensures consistency
+2. **Use world coordinates** only when necessary for calculations
+3. **Account for object geometry** - the system automatically handles bottom alignment
+4. **Test positioning** before batch processing to ensure correct placement
 
 ## Error Handling
 
-### Common Exceptions
-
-- **ValueError**: Raised when:
-  - Specified object name doesn't exist in the scene
-  - Surface coordinates are outside the -1 to 1 range
-  - Invalid parameter values are provided
-
-### Best Practices
-
-1. **Object Existence**: Always ensure the Blender object exists before creating a SceneAsset
-2. **Origin Awareness**: Remember that transforms behave differently based on the current origin type
-3. **Surface Coordinates**: Use the surface coordinate system (-1 to 1) for consistent placement
-4. **Error Handling**: Wrap SceneAsset operations in try-catch blocks for robust code
+The table coordinate system requires the "Table" object to exist in the scene:
 
 ```python
 try:
-    asset = GenericAsset("MyObject")
-    asset.location = (0, 0, 5)
-except ValueError as e:
-    print(f"Error: {e}")
-    # Handle missing object case
-``` 
+    obj.tb_coords = (0.0, 0.0, 0.0)
+except RuntimeError as e:
+    print(f"Error: Table object not found. Run bpy.ops.traitblender.setup_scene() first")
+```
+
+Always ensure the museum scene is loaded before using table coordinates.
