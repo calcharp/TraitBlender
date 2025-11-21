@@ -12,64 +12,6 @@ class TransformPipelineConfig(TraitBlenderConfig):
         default=""
     )
 
-    # Dynamic enums for building transforms
-    selected_section: bpy.props.EnumProperty(
-        name="Section",
-        description="Select a configuration section",
-        items=lambda self, context: self._get_section_items(),
-        default=0
-    )
-    selected_property: bpy.props.EnumProperty(
-        name="Property",
-        description="Select a property within the section",
-        items=lambda self, context: self._get_property_items(),
-        default=0
-    )
-    selected_sampler: bpy.props.EnumProperty(
-        name="Sampler",
-        description="Select a sampler function",
-        items=lambda self, context: self._get_sampler_items(),
-        default=0
-    )
-
-    def _get_section_items(self):
-        items = []
-        try:
-            config = bpy.context.scene.traitblender_config
-            sections = config.get_config_sections()
-            for i, section_name in enumerate(sections.keys()):
-                if section_name.lower() == "transforms":
-                    continue
-                items.append((section_name, section_name.replace('_', ' ').title(), f"Section {i+1}"))
-        except Exception as e:
-            print(f"Error getting section items: {e}")
-        return items
-
-    def _get_property_items(self):
-        items = []
-        try:
-            if not self.selected_section:
-                return items
-            config = bpy.context.scene.traitblender_config
-            section_obj = getattr(config, self.selected_section, None)
-            if section_obj and hasattr(section_obj, '__class__') and hasattr(section_obj.__class__, '__annotations__'):
-                for prop_name in section_obj.__class__.__annotations__.keys():
-                    if prop_name != "show":
-                        items.append((prop_name, prop_name.replace('_', ' ').title(), f"Property: {prop_name}"))
-        except Exception as e:
-            print(f"Error getting property items: {e}")
-        return items
-
-    def _get_sampler_items(self):
-        items = []
-        try:
-            from ...transforms.registry import TRANSFORMS
-            for sampler_name in sorted(TRANSFORMS.keys()):
-                items.append((sampler_name, sampler_name.replace('_', ' ').title(), f"Sampler: {sampler_name}"))
-        except Exception as e:
-            print(f"Error getting sampler items: {e}")
-        return items
-
     def _get_pipeline(self):
         if self.pipeline_state:
             try:

@@ -4,8 +4,8 @@ Standalone DearPyGUI app for editing transform pipelines.
 """
 
 import dearpygui.dearpygui as dpg
-from transforms_manager import TransformsManager
-from ui_manager import UIManager
+from .transforms_manager import TransformsManager
+from .ui_manager import UIManager
 
 
 class TransformEditor:

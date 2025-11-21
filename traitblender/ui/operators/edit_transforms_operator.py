@@ -16,15 +16,8 @@ class TRAITBLENDER_OT_edit_transforms(Operator):
     
     def execute(self, context):
         try:
-            # Add the transforms_gui directory to the path
-            addon_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-            transforms_gui_path = os.path.join(addon_dir, 'misc_testing', 'transforms_gui')
-            
-            if transforms_gui_path not in sys.path:
-                sys.path.insert(0, transforms_gui_path)
-            
-            # Import the transforms editor
-            from transforms_editor import launch_transform_editor
+            # Import the transforms editor from core module
+            from ...core.transforms.pipeline_editor import launch_transform_editor
             
             # Get current pipeline state from config
             config = context.scene.traitblender_config

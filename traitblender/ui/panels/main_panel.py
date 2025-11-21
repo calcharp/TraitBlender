@@ -177,17 +177,6 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         box = layout.box()
         transforms_config = config.transforms
 
-        # Property selection row: [Property:][Section][Property]
-        row = box.row(align=True)
-        row.label(text="Property:")
-        row.prop(transforms_config, "selected_section", text="", emboss=True)
-        row.prop(transforms_config, "selected_property", text="", emboss=True)
-
-        # Sampler selection row: [Sampler:][Sampler Dropdown]
-        row = box.row(align=True)
-        row.label(text="Sampler:")
-        row.prop(transforms_config, "selected_sampler", text="", emboss=True)
-
         # Edit transforms button
         row = box.row(align=True)
         row.operator("traitblender.edit_transforms", text="Edit Transform Pipeline", icon='PREFERENCES')

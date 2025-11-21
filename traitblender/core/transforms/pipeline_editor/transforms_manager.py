@@ -5,19 +5,19 @@ Manages the transform pipeline data and operations.
 
 import yaml
 import dearpygui.dearpygui as dpg
-from property_helper import (
+from .property_helper import (
     get_available_sections,
     get_properties_for_section,
     build_property_path,
     parse_property_path,
     get_available_samplers
 )
-from sampler_helper import (
+from .sampler_helper import (
     get_sampler_signature,
     validate_parameter_value,
     format_parameter_value
 )
-from property_dimension_helper import (
+from .property_dimension_helper import (
     get_property_dimension,
     should_auto_set_n_parameter
 )
