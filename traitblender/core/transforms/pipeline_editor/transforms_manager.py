@@ -31,7 +31,7 @@ class TransformsManager:
         self.last_moved_index = -1  # Track last moved transform for highlighting
     
     def load_from_yaml(self, yaml_string):
-        """Load transforms from YAML string"""
+        """Load transforms from YAML string (handles both old list and new dict formats)"""
         try:
             if not yaml_string or yaml_string.strip() == "":
                 self.transforms = []
@@ -43,12 +43,19 @@ class TransformsManager:
                 self.transforms = []
                 return True
             
-            if not isinstance(data, list):
-                print(f"Invalid YAML format: expected list, got {type(data)}")
+            # Handle both formats: old (list) and new (dict with 'transforms' key)
+            if isinstance(data, dict):
+                # New format: extract the transforms list, ignore history
+                transforms_list = data.get('transforms', [])
+            elif isinstance(data, list):
+                # Old format: data is the transforms list
+                transforms_list = data
+            else:
+                print(f"Invalid YAML format: expected list or dict, got {type(data)}")
                 return False
             
             # Validate each transform
-            for i, transform in enumerate(data):
+            for i, transform in enumerate(transforms_list):
                 if not isinstance(transform, dict):
                     print(f"Invalid transform {i}: expected dict, got {type(transform)}")
                     return False
@@ -59,7 +66,17 @@ class TransformsManager:
                         print(f"Invalid transform {i}: missing required key '{key}'")
                         return False
             
-            self.transforms = data
+            # Strip out _cache_stack and other internal fields for clean editing
+            clean_transforms = []
+            for t in transforms_list:
+                clean_t = {
+                    'property_path': t['property_path'],
+                    'sampler_name': t['sampler_name'],
+                    'params': t.get('params', {})
+                }
+                clean_transforms.append(clean_t)
+            
+            self.transforms = clean_transforms
             return True
             
         except yaml.YAMLError as e:

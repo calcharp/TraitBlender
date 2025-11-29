@@ -8,21 +8,23 @@ from ..register_config import register, TraitBlenderConfig
 class TransformPipelineConfig(TraitBlenderConfig):
     pipeline_state: StringProperty(
         name="Pipeline State",
-        description="Serialized state of the pipeline (including undo history)",
+        description="Serialized pipeline with undo history",
         default=""
     )
 
     def _get_pipeline(self):
+        """Deserialize pipeline from YAML string."""
         if self.pipeline_state:
             try:
                 data = yaml.safe_load(self.pipeline_state)
                 return TransformPipeline.from_dict(data)
             except Exception as e:
-                print(f"Error loading pipeline from state: {e}")
+                print(f"Error loading pipeline: {e}")
                 return TransformPipeline()
         return TransformPipeline()
 
     def _set_pipeline(self, pipeline_obj):
+        """Serialize pipeline to YAML string (includes undo history)."""
         self.pipeline_state = yaml.dump(pipeline_obj.to_dict())
 
     @property
@@ -84,39 +86,81 @@ class TransformPipelineConfig(TraitBlenderConfig):
         return len(self._get_pipeline())
 
     def _to_yaml(self, indent_level=0, parent_path=""):
+        """Format transforms for display in config export (clean, no history)"""
         indent = "  " * indent_level
         if not self.pipeline_state:
             return f"{indent}[]"
         try:
-            transforms_list = yaml.safe_load(self.pipeline_state)
+            data = yaml.safe_load(self.pipeline_state)
+            if not data:
+                return f"{indent}[]"
+            
+            # Extract transforms (new format is dict with 'transforms' key)
+            if isinstance(data, dict):
+                transforms_list = data.get('transforms', [])
+            elif isinstance(data, list):
+                transforms_list = data  # Old format compatibility
+            else:
+                return f"{indent}[]"
+            
             if not transforms_list:
                 return f"{indent}[]"
+            
             result = []
             for transform in transforms_list:
                 result.append(f"{indent}- property_path: {transform['property_path']}")
                 result.append(f"{indent}  sampler_name: {transform['sampler_name']}")
-                if transform.get('params'):
+                # Only show params, not _cache_stack or other internal fields
+                params = transform.get('params', {})
+                if params:
                     result.append(f"{indent}  params:")
-                    for key, value in transform['params'].items():
-                        result.append(f"{indent}    {key}: {value}")
+                    for key, value in params.items():
+                        # Skip internal fields if any
+                        if not key.startswith('_'):
+                            result.append(f"{indent}    {key}: {value}")
             return '\n'.join(result)
         except Exception as e:
             print(f"Error formatting transforms YAML: {e}")
             return f"{indent}[]"
 
     def to_dict(self):
+        """Return transforms list for config export (clean, no history)"""
         try:
-            return self._get_pipeline().to_dict()
+            data = yaml.safe_load(self.pipeline_state) if self.pipeline_state else None
+            if not data:
+                return []
+            
+            # Extract transforms without internal state
+            if isinstance(data, dict):
+                transforms_list = data.get('transforms', [])
+            elif isinstance(data, list):
+                transforms_list = data  # Old format
+            else:
+                return []
+            
+            # Clean up transforms - remove _cache_stack and internal fields
+            clean_transforms = []
+            for t in transforms_list:
+                clean_t = {
+                    'property_path': t['property_path'],
+                    'sampler_name': t['sampler_name'],
+                    'params': {k: v for k, v in t.get('params', {}).items()}
+                }
+                clean_transforms.append(clean_t)
+            return clean_transforms
         except Exception as e:
             print(f"Error converting transforms to dict: {e}")
             return []
 
     def from_dict(self, data_dict):
+        """Load transforms from a list (config import)"""
         if not data_dict:
             self.pipeline_state = ""
             return
         try:
-            self.pipeline_state = yaml.dump(data_dict)
+            # data_dict is a list of transforms - load as fresh pipeline
+            pipeline = TransformPipeline.from_dict(data_dict)
+            self.pipeline_state = yaml.dump(pipeline.to_dict())
         except Exception as e:
             print(f"Error loading transforms from dict: {e}")
             self.pipeline_state = "" 

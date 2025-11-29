@@ -122,7 +122,7 @@ class TransformPipeline:
             transform_index = i + 1
             print(f"\n--- Undoing Transform {transform_index}/{len(self._transforms)} ---")
             try:
-                transform.undo_all()
+                transform.undo()  # Undo last run only (not undo_all)
                 undo_results.append(True)
                 print(f"✓ Transform {transform_index} undone successfully")
             except Exception as e:
@@ -219,15 +219,30 @@ class TransformPipeline:
         return len(self._transforms) > 0
 
     def to_dict(self):
-        """Serialize the pipeline to a list of transform dicts."""
-        return [t.to_dict() for t in self._transforms]
+        """Serialize the pipeline to a dict with transforms and execution history."""
+        return {
+            'transforms': [t.to_dict() for t in self._transforms],
+            '_execution_history': self._execution_history.copy()
+        }
 
     @classmethod
     def from_dict(cls, d, name="TransformPipeline"):
-        """Create a TransformPipeline from a list of transform dicts."""
+        """Create a TransformPipeline from a dict with transforms and execution history."""
         pipeline = cls(name=name)
-        for t_dict in d:
-            pipeline._transforms.append(Transform.from_dict(t_dict))
+        
+        # Handle both old format (list) and new format (dict)
+        if isinstance(d, list):
+            # Old format: just a list of transforms
+            for t_dict in d:
+                pipeline._transforms.append(Transform.from_dict(t_dict))
+        elif isinstance(d, dict):
+            # New format: dict with transforms and history
+            for t_dict in d.get('transforms', []):
+                pipeline._transforms.append(Transform.from_dict(t_dict))
+            # Restore execution history
+            if '_execution_history' in d:
+                pipeline._execution_history = d['_execution_history'].copy() if d['_execution_history'] else []
+        
         return pipeline
 
     def __iter__(self):

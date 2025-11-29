@@ -175,18 +175,38 @@ class Transform:
         return f"Transform(property_path='{self.property_path}', sampler_name='{self.sampler_name}', params={self.params})"
 
     def to_dict(self):
-        """Serialize the transform to a dictionary."""
+        """Serialize the transform to a dictionary, including undo history."""
+        # Convert tuples to lists in cache_stack for YAML serialization
+        serializable_cache = []
+        for item in self._cache_stack:
+            if isinstance(item, tuple):
+                serializable_cache.append(list(item))
+            else:
+                serializable_cache.append(item)
+        
         return {
             'property_path': self.property_path.replace('bpy.context.scene.traitblender_config.', ''),
             'sampler_name': self.sampler_name,
-            'params': self.params.copy() if self.params else {}
+            'params': self.params.copy() if self.params else {},
+            '_cache_stack': serializable_cache  # SAVE UNDO HISTORY (tuples converted to lists)
         }
 
     @classmethod
     def from_dict(cls, d):
-        """Create a Transform from a dictionary."""
-        return cls(
+        """Create a Transform from a dictionary, restoring undo history."""
+        transform = cls(
             property_path=d['property_path'],
             sampler_name=d['sampler_name'],
             params=d.get('params', {})
-        ) 
+        )
+        # RESTORE UNDO HISTORY (convert lists back to tuples if needed for vector properties)
+        if '_cache_stack' in d and d['_cache_stack']:
+            cache = []
+            for item in d['_cache_stack']:
+                # Keep as-is (lists are fine for setters, will be converted back to tuples on get)
+                if isinstance(item, list):
+                    cache.append(tuple(item))  # Convert back to tuple for consistency
+                else:
+                    cache.append(item)
+            transform._cache_stack = cache
+        return transform 
