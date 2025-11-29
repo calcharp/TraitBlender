@@ -6,6 +6,14 @@ from ...helpers import get_property, set_property
 @register("output")
 class OutputConfig(TraitBlenderConfig):
     print_index = 6
+    
+    rendering_directory: bpy.props.StringProperty(
+        name="Rendering Directory",
+        description="Directory path for rendered images",
+        default="",
+        subtype='DIR_PATH'
+    )
+    
     output_type: bpy.props.EnumProperty(
         name="Output Type",
         description="The type of material to use",

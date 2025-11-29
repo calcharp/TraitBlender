@@ -1,6 +1,14 @@
+✅ COMPLETED:
+- Transforms GUI fully set up
+- Interactive dataset editor working
+- TransformPipelineConfig undo functionality fixed
+- Imaging pipeline operator implemented (timer-based batch rendering)
 
-Get the transforms GUI fully set up
+---
 
-Get the interactive dataset editor to cooperate
+🚧 IN PROGRESS:
+- Orientations system (rotation origin functionality needs implementation)
 
-TODO: Fix TransformPipelineConfig undo functionality - the undo operation doesn't work correctly when using the config wrapper, but works fine with direct TransformPipeline instances. The issue is likely related to serialization/deserialization of the pipeline state and undo history.
+---
+
+Future enhancements and new features can be added below:

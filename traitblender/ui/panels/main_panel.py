@@ -200,6 +200,16 @@ class TRAITBLENDER_PT_imaging_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
+        config = context.scene.traitblender_config
+        
+        # Rendering directory
+        row = layout.row(align=True)
+        row.prop(config.output, "rendering_directory", text="Rendering Directory")
+        
+        # Images per specimen
+        row = layout.row(align=True)
+        row.prop(config.output, "images_per_view", text="Images Per Species")
+        
         # Imaging pipeline button
         row = layout.row(align=True)
         row.operator("traitblender.imaging_pipeline", text="Run Imaging Pipeline", icon='PLAY') 
