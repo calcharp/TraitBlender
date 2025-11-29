@@ -30,7 +30,7 @@ mat:
   color: [0.0, 0.0, 0.0, 1.0]
   location: [0.0, 0.0, 0.59]
   rotation: [0.0, 0.0, 0.0]
-  roughness: 0.0
+  roughness: 1.0
   scale: [0.125, 0.125, 1.0]
 render:
   eevee_use_raytracing: false
