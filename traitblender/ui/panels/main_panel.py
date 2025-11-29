@@ -184,7 +184,8 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         # Pipeline control buttons
         row = box.row(align=True)
         row.operator("traitblender.run_pipeline", text="Run Pipeline", icon='PLAY')
-        row.operator("traitblender.undo_pipeline", text="Undo Pipeline", icon='LOOP_BACK')
+        row.operator("traitblender.undo_pipeline", text="Undo", icon='LOOP_BACK')
+        row.operator("traitblender.reset_pipeline", text="Reset", icon='RECOVER_LAST')
 
         # Transform count
         row = box.row(align=True)

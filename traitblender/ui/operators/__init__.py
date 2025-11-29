@@ -30,6 +30,7 @@ classes = [
     edit_dataset_operator.TRAITBLENDER_OT_edit_dataset,
     transforms_operators.TRAITBLENDER_OT_run_pipeline,
     transforms_operators.TRAITBLENDER_OT_undo_pipeline,
+    transforms_operators.TRAITBLENDER_OT_reset_pipeline,
     edit_transforms_operator.TRAITBLENDER_OT_edit_transforms,
     generate_morphospace_sample_operator.TRAITBLENDER_OT_generate_morphospace_sample,
     imaging_pipeline_operator.TRAITBLENDER_OT_imaging_pipeline,

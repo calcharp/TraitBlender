@@ -70,6 +70,12 @@ class TransformPipelineConfig(TraitBlenderConfig):
         result = pipeline.undo(*args, **kwargs)
         self._set_pipeline(pipeline)
         return result
+    
+    def reset(self, *args, **kwargs):
+        pipeline = self._get_pipeline()
+        result = pipeline.reset(*args, **kwargs)
+        self._set_pipeline(pipeline)
+        return result
 
     def __iter__(self):
         return iter(self._get_pipeline())

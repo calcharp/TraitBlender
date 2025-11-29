@@ -133,6 +133,41 @@ class TransformPipeline:
         print(f"\n=== Pipeline '{self.name}' undo completed ===")
         return undo_results
     
+    def reset(self) -> list:
+        """
+        Reset all transforms in the pipeline to their original values.
+        
+        Returns:
+            list: List of reset results from each transform
+            
+        Example:
+            reset_results = pipeline.reset()
+        """
+        if not self._transforms:
+            print(f"Pipeline '{self.name}' is empty - no transforms to reset")
+            return []
+        
+        print(f"\n=== Resetting Pipeline: {self.name} ===")
+        print(f"Resetting {len(self._transforms)} transforms to original values...")
+        
+        reset_results = []
+        # Reset in reverse order (last applied first)
+        for i in range(len(self._transforms) - 1, -1, -1):
+            transform = self._transforms[i]
+            transform_index = i + 1
+            print(f"\n--- Resetting Transform {transform_index}/{len(self._transforms)} ---")
+            try:
+                transform.undo_all()  # Reset to original value
+                reset_results.append(True)
+                print(f"✓ Transform {transform_index} reset successfully")
+            except Exception as e:
+                print(f"✗ Transform {transform_index} reset failed: {e}")
+                reset_results.append(False)
+        
+        self._execution_history.append("reset")
+        print(f"\n=== Pipeline '{self.name}' reset completed ===")
+        return reset_results
+    
     def clear(self):
         """Clear all transforms from the pipeline."""
         count = len(self._transforms)
