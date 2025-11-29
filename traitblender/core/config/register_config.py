@@ -83,6 +83,8 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
     
     def _format_value_for_yaml(self, value, prop_type=None):
         """Format a value appropriately for YAML output."""
+        import os
+        
         if value is None:
             return "null"
         
@@ -104,6 +106,9 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
             # Boolean properties
             return str(value).lower()
         elif prop_type == 'StringProperty':
+            # Normalize paths for OS (if it looks like a path)
+            if isinstance(value, str) and ('/' in value or '\\' in value):
+                value = os.path.normpath(value)
             # String properties - quote if needed
             if not value or any(char in value for char in '":{}[]&*#?|-<>=!%@`,\'\\'):
                 return f'"{value}"'

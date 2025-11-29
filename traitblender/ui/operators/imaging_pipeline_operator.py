@@ -1,6 +1,7 @@
 import bpy
 from bpy.types import Operator
 import os
+import csv
 from datetime import datetime
 
 class TRAITBLENDER_OT_imaging_pipeline(Operator):
@@ -16,6 +17,8 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
     _imgs_per = 1
     _render_dir = ""
     _log_file = None
+    _csv_file = None
+    _csv_writer = None
 
     def modal(self, context, event):
         if event.type == 'TIMER':
@@ -28,25 +31,57 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
             row = dataset.loc(name)
             config = context.scene.traitblender_config
             
+            # Generate new specimen at start of each specimen
+            if self._img_idx == 0:
+                # Delete previous specimen (except first one)
+                if self._idx > 0:
+                    prev_name = self._specimens[self._idx - 1]
+                    prev_obj = bpy.data.objects.get(prev_name)
+                    if prev_obj:
+                        bpy.data.objects.remove(prev_obj, do_unlink=True)
+                
+                # Generate new specimen
+                dataset.sample = name
+                bpy.ops.traitblender.generate_morphospace_sample()
+            
             # Reset and run pipeline for each variation
             bpy.ops.traitblender.reset_pipeline()
             bpy.ops.traitblender.run_pipeline()
             
-            # Create species subdirectory
-            species_dir = os.path.join(self._render_dir, name)
-            os.makedirs(species_dir, exist_ok=True)
+            # Create directory structure
+            images_dir = os.path.join(self._render_dir, "images", name)
+            configs_dir = os.path.join(self._render_dir, "configs", name)
+            os.makedirs(images_dir, exist_ok=True)
+            os.makedirs(configs_dir, exist_ok=True)
+            
+            # Export config after transforms
+            img_format = config.output.image_format.lower()
+            config_filename = f"{name}_{self._img_idx}.yaml"
+            config_path = os.path.join(configs_dir, config_filename)
+            
+            # Use export_config operator
+            bpy.ops.traitblender.export_config(filepath=config_path)
             
             # Set render filepath
-            img_format = config.output.image_format.lower()
-            filename = f"{name}_{self._img_idx}.{img_format}"
-            filepath = os.path.join(species_dir, filename)
-            context.scene.render.filepath = filepath
+            img_filename = f"{name}_{self._img_idx}.{img_format}"
+            img_path = os.path.join(images_dir, img_filename)
+            context.scene.render.filepath = img_path
             
             # Render image
             bpy.ops.traitblender.render_image()
             
-            # Log info
-            log_msg = f"[{self._idx + 1}/{self._total}] {name} (image {self._img_idx + 1}/{self._imgs_per}): {dict(row)}\n"
+            # Get absolute paths
+            abs_img_path = os.path.abspath(img_path)
+            abs_config_path = os.path.abspath(config_path)
+            
+            # Write to CSV
+            if self._csv_writer:
+                self._csv_writer.writerow([name, self._img_idx, abs_img_path, abs_config_path])
+                self._csv_file.flush()
+            
+            # Log info with timestamp
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            log_msg = f"[{timestamp}] [{self._idx + 1}/{self._total}] {name} (image {self._img_idx + 1}/{self._imgs_per}): {dict(row)}\n"
             print(log_msg.strip())
             if self._log_file:
                 self._log_file.write(log_msg)
@@ -102,6 +137,17 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
             self.report({'WARNING'}, f"Failed to open log file: {e}")
             self._log_file = None
         
+        # Open CSV file
+        csv_path = os.path.join(render_dir, "rendering_log.csv")
+        try:
+            self._csv_file = open(csv_path, 'w', newline='')
+            self._csv_writer = csv.writer(self._csv_file)
+            self._csv_writer.writerow(['species', 'index', 'image_path', 'config_path'])
+        except Exception as e:
+            self.report({'WARNING'}, f"Failed to open CSV file: {e}")
+            self._csv_file = None
+            self._csv_writer = None
+        
         total_imgs = self._total * self._imgs_per
         print(f"Rendering {self._total} specimens ({total_imgs} total images) to {render_dir}")
         
@@ -115,12 +161,28 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
             context.window_manager.event_timer_remove(self._timer)
             self._timer = None
         
+        # Clean up last specimen
+        if self._specimens and self._idx > 0:
+            last_idx = min(self._idx - 1, len(self._specimens) - 1)
+            if last_idx >= 0:
+                last_name = self._specimens[last_idx]
+                last_obj = bpy.data.objects.get(last_name)
+                if last_obj:
+                    bpy.data.objects.remove(last_obj, do_unlink=True)
+        
+        # Close CSV file
+        if self._csv_file:
+            self._csv_file.close()
+            self._csv_file = None
+            self._csv_writer = None
+        
         # Close log file
         if self._log_file:
             if self._idx >= self._total:
                 total_imgs = self._total * self._imgs_per
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self._log_file.write(f"\n{'='*60}\n")
-                self._log_file.write(f"Rendering complete: {total_imgs} images rendered\n")
+                self._log_file.write(f"[{timestamp}] Rendering complete: {total_imgs} images rendered\n")
             self._log_file.close()
             self._log_file = None
         

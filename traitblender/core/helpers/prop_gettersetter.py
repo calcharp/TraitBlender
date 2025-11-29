@@ -50,6 +50,10 @@ def get_default(property_path: str, prop_type: str):
         'EnumProperty': 0
     }
     
+    # Check if prop_type is None
+    if prop_type is None:
+        return None
+    
     # Check if it's a scalar property
     if prop_type in scalar_defaults:
         return scalar_defaults[prop_type]
