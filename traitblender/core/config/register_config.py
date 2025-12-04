@@ -106,11 +106,11 @@ class TraitBlenderConfig(bpy.types.PropertyGroup):
             # Boolean properties
             return str(value).lower()
         elif prop_type == 'StringProperty':
-            # Normalize paths for OS (if it looks like a path)
+            # Convert paths to forward slashes (cross-platform compatible)
             if isinstance(value, str) and ('/' in value or '\\' in value):
-                value = os.path.normpath(value)
+                value = value.replace('\\', '/')
             # String properties - quote if needed
-            if not value or any(char in value for char in '":{}[]&*#?|-<>=!%@`,\'\\'):
+            if not value or any(char in value for char in '":{}[]&*#?|-<>=!%@`\''):
                 return f'"{value}"'
             return value
         else:
