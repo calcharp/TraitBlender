@@ -148,7 +148,7 @@ class TransformsManager:
             self._create_transform_card(i, transform)
     
     def _create_transform_card(self, index, transform):
-        """Create a card/rectangle for displaying a transform"""
+        """Create a card using group with separator for auto-sizing"""
         property_path = transform.get('property_path', 'Unknown')
         sampler_name = transform.get('sampler_name', 'Unknown')
         params = transform.get('params', {})
@@ -167,70 +167,36 @@ class TransformsManager:
         # Auto-set 'n' parameter based on property dimension
         should_auto_set, dimension = should_auto_set_n_parameter(property_path)
         if should_auto_set and dimension is not None:
-            # Auto-set n parameter, don't show it in UI
             self.transforms[index]['params']['n'] = dimension
         
-        # Calculate card height based on content
-        # Base height: title + property dropdowns + sampler dropdown + spacing
-        card_height = 155  # Base for dropdowns
+        # Highlight if this was just moved
+        is_highlighted = (index == self.last_moved_index)
+        title_color = (150, 220, 150) if is_highlighted else (100, 150, 200)
         
-        # Add height for each parameter based on type
-        # Exclude 'n' from count since we don't show it in UI
-        for p_name, p_info in param_signature.items():
-            if p_name == 'n':
-                continue  # Skip n parameter
-            
-            type_str = p_info['type_str']
-            if type_str == 'list[list[float]]':
-                # Matrix: needs dimension × 30px + label
-                dim = dimension or 3
-                card_height += 25 + (dim * 30)  # Label + grid rows
-            elif type_str in ('list[float]', 'list[int]'):
-                # Vector: single row of inputs + label
-                card_height += 45  # Label + input row
-            else:
-                # Scalar: single input + label
-                card_height += 35  # Label + input
-        
-        # Create a child window for the card (with drop target)
         card_tag = f"transform_card_{index}"
-        with dpg.child_window(
+        content_group_tag = f"content_group_{index}"
+        
+        # Use group for auto-sizing - groups naturally size to content
+        with dpg.group(
             tag=card_tag,
             parent="transforms_list",
-            width=-1,
-            height=card_height,
-            border=True,
-            no_scrollbar=True,
-            no_scroll_with_mouse=True,
             drop_callback=lambda s, a: self._handle_drop(index, a),
             payload_type="TRANSFORM_REORDER"
         ):
-            dpg.add_spacer(height=5)
-            
-            # Highlight if this was just moved
-            is_highlighted = (index == self.last_moved_index)
-            title_color = (150, 220, 150) if is_highlighted else (100, 150, 200)
-            
-            # Create a group for all content and make it draggable
-            content_group_tag = f"content_group_{index}"
+            # Create a group for content and make it draggable
             with dpg.group(tag=content_group_tag):
-                # Header row with controls
+                # Header row with title and delete button
                 with dpg.group(horizontal=True):
                     dpg.add_text(f"Transform {index + 1}", color=title_color)
-                    
-                    # Use spacer to push delete button to the right
                     dpg.add_spacer(width=395)
-                    
-                    # Delete button
                     dpg.add_button(
                         label="Delete",
                         callback=lambda s, a, u: self.remove_transform(u),
                         width=60,
-                        height=20,
                         user_data=index
                     )
                 
-                dpg.add_spacer(height=5)
+                dpg.add_spacer(height=3)
                 
                 # Property path selection row
                 with dpg.group(horizontal=True):
@@ -251,7 +217,7 @@ class TransformsManager:
                     
                     dpg.add_spacer(width=5)
                     
-                    # Property combo (populated based on section)
+                    # Property combo
                     properties = get_properties_for_section(current_section) if current_section else []
                     property_names = [p[0] for p in properties]
                     property_display = [p[1] for p in properties]
@@ -274,7 +240,6 @@ class TransformsManager:
                     dpg.add_text("Sampler:")
                     dpg.add_spacer(width=10)
                     
-                    # Sampler combo
                     samplers = get_available_samplers()
                     sampler_names = [s[0] for s in samplers]
                     sampler_display = [s[1] for s in samplers]
@@ -292,10 +257,8 @@ class TransformsManager:
                 
                 dpg.add_spacer(height=3)
                 
-                # Dynamic parameter inputs based on sampler signature
-                # Skip 'n' parameter - it's auto-determined from property dimension
+                # Dynamic parameter inputs
                 visible_params = {k: v for k, v in param_signature.items() if k != 'n'}
-                
                 if visible_params:
                     dpg.add_text("Parameters:", color=(180, 180, 180))
                     dpg.add_spacer(height=2)
@@ -307,12 +270,15 @@ class TransformsManager:
                             param_info=param_info,
                             current_value=params.get(param_name)
                         )
-                
-                dpg.add_spacer(height=5)
             
             # Attach drag payload to the content group
             with dpg.drag_payload(parent=content_group_tag, drag_data=index, payload_type="TRANSFORM_REORDER"):
                 dpg.add_text(f"Moving Transform {index + 1}: {property_path} ~ {sampler_name}", color=(150, 220, 150))
+            
+            # Separator between cards
+            dpg.add_spacer(height=5)
+            dpg.add_separator()
+            dpg.add_spacer(height=5)
     
     def _create_parameter_input(self, index, param_name, param_info, current_value):
         """Create an input field for a parameter based on its type."""
