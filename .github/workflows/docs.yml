@@ -5,8 +5,8 @@ on:
     branches:
       - v2  # Your current branch (change to 'main' or 'master' if you merge to default branch)
     paths:
-      - 'TraitBlender/docs/**'
-      - 'TraitBlender/mkdocs.yml'
+      - 'traitblender/docs/**'
+      - 'traitblender/mkdocs.yml'
       - '.github/workflows/docs.yml'
   workflow_dispatch:  # Allows manual triggering
 
@@ -38,7 +38,7 @@ jobs:
           pip install pymdown-extensions
 
       - name: Build documentation
-        working-directory: TraitBlender
+        working-directory: traitblender
         run: mkdocs build --strict
 
       - name: Setup Pages
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: TraitBlender/site
+          path: traitblender/site
 
   deploy:
     environment:
