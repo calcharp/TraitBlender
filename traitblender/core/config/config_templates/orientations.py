@@ -18,7 +18,7 @@ class OrientationsConfig(TraitBlenderConfig):
 
     def _get_orientation_items(self, context):
         """Get orientation options from the selected morphospace's ORIENTATIONS dict."""
-        items = [("NONE", "None", "No orientation applied")]
+        items = []
         try:
             setup = context.scene.traitblender_setup
             morphospace_name = setup.available_morphospaces
@@ -26,6 +26,9 @@ class OrientationsConfig(TraitBlenderConfig):
             for name, func in orientations.items():
                 if callable(func):
                     items.append((name, name, f"Apply {name} orientation"))
+            if not items:
+                items = [("", "—", "No orientations defined")]
         except Exception as e:
             print(f"TraitBlender: Error getting orientation items: {e}")
+            items = items or [("", "—", "No orientations defined")]
         return items

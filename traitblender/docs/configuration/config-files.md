@@ -156,7 +156,7 @@ Orientation function to apply to specimens (defined by each morphospace).
 
 ```yaml
 orientations:
-  orientation: NONE  # Or morphospace-specific: Default, Aperture Up, etc.
+  orientation: Default  # Morphospace-specific (e.g., Default for CO_Raup)
 ```
 
 ### transforms

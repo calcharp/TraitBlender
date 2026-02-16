@@ -152,24 +152,18 @@ __all__ = ['sample']
 - ✅ Returns object with `to_blender()` method
 - ✅ Docstring explaining parameters
 
-### Optional: `ORIENTATIONS` Dictionary
+### Required: `ORIENTATIONS` Dictionary
 
-Morphospaces can export an `ORIENTATIONS` dict mapping display names to callable orientation functions. Each function receives `(sample_obj)` and modifies the object in place (e.g., rotating so the specimen faces the camera).
+Morphospaces **must** export an `ORIENTATIONS` dict with at least a callable `"Default"` entry. Morphospaces without it are not listed. Each function receives `(sample_obj)` and modifies the object in place (e.g., rotating so the specimen faces the camera).
 
 ```python
 def _orient_default(sample_obj):
-    """No change."""
-    pass
-
-def _orient_aperture_up(sample_obj):
-    """Rotate aperture toward camera."""
-    import math
-    x, y, z = sample_obj.tb_rotation
-    sample_obj.tb_rotation = (x, y + math.pi / 2, z)
+    """Center on table, rotate so aperture face is orthogonal to table Y axis."""
+    sample_obj.tb_coords = (0.0, 0.0, 0.0)
+    # ... compute aperture plane from vertex group, rotate to align ...
 
 ORIENTATIONS = {
     "Default": _orient_default,
-    "Aperture Up": _orient_aperture_up,
 }
 ```
 

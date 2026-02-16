@@ -198,6 +198,13 @@ class Contreras_MORPHOSPACE_SAMPLE():
         obj = bpy.context.active_object
         obj.name = self.name
 
+        # Store mesh structure for orientation (last ring of outer_surface = aperture)
+        outer_points = self.data["outer_surface"]
+        num_rings = len(outer_points)
+        points_per_ring = len(outer_points[0])
+        obj["raup_num_rings"] = num_rings
+        obj["raup_points_per_ring"] = points_per_ring
+
         bpy.context.view_layer.objects.active = obj
         bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_VOLUME')
 

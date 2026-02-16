@@ -743,12 +743,12 @@
     **Requirements**:
     - A dataset sample must be selected (via `traitblender_dataset.sample`)
     - The sample object must exist in the scene
-    - An orientation other than "NONE" must be selected
+    - A valid orientation must be selected (from the morphospace's ORIENTATIONS)
     
     **Example**:
     ```python
     config = bpy.context.scene.traitblender_config
-    config.orientations.orientation = "Aperture Up"  # Morphospace-specific
+    config.orientations.orientation = "Default"  # Morphospace-specific
     bpy.ops.traitblender.apply_orientation()
     ```
     
@@ -759,7 +759,7 @@
     **`bpy.context.scene.traitblender_config.orientations`**
     
     **Properties**:
-    - `orientation` (EnumProperty): Orientation function to apply. Options come from the selected morphospace's `ORIENTATIONS` dict (e.g., "Default", "Center on Table", "Aperture Up" for CO_Raup). Use "NONE" to skip.
+    - `orientation` (EnumProperty): Orientation function to apply. Options come from the selected morphospace's `ORIENTATIONS` dict (e.g., "Default" for CO_Raup).
     
     ---
     
@@ -828,7 +828,7 @@
     
     ```python
     config = bpy.context.scene.traitblender_config
-    config.orientations.orientation = "Aperture Up"  # Morphospace-specific
+    config.orientations.orientation = "Default"  # Morphospace-specific
     bpy.ops.traitblender.apply_orientation()
     ```
     

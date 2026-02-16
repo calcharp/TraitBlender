@@ -33,14 +33,9 @@ class TRAITBLENDER_OT_apply_orientation(Operator):
             return {'CANCELLED'}
 
         orientation_key = config.orientations.orientation
-        if orientation_key == "NONE":
-            self.report({'INFO'}, "No orientation selected")
-            return {'FINISHED'}
-
         orientations = get_orientations_for_morphospace(setup.available_morphospaces)
-        if orientation_key not in orientations:
-            self.report({'ERROR'}, f"Orientation '{orientation_key}' not found in morphospace")
-            return {'CANCELLED'}
+        if not orientation_key or orientation_key not in orientations:
+            return {'FINISHED'}  # No orientation to apply
 
         orient_func = orientations[orientation_key]
         if not callable(orient_func):

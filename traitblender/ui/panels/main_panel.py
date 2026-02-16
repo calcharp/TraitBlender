@@ -123,18 +123,6 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         # Generate sample button
         row = layout.row(align=True)
         row.operator("traitblender.generate_morphospace_sample", text="Generate Sample", icon='ADD')
-        
-        # Sample controls (only show if a sample is selected and exists)
-        if dataset.sample and dataset.sample in bpy.data.objects:
-            layout.separator()
-            box = layout.box()
-            box.label(text="Sample Controls", icon='OBJECT_DATA')
-
-            sample_config = context.scene.traitblender_config.sample
-            sample_obj = bpy.data.objects[dataset.sample]
-            # Use table coordinates location and rotation
-            box.prop(sample_obj, "tb_coords", text="Location")
-            box.prop(sample_obj, "tb_rotation", text="Rotation")
 
 class TRAITBLENDER_PT_orientations_panel(Panel):
     bl_label = "5 Orientations"

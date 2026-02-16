@@ -49,6 +49,10 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 sys.modules[morphospace_name] = morphospace_module
                 spec.loader.exec_module(morphospace_module)
                 sample_func = getattr(morphospace_module, 'sample')
+                orientations = getattr(morphospace_module, 'ORIENTATIONS', {})
+                if 'Default' not in orientations or not callable(orientations.get('Default')):
+                    self.report({'ERROR'}, f"Morphospace '{morphospace_name}' must define ORIENTATIONS with a callable 'Default'")
+                    return {'CANCELLED'}
             except (ImportError, AttributeError) as e:
                 traceback.print_exc()
                 self.report({'ERROR'}, f"Failed to import morphospace module: {e}")
@@ -86,25 +90,31 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
 
                 # Ensure the object is properly created and positioned
                 bpy.context.view_layer.update()
-                
+
                 # Get the generated object
                 generated_obj = bpy.data.objects.get(selected_sample_name)
                 if generated_obj is None:
                     self.report({'ERROR'}, f"Failed to find generated object: {selected_sample_name}")
                     return {'CANCELLED'}
-                
-                # Handles weird cases where objects have infinite or nonexistent locations/rotations
-                generated_obj.location = (0.0, 0.0, 0.0)
-                generated_obj.rotation_euler = (0.0, 0.0, 0.0)
 
+                # Ensure OBJECT mode (orientation needs to modify object transforms)
+                if bpy.context.active_object and bpy.context.mode != 'OBJECT':
+                    bpy.ops.object.mode_set(mode='OBJECT')
+
+                if "Table" not in bpy.data.objects:
+                    self.report({'WARNING'}, "Table object missing - run Import Museum first for correct orientation")
+
+                # Apply Default orientation (required for all morphospaces)
+                orientations['Default'](generated_obj)
                 bpy.context.view_layer.update()
 
-                # Sets the objects to the center of the table
-                generated_obj.tb_coords = (0.0, 0.0, 0.0)
-                generated_obj.tb_rotation = (0.0, 0.0, 0.0)
-                
-                print(f"Set location for {selected_sample_name} to {generated_obj.location}")
-                
+                # Deselect to avoid interactive transform/property controls appearing (slow/awkward)
+                generated_obj.select_set(False)
+                if "Table" in bpy.data.objects:
+                    bpy.context.view_layer.objects.active = bpy.data.objects["Table"]
+                else:
+                    bpy.context.view_layer.objects.active = None
+
                 self.report({'INFO'}, f"Generated morphospace sample: {selected_sample_name}")
             except Exception as e:
                 traceback.print_exc()
