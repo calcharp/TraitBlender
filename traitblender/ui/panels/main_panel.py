@@ -65,7 +65,7 @@ class TRAITBLENDER_PT_config_panel(Panel):
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
-                if section_name in ["transforms", "sample", "orientations"]:
+                if section_name in ["transforms", "sample"]:
                     continue
                 self._draw_config_section(layout, section_name, section_obj)
         else:
@@ -133,11 +133,11 @@ class TRAITBLENDER_PT_orientations_panel(Panel):
 
     def draw(self, context):
         layout = self.layout
-        config = context.scene.traitblender_config
-        
+        orientation_state = context.scene.traitblender_orientation
+
         layout.label(text="Apply orientation from the selected morphospace:")
         row = layout.row(align=True)
-        row.prop(config.orientations, "orientation", text="")
+        row.prop(orientation_state, "orientation", text="")
         row.operator("traitblender.apply_orientation", text="Apply", icon='ORIENTATION_VIEW')
 
 class TRAITBLENDER_PT_transforms_panel(Panel):

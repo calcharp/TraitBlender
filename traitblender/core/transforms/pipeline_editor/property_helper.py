@@ -28,7 +28,6 @@ def get_available_sections():
             ("camera", "Camera"),
             ("lamp", "Lamp"),
             ("output", "Output"),
-            ("orientations", "Orientations"),
         ]
 
 
@@ -78,9 +77,6 @@ def get_properties_for_section(section_name):
                 ("resolution_y", "Resolution Y"),
                 ("samples", "Samples"),
                 ("file_format", "File Format"),
-            ],
-            "orientations": [
-                ("orientation", "Orientation"),
             ],
         }
         return mock_properties.get(section_name, [])

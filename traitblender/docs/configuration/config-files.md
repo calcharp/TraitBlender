@@ -150,15 +150,6 @@ metadata:
   # Additional stamp options available
 ```
 
-### orientations
-
-Orientation function to apply to specimens (defined by each morphospace).
-
-```yaml
-orientations:
-  orientation: Default  # Morphospace-specific (e.g., Default for CO_Raup)
-```
-
 ### transforms
 
 Transform pipeline for data augmentation. This is a list of transform definitions.

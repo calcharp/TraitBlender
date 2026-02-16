@@ -286,7 +286,6 @@
     - `render` - Render engine settings
     - `output` - Output format and directory
     - `metadata` - Image metadata/stamp settings
-    - `orientations` - Specimen orientation settings
     - `transforms` - Transform pipeline configuration
     
     Each section can be accessed as `config.section_name` and contains properties specific to that section.
@@ -747,16 +746,17 @@
     
     **Example**:
     ```python
-    config = bpy.context.scene.traitblender_config
-    config.orientations.orientation = "Default"  # Morphospace-specific
+    bpy.context.scene.traitblender_orientation.orientation = "Default"  # Morphospace-specific
     bpy.ops.traitblender.apply_orientation()
     ```
     
     ---
     
-    ## Configuration Properties
+    ## Orientation State (Scene Property)
     
-    **`bpy.context.scene.traitblender_config.orientations`**
+    **`bpy.context.scene.traitblender_orientation`**
+    
+    Temporary UI state for the selected morphospace orientation (not part of config).
     
     **Properties**:
     - `orientation` (EnumProperty): Orientation function to apply. Options come from the selected morphospace's `ORIENTATIONS` dict (e.g., "Default" for CO_Raup).
@@ -827,8 +827,7 @@
     ### Apply Orientation
     
     ```python
-    config = bpy.context.scene.traitblender_config
-    config.orientations.orientation = "Default"  # Morphospace-specific
+    bpy.context.scene.traitblender_orientation.orientation = "Default"  # Morphospace-specific
     bpy.ops.traitblender.apply_orientation()
     ```
     

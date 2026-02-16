@@ -20,7 +20,6 @@ class TRAITBLENDER_OT_apply_orientation(Operator):
 
     def execute(self, context):
         dataset = context.scene.traitblender_dataset
-        config = context.scene.traitblender_config
         setup = context.scene.traitblender_setup
 
         if not dataset.sample:
@@ -32,7 +31,7 @@ class TRAITBLENDER_OT_apply_orientation(Operator):
             self.report({'ERROR'}, f"Sample object '{sample_name}' not found in scene")
             return {'CANCELLED'}
 
-        orientation_key = config.orientations.orientation
+        orientation_key = context.scene.traitblender_orientation.orientation
         orientations = get_orientations_for_morphospace(setup.available_morphospaces)
         if not orientation_key or orientation_key not in orientations:
             return {'FINISHED'}  # No orientation to apply

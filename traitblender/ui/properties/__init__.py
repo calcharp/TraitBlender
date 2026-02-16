@@ -1,10 +1,12 @@
 import bpy
 from . import setup_properties
+from . import orientation_properties
 from . import table_coords
 from . import table_rotations
 
 classes = [
     setup_properties.TraitBlenderSetupProperties,
+    orientation_properties.TRAITBLENDER_PG_orientation,
 ]
 
 
@@ -12,8 +14,9 @@ def register():
     r_classes = classes
     for cls in r_classes:
         bpy.utils.register_class(cls)
-    # Create the scene property
+    # Create the scene properties
     bpy.types.Scene.traitblender_setup = bpy.props.PointerProperty(type=setup_properties.TraitBlenderSetupProperties)
+    bpy.types.Scene.traitblender_orientation = bpy.props.PointerProperty(type=orientation_properties.TRAITBLENDER_PG_orientation)
     # Register table coordinate properties
     table_coords.register_table_coords()
     # Register table rotation properties
@@ -21,7 +24,8 @@ def register():
 
 
 def unregister():
-    # Remove the scene property
+    # Remove the scene properties
+    del bpy.types.Scene.traitblender_orientation
     del bpy.types.Scene.traitblender_setup
     r_classes = classes
     for cls in r_classes:

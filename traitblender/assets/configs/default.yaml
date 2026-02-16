@@ -56,7 +56,5 @@ metadata:
   use_stamp_scene: true
   use_stamp_sequencer_strip: false
   use_stamp_time: true
-orientations:
-  orientation: Default
 transforms:
   [] 

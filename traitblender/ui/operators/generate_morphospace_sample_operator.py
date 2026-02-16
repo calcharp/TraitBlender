@@ -105,7 +105,7 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                     self.report({'WARNING'}, "Table object missing - run Import Museum first for correct orientation")
 
                 # Apply Default orientation (required for all morphospaces)
-                orientations['Default'](generated_obj)
+                
                 bpy.context.view_layer.update()
 
                 # Deselect to avoid interactive transform/property controls appearing (slow/awkward)

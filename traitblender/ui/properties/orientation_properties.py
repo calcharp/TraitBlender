@@ -1,19 +1,23 @@
+"""
+TraitBlender Orientation Properties
+
+Temporary UI state for the selected orientation of the active morphospace.
+Not part of scene configuration - just tracks which orientation to apply.
+"""
+
 import bpy
-from ..register_config import register, TraitBlenderConfig
-from ...morphospaces import get_orientations_for_morphospace
+from bpy.props import EnumProperty
+from ...core.morphospaces import get_orientations_for_morphospace
 
 
-@register("orientations")
-class OrientationsConfig(TraitBlenderConfig):
-    """Orientation functions provided by the selected morphospace."""
+class TRAITBLENDER_PG_orientation(bpy.types.PropertyGroup):
+    """Temporary state: which orientation to apply for the current morphospace."""
 
-    print_index = 1
-
-    orientation: bpy.props.EnumProperty(
+    orientation: EnumProperty(
         name="Orientation",
-        description="Orientation function to apply to the specimen (defined by the morphospace)",
+        description="Orientation function to apply to the specimen (from the selected morphospace)",
         items=lambda self, context: self._get_orientation_items(context),
-        default=0
+        default=0,
     )
 
     def _get_orientation_items(self, context):
