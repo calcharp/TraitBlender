@@ -100,42 +100,52 @@ class Contreras_MORPHOSPACE_SAMPLE():
             bmesh.update_edit_mesh(mesh)
 
         ap = self.data["aperture"]
-        points_around_aperture = ap.shape[0] // 2  
-        outer = ap[:points_around_aperture]
-        inner = ap[points_around_aperture:]
-        vertices = np.vstack((outer, inner))  
+        inner_surface = self.data.get("inner_surface")
+        use_inner = inner_surface is not None
+        
+        # Only create aperture mesh if we have inner surface (aperture connects outer to inner)
+        aperture_obj = None
+        if use_inner:
+            # Aperture connects outer and inner surfaces
+            points_around_aperture = ap.shape[0] // 2  
+            outer = ap[:points_around_aperture]
+            inner = ap[points_around_aperture:]
+            aperture_vertices = np.vstack((outer, inner))  
 
-        aperture_faces = []
-        for i in range(points_around_aperture):
-            # wrap around to 0 after the last index
-            next_i = (i + 1) % points_around_aperture
+            aperture_faces = []
+            for i in range(points_around_aperture):
+                # wrap around to 0 after the last index
+                next_i = (i + 1) % points_around_aperture
+                
+                outer_i = i
+                outer_next = next_i
+                inner_i = i + points_around_aperture
+                inner_next = next_i + points_around_aperture
+
+                # define quad face as (outer_i, outer_next, inner_next, inner_i)
+                aperture_faces.append((outer_i, outer_next, inner_next, inner_i))
             
-            outer_i = i
-            outer_next = next_i
-            inner_i = i + points_around_aperture
-            inner_next = next_i + points_around_aperture
+            # Create aperture mesh
+            aperture_mesh = bpy.data.meshes.new(name=f"{self.name}_aperture")
+            aperture_mesh.from_pydata(aperture_vertices.tolist(), [], aperture_faces)
+            aperture_mesh.update()
 
-            # define quad face as (outer_i, outer_next, inner_next, inner_i)
-            aperture_faces.append((outer_i, outer_next, inner_next, inner_i))
+            aperture_obj = bpy.data.objects.new(f"{self.name}_aperture", aperture_mesh)
+            bpy.context.collection.objects.link(aperture_obj)
+            vg = aperture_obj.vertex_groups.new(name="aperture_vg")
+            all_vert_indices = [v.index for v in aperture_obj.data.vertices]
+            vg.add(all_vert_indices, 1.0, 'REPLACE')
 
-        aperture_mesh = bpy.data.meshes.new(name=f"{self.name}_aperture")
-        aperture_mesh.from_pydata(vertices.tolist(), [], aperture_faces)
-        aperture_mesh.update()
+            aperture_obj.data.uv_layers.new(name="uv")
+            aperture_obj.data.uv_layers.active = aperture_obj.data.uv_layers["uv"]
+            bpy.context.view_layer.objects.active = aperture_obj
+            bpy.ops.object.mode_set(mode='EDIT')
+            bpy.ops.uv.unwrap(method='ANGLE_BASED')
+            bpy.ops.object.mode_set(mode='OBJECT')
 
-        obj = bpy.data.objects.new(f"{self.name}_aperture", aperture_mesh)
-        bpy.context.collection.objects.link(obj)
-        vg = obj.vertex_groups.new(name="aperture_vg")
-        all_vert_indices = [v.index for v in obj.data.vertices]
-        vg.add(all_vert_indices, 1.0, 'REPLACE')
-
-        obj.data.uv_layers.new(name="uv")
-        obj.data.uv_layers.active = obj.data.uv_layers["uv"]
-        bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.uv.unwrap(method='ANGLE_BASED')
-        bpy.ops.object.mode_set(mode='OBJECT')
-
-        surfaces = ["outer_surface", "inner_surface"]
+        surfaces = ["outer_surface"]
+        if use_inner:
+            surfaces.append("inner_surface")
         objs = []
 
         for surface_name in surfaces:
@@ -173,7 +183,8 @@ class Contreras_MORPHOSPACE_SAMPLE():
             objs.append(obj)
 
         surface_names = [f"{surface_name}" for surface_name in surfaces]
-        surface_names.append(f"{self.name}_aperture")
+        if aperture_obj is not None:
+            surface_names.append(f"{self.name}_aperture")
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.select_all(action='DESELECT')

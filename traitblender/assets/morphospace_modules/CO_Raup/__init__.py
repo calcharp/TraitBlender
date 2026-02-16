@@ -1,9 +1,42 @@
+import math
 from .morphospace.contreras_morphospace import Contreras_MORPHOSPACE
 from .morphospace_sample.contreras_morphospace_sample import Contreras_MORPHOSPACE_SAMPLE
 
+# Orientation functions for specimens. Each receives (sample_obj) and modifies it in place.
+# Shell grows along +X, aperture at max X. Camera typically looks down (+Z).
+def _orient_default(sample_obj):
+    """No change - specimen as generated."""
+    pass
+
+def _orient_center_on_table(sample_obj):
+    """Ensure specimen is centered on the table."""
+    sample_obj.tb_coords = (0.0, 0.0, 0.0)
+
+def _orient_aperture_up(sample_obj):
+    """Rotate so aperture (open end) faces up toward typical camera view."""
+    # Shell grows along +X, aperture at +X. Rotate 90° around Y so +X → +Z
+    x, y, z = sample_obj.tb_rotation
+    sample_obj.tb_rotation = (x, y + math.pi / 2, z)
+
+ORIENTATIONS = {
+    "Default": _orient_default,
+    "Center on Table": _orient_center_on_table,
+    "Aperture Up": _orient_aperture_up,
+}
+
+# Hyperparameters: Non-biological parameters needed for morphospace generation
+HYPERPARAMETERS = {
+    'points_in_circle': 40,      # Number of points around each shell ring (discretization)
+    'time_step': 1/30,            # Time step for shell generation (discretization)
+    'use_inner_surface': True,    # Whether to generate inner surface with thickness
+    'eps': 0.8,                   # Thickness parameter (allometric exponent)
+    'h_0': 0.1,                   # Base thickness parameter
+    'length': 0.015               # Desired final shell length in meters (scaling)
+}
+
 def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0, 
-           c_depth=0, c_n=0, n_depth=0, n=0, t=10, time_step=1/30, 
-           points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
+           c_depth=0, c_n=0, n_depth=0, n=0, t=10, 
+           hyperparameters=None):
     """
     Generate a shell sample using the Contreras morphospace model.
     
@@ -20,21 +53,28 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
         n_depth (float): Spiral rib depth
         n (float): Spiral rib frequency
         t (float): Time parameter (shell length)
-        time_step (float): Time step for shell generation
-        points_in_circle (int): Number of points around each shell ring
-        eps (float): Thickness parameter
-        h_0 (float): Base thickness parameter
-        length (float): Desired length of the shell in meters
+        hyperparameters (dict, optional): Dictionary of hyperparameters. If None, uses defaults from HYPERPARAMETERS.
+            Available hyperparameters:
+            - points_in_circle (int): Number of points around each shell ring
+            - time_step (float): Time step for shell generation
+            - use_inner_surface (bool): Whether to generate inner surface with thickness
+            - eps (float): Thickness parameter (allometric exponent)
+            - h_0 (float): Base thickness parameter
+            - length (float): Desired length of the shell in meters
     
     Returns:
         Contreras_MORPHOSPACE_SAMPLE: A shell sample object that can be converted to Blender
     """
+    # Merge provided hyperparameters with defaults
+    if hyperparameters is None:
+        hyperparameters = {}
+    merged_hyperparams = {**HYPERPARAMETERS, **hyperparameters}
+    
     morphospace = Contreras_MORPHOSPACE()
     return morphospace.generate_sample(
         name=name, b=b, d=d, z=z, a=a, phi=phi, psi=psi,
-        c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, t=t, 
-        time_step=time_step, points_in_circle=points_in_circle, 
-        eps=eps, h_0=h_0, length=length
+        c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, t=t,
+        **merged_hyperparams
     )
 
-__all__ = ['sample'] 
+__all__ = ['sample', 'HYPERPARAMETERS', 'ORIENTATIONS'] 

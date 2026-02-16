@@ -17,7 +17,7 @@ from . import (
     edit_transforms_operator,
     generate_morphospace_sample_operator,
     imaging_pipeline_operator,
-    sample_origin_shift_operator,
+    apply_orientation_operator,
     render_image_operator,
 )
 
@@ -35,7 +35,7 @@ classes = [
     edit_transforms_operator.TRAITBLENDER_OT_edit_transforms,
     generate_morphospace_sample_operator.TRAITBLENDER_OT_generate_morphospace_sample,
     imaging_pipeline_operator.TRAITBLENDER_OT_imaging_pipeline,
-    sample_origin_shift_operator.TRAITBLENDER_OT_sample_origin_shift,
+    apply_orientation_operator.TRAITBLENDER_OT_apply_orientation,
     render_image_operator.TRAITBLENDER_OT_render_image,
 ]
 

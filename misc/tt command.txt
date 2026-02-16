@@ -1,0 +1,174 @@
+
+pip download --python-version 3.11 --only-binary=:all: pandas -d .
+
+cls; rm traitblender-2.0.0.zip; blender --command extension build --source-dir TraitBlender/ --verbose
+
+blender --command extension build --source-dir blender_testing/ --verbose
+
+import bl_ext.user_default.traitblender as tb
+
+table = tb.SceneAsset.TableAsset(name="table", file_path="C://Users/caleb/Downloads/old_table_fbx/old_table/old_table.fbx", file_type="fbx")
+lamp = tb.SceneAsset.TabletopAsset(name="lamp", file_path="C://Users/caleb/Downloads/lamp.obj", file_type="obj")
+lamp.put_on_table(table, (0, 1))
+
+import bl_ext.user_default.traitblender as tb
+gptdata = tb.Dataset.Dataset(file_path="C://Users/caleb/Downloads/simulation_traits.xlsx", label="Species")
+gptdata.data.head()
+
+for obj in bpy.data.objects:
+        bpy.data.objects.remove(obj, do_unlink=True)
+
+import bl_ext.user_default.traitblender as tb
+snailspace = tb.ContrerasMorphospace.ContrerasMorphospace()
+points = snailspace.generate_sample()
+snail = snailspace.to_blender(points, name="snail", length = 1, smooth=True)
+table = tb.SceneAsset.TableAsset(name="table", file_path="C://Users/caleb/Downloads/old_table_fbx/old_table/old_table.fbx", file_type="fbx")
+table.mesh.dimensions[0] = 5
+table.mesh.dimensions[1] = 3
+snail.put_on_table(table, (0, 1))
+
+import bl_ext.user_default.traitblender as tb
+table = tb.SceneAsset.TableAsset(name="table", file_path="C://Users/caleb/Downloads/old_table_fbx/old_table/old_table.fbx", file_type="fbx")
+
+import bl_ext.user_default.traitblender as tb
+snailspace = tb.ContrerasMorphospace.ContrerasMorphospace()
+snail_data = tb.datasets.Dataset.Dataset(file_path="C://Users/caleb/Downloads/snails.csv", name="label", morphospace=snailspace )
+
+snail_data["Helix fulica", "a"]
+type(snail_data["Helix fulica", "a":"phi"])
+
+
+import bl_ext.user_default.traitblender as tb
+tb.morphospaces.Morphospace.MorphospaceManager.base_dir()
+tb.morphospaces.Morphospace.MorphospaceManager.install_morphospace(path="C://Users/caleb/OneDrive/Documents/Obsidian Vault/projects/GitHub Projects/TraitBlender2/TraitBlender/misc/ContrerasMorphospace.py")
+tb.morphospaces.Morphospace.MorphospaceManager.get_morphospaces()
+
+
+[tb.morphospaces.Morphospace.MorphospaceManager.install_morphospaces(paths="C://Users/caleb/OneDrive/Documents/Obsidian Vault/projects/GitHub Projects/TraitBlender2/TraitBlender/misc/ContrerasMorphospace.py") for i in range(15)]
+
+tb.morphospaces.Morphospace.MorphospaceManager.uninstall_morphospaces(names='ContrerasMorphospace_10')
+
+
+
+import bl_ext.user_default.traitblender as tb
+tb.misc.LocalStorage.LocalStorage.base_dir()
+
+
+import bl_ext.user_default.traitblender as tb
+tb.misc.globals.traitblender_objects['active_dataset'].head()
+
+
+table = tb.scene_assets.SceneAsset(name="Table", file_path="C://Users/caleb/Downloads/old_table_fbx/old_table/old_table.fbx", file_type="fbx", textures_path="C://Users/caleb/Downloads/old_table_fbx/old_table/textures")
+
+C://Users/caleb/AppData/Roaming/Blender Foundation/Blender/4.3/extensions/.user/user_default/traitblender/SceneAssets/TableAsset
+
+
+
+tb.TRAITBLENDER_OBJECTS.scene_asset_manager.is_valid_scene_asset("C://Users/caleb/Downloads/old_table_fbx/old_table")
+
+table = tb.TRAITBLENDER_OBJECTS.scene_asset_manager.load_asset(name="old_table", subtype="TableAsset")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        spiral_axis = gamma(t, sin_t, cos_t, b, d, z)
+        ribbing, aperture_size, aperture_shape = C(t, theta_values, sin_t_values, cos_t_values, sin_theta_values, cos_theta_values, b, a, d, z, phi, psi, c_n, c_depth, n, n_depth)
+
+        inner_surface = aperture_size*aperture_shape
+        outer_surface = ribbing*inner_surface
+
+
+
+
+
+
+
+snail_space = tb.TRAITBLENDER_OBJECTS.morphospace_manager.load_morphospace("ContrerasMorphospace")
+snail_space.generate_sample()
+
+
+
+import bpy
+bpy.ops.traitblender.setup_scene()
+
+
+
+import bl_ext.user_default.traitblender as tb
+with tb.core.scene_asset("old_table", tb.core.SurfaceAsset) as table:
+    with tb.core.scene_asset("Suzanne") as suzanne:
+        table.place(suzanne, (0, 0))
+
+
+
+
+import bl_ext.user_default.traitblender as tb
+WCT = tb.core.TRANSFORMS['RandomWorldColor']()
+WCT.apply()
+
+tb.core.register_config(yaml_path="C://Users/caleb/OneDrive/Documents/Obsidian Vault/projects/GitHub Projects/BioEncoder/bioencoder_configs/train_stage1.yml")
+
+
+
+with tb.core.scene_asset("Camera","CameraAsset") as camera:
+     camera.lens = 100
+
+
+
+
+def register_to_config(name: str):
+	"""This decorator takes a PropertyGroup and adds it to dict that gets converted to the	 	    global config registry"""
+	def decorator(cls: PropertyGroup):
+		def wrapper():
+			TRAITBLENDER_CONFIG[cls.__name__] = PointerProperty(type=cls)
+		return cls
+	return wrapper
+return decorator
+
+
+# Get the transforms configuration
+transforms_config = bpy.context.scene.traitblender_config.transforms
+
+# Add gaussian transform for focal length (mean=60, sd=5)
+transforms_config.add_transform("camera.focal_length", "normal", {"mu": 60, "sigma": 5})
+
+# Add dirichlet transform for world color (equal alpha values for RGB + alpha)
+transforms_config.add_transform("world.color", "dirichlet", {"alphas": [0.3, 0.3, 0.3, 1.0]})
+
+print(f"Added 2 transforms to pipeline. Total transforms: {len(transforms_config)}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

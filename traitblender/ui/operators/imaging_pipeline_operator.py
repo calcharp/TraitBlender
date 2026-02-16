@@ -43,6 +43,10 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                 # Generate new specimen
                 dataset.sample = name
                 bpy.ops.traitblender.generate_morphospace_sample()
+
+                # Apply selected orientation (if any)
+                if config.orientations.orientation != "NONE":
+                    bpy.ops.traitblender.apply_orientation()
             
             # Reset and run pipeline for each variation
             bpy.ops.traitblender.reset_pipeline()

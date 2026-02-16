@@ -8,6 +8,7 @@
 
 🚧 IN PROGRESS:
 - Orientations system (rotation origin functionality needs implementation)
+- Hyperparameters system testing: Need to rebuild package and import into Blender to verify changes didn't break anything (use_inner_surface, points_in_circle, time_step moved to HYPERPARAMETERS dict)
 
 ---
 
@@ -15,7 +16,11 @@ Future enhancements and new features can be added below:
 - Get Transforms more fully fleshed out.
 - Make a plan (even if its not completed) for how to make the sampling go faster for the shell morphospace
 - Better integration with HPCs
+- Morphospace hyperparameters system: Add support for distinguishing biological traits from hyperparameters (e.g., points_in_circle, time_step, inner/outer surface flag). These should be configurable separately from dataset traits and have sensible defaults.
 
 
 
 - Make documentation building work
+
+
+cls; rm -f traitblender-2.0.0.zip; blender --command extension build --source-dir ./traitblender 

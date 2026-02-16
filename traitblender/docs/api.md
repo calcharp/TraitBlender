@@ -728,13 +728,13 @@
 
 ??? note "Orientations"
     
+    Each morphospace defines orientation functions in its `ORIENTATIONS` dictionary. These functions are called with the sample object and modify it in place (e.g., rotating so the aperture faces the camera).
+    
     ## Operators
     
-    **`bpy.ops.traitblender.sample_origin_shift()`**
+    **`bpy.ops.traitblender.apply_orientation()`**
     
-    Shift the sample object's origin to (0,0,0) in table coordinates along specified axes.
-    
-    **Description**: Repositions a specimen object so that its calculated origin (based on orientation settings) is at (0,0,0) in table coordinates.
+    Apply the selected orientation function to the current sample.
     
     **Returns**: 
     - `{'FINISHED'}` on success
@@ -743,20 +743,13 @@
     **Requirements**:
     - A dataset sample must be selected (via `traitblender_dataset.sample`)
     - The sample object must exist in the scene
-    - Orientation settings must be configured
+    - An orientation other than "NONE" must be selected
     
     **Example**:
     ```python
-    dataset = bpy.context.scene.traitblender_dataset
-    dataset.sample = "SpeciesName"
-    
-    # Configure orientation settings
     config = bpy.context.scene.traitblender_config
-    config.orientations.object_location_origin = "GEOM_BOUNDS"
-    config.orientations.location_shift_axes = "XYZ"
-    
-    # Shift the origin
-    bpy.ops.traitblender.sample_origin_shift()
+    config.orientations.orientation = "Aperture Up"  # Morphospace-specific
+    bpy.ops.traitblender.apply_orientation()
     ```
     
     ---
@@ -765,25 +758,8 @@
     
     **`bpy.context.scene.traitblender_config.orientations`**
     
-    Configuration object for orientation settings.
-    
     **Properties**:
-    - `object_location_origin` (EnumProperty): Origin type for object positioning (e.g., 'GEOM_BOUNDS', 'MEAN', 'MEDIAN', 'OBJECT')
-    - `object_rotation_origin` (EnumProperty): Origin type for object rotation
-    - `location_shift_axes` (EnumProperty): Which axes to apply location shifts to ('X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ')
-    
-    **Example**:
-    ```python
-    config = bpy.context.scene.traitblender_config
-    orientations = config.orientations
-    
-    # Set origin type
-    orientations.object_location_origin = "GEOM_BOUNDS"
-    orientations.object_rotation_origin = "MEAN"
-    
-    # Set which axes to shift
-    orientations.location_shift_axes = "XYZ"
-    ```
+    - `orientation` (EnumProperty): Orientation function to apply. Options come from the selected morphospace's `ORIENTATIONS` dict (e.g., "Default", "Center on Table", "Aperture Up" for CO_Raup). Use "NONE" to skip.
     
     ---
     
@@ -848,18 +824,12 @@
     
     ---
     
-    ### Shift Specimen Origin
+    ### Apply Orientation
     
     ```python
-    # Configure orientation
     config = bpy.context.scene.traitblender_config
-    config.orientations.object_location_origin = "GEOM_BOUNDS"
-    config.orientations.location_shift_axes = "XY"  # Only shift X and Y
-    
-    # Shift the origin
-    dataset = bpy.context.scene.traitblender_dataset
-    dataset.sample = "SpeciesName"
-    bpy.ops.traitblender.sample_origin_shift()
+    config.orientations.orientation = "Aperture Up"  # Morphospace-specific
+    bpy.ops.traitblender.apply_orientation()
     ```
     
 

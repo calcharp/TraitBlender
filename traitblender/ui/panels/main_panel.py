@@ -147,21 +147,10 @@ class TRAITBLENDER_PT_orientations_panel(Panel):
         layout = self.layout
         config = context.scene.traitblender_config
         
-        # Object Location Origin dropdown
+        layout.label(text="Apply orientation from the selected morphospace:")
         row = layout.row(align=True)
-        row.prop(config.orientations, "object_location_origin", text="Object Location Origin")
-        
-        # Object Rotation Origin dropdown
-        row = layout.row(align=True)
-        row.prop(config.orientations, "object_rotation_origin", text="Object Rotation Origin")
-        
-        # Location Shift Axes dropdown
-        row = layout.row(align=True)
-        row.prop(config.orientations, "location_shift_axes", text="Location Shift Axes")
-        
-        # Shift Sample Origin button
-        row = layout.row(align=True)
-        row.operator("traitblender.sample_origin_shift", text="Shift Sample Origin", icon='ARROW_LEFTRIGHT')
+        row.prop(config.orientations, "orientation", text="")
+        row.operator("traitblender.apply_orientation", text="Apply", icon='ORIENTATION_VIEW')
 
 class TRAITBLENDER_PT_transforms_panel(Panel):
     bl_label = "6 Transforms"

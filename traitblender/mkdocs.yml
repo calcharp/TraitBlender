@@ -92,6 +92,7 @@ nav:
       - 6 Transform Pipeline: developers/transform-pipeline.md
       - 7 Imaging: developers/imaging.md
   - Tutorials:
+    - Generating Shell Dataset Data: tutorials/generating-shell-data.md
     - Basic Specimen Imaging: tutorials/basic-imaging.md
 
 extra:

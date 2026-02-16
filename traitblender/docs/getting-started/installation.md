@@ -12,79 +12,45 @@
     - **RAM**: 32GB for large datasets
     - **CPU**: Multi-core processor (8+ cores recommended)
 
-??? note "Installation"
-    <!-- TODO: Add command-line installation instructions for advanced users -->
+## Installation
 
-    **Step 1: Download TraitBlender**
+<!-- TODO: Add command-line installation instructions for advanced users -->
 
-    - Download the latest release from [GitHub Releases](https://github.com/Imageomics/TraitBlender/releases)
-    - Save the `.zip` file to your computer
+**Step 1: Download TraitBlender**
 
-    **Step 2: Install in Blender**
+- Download the latest release from [GitHub Releases](https://github.com/Imageomics/TraitBlender/releases)
+- Save the `.zip` file to your computer
 
-    - Open Blender
-    - Go to `Edit > Preferences` (or `Blender > Preferences` on macOS)
-    - Navigate to the `Add-ons` tab
-    - Click `Install...` button
-    - Browse and select the downloaded TraitBlender `.zip` file
-    - Click `Install Add-on`
+**Step 2: Install in Blender**
 
-    **Step 3: Enable the Add-on**
+- Open Blender
+- Go to `Edit > Preferences` (or `Blender > Preferences` on macOS)
+- Navigate to the `Add-ons` tab
+- Click `Install...` button
+- Browse and select the downloaded TraitBlender `.zip` file
+- Click `Install Add-on`
 
-    - In the Add-ons list, search for "TraitBlender"
-    - Check the box next to "TraitBlender" to enable it
-    - The add-on should now appear in the 3D Viewport sidebar (press `N` to show/hide)
+**Step 3: Enable the Add-on**
 
-    ### Dependency Installation
+- In the Add-ons list, search for "TraitBlender"
+- Check the box next to "TraitBlender" to enable it
+- The add-on should now appear in the 3D Viewport sidebar (press `N` to show/hide)
 
-    TraitBlender automatically includes all required Python dependencies as wheel files. These include:
+## Verify Installation
 
-    - **pandas** - Dataset management and CSV/Excel handling
-    - **numpy** - Numerical computing and mathematical operations
-    - **scipy** - Statistical functions for transforms
-    - **PyYAML** - Configuration file parsing
-    - **Pillow** - Image processing
-    - **dearpygui** - CSV viewer interface
-    - **openpyxl** - Excel file support
+To verify that TraitBlender is properly installed:
 
-    All dependencies are bundled as wheel files in the `wheels/` directory. No additional manual dependency installation is required.
+**Check the UI Panel**
 
-??? note "Verify Installation"
-    ### How to Verify Installation
+- In the 3D Viewport, press `N` to open the sidebar
+- Look for the "TraitBlender" tab
 
-    To verify that TraitBlender is properly installed:
+**Test Basic Functionality**
 
-    **Check the UI Panel**
+- Create a simple object (cube or sphere)
+- Open the TraitBlender panel
+- Try basic operations to ensure everything works
 
-    - In the 3D Viewport, press `N` to open the sidebar
-    - Look for the "TraitBlender" tab
-
-    **Test Basic Functionality**
-
-    - Create a simple object (cube or sphere)
-    - Open the TraitBlender panel
-    - Try basic operations to ensure everything works
-
-??? note "Troubleshooting Installation"
-    ### Common Issues
-
-    **Add-on doesn't appear after installation:**
-
-    - Ensure you're using Blender 4.3.0 or higher
-    - Check that the add-on is enabled in Preferences
-    - Restart Blender completely
-
-    **Import errors or missing dependencies:**
-
-    - Re-download the add-on to ensure all wheel files are included
-    - Check Blender's console for specific error messages
-
-    **Performance issues:**
-
-    - Check available system memory
-    - Close unnecessary applications to free up resources
-
-    For additional help, see the [Troubleshooting section](../troubleshooting/common-issues.md) or report issues on our [GitHub repository](https://github.com/Imageomics/TraitBlender/issues).
 
 ## Next Steps
 

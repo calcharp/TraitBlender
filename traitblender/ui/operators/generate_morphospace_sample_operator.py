@@ -1,6 +1,7 @@
 import bpy
 from bpy.types import Operator
 import importlib
+import importlib.util
 import sys
 import os
 import inspect
@@ -58,11 +59,25 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             # Get the argument names for the sample function (excluding 'name')
             sig = inspect.signature(sample_func)
             valid_params = set(sig.parameters.keys()) - {'name'}
+            
+            # Get hyperparameters if the morphospace defines them
+            hyperparameters = None
+            if hasattr(morphospace_module, 'HYPERPARAMETERS'):
+                hyperparameters = morphospace_module.HYPERPARAMETERS.copy()
+                # Remove hyperparameters from valid_params so they don't get mapped from dataset
+                valid_params = valid_params - set(hyperparameters.keys()) - {'hyperparameters'}
+            
+            # Map dataset columns to function parameters (excluding hyperparameters)
             params = {}
             for column_name, value in row_data.items():
                 param_name = column_name.lower().replace(' ', '_')
                 if param_name in valid_params:
                     params[param_name] = value
+            
+            # Add hyperparameters as a dict parameter if the function accepts it
+            if 'hyperparameters' in sig.parameters:
+                params['hyperparameters'] = hyperparameters
+            
             # Debug: show what will be passed
             print(f"Calling {morphospace_name}.sample with name={selected_sample_name} and params={params}")
             try:

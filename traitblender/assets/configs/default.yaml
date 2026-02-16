@@ -57,8 +57,6 @@ metadata:
   use_stamp_sequencer_strip: false
   use_stamp_time: true
 orientations:
-  object_location_origin: OBJECT
-  object_rotation_origin: OBJECT
-  location_shift_axes: XYZ
+  orientation: NONE
 transforms:
   [] 

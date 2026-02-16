@@ -10,8 +10,9 @@ class Contreras_MORPHOSPACE():
         pass
 
     def generate_sample(self, name="Shell", b = .1, d = 4, z = 0, a = 1, phi = 0, psi = 0, 
-                         c_depth=0.1, c_n = 70, n_depth = 0, n = 0, t = 20, time_step = .25/30, 
-                         points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
+                         c_depth=0.1, c_n = 70, n_depth = 0, n = 0, t = 20, 
+                         points_in_circle=40, time_step=1/30, use_inner_surface=True, 
+                         eps=0.8, h_0=0.1, length=0.015):
 
         t_values = np.arange(0, t, time_step)
         theta_values = np.arange(0, 2*np.pi, np.pi/points_in_circle)
@@ -102,12 +103,20 @@ class Contreras_MORPHOSPACE():
             ])
 
         outer_surface = compute_surface_vertices(inner=False)
-        inner_surface = compute_surface_vertices(inner=True, eps=eps, h_0=h_0)
+        
+        # Conditionally generate inner surface based on hyperparameter
+        if use_inner_surface:
+            inner_surface = compute_surface_vertices(inner=True, eps=eps, h_0=h_0)
+            aperture = np.vstack((outer_surface[-1], inner_surface[-1]))
+        else:
+            inner_surface = None
+            # Aperture is just the outer surface at the end
+            aperture = outer_surface[-1]
 
         shell = {
             "outer_surface": outer_surface,
             "inner_surface": inner_surface,
-            "aperture": np.vstack((outer_surface[-1], inner_surface[-1]))
+            "aperture": aperture
         }
 
         # Calculate the current length along the x-axis and apply scaling
@@ -115,8 +124,9 @@ class Contreras_MORPHOSPACE():
             # Get all x coordinates from the shell data
             all_x_coords = []
             all_x_coords.extend(outer_surface[:, :, 0].flatten())
-            all_x_coords.extend(inner_surface[:, :, 0].flatten())
-            all_x_coords.extend(shell["aperture"][:, 0])
+            if inner_surface is not None:
+                all_x_coords.extend(inner_surface[:, :, 0].flatten())
+            all_x_coords.extend(aperture[:, 0])
             
             x_length_current = max(all_x_coords) - min(all_x_coords)
             
@@ -125,7 +135,8 @@ class Contreras_MORPHOSPACE():
             
             # Apply scaling to all shell data
             shell["outer_surface"] = outer_surface * scale_factor
-            shell["inner_surface"] = inner_surface * scale_factor
+            if inner_surface is not None:
+                shell["inner_surface"] = inner_surface * scale_factor
             shell["aperture"] = shell["aperture"] * scale_factor
 
         return Contreras_MORPHOSPACE_SAMPLE(

@@ -80,9 +80,7 @@ def get_properties_for_section(section_name):
                 ("file_format", "File Format"),
             ],
             "orientations": [
-                ("object_location_origin", "Object Location Origin"),
-                ("object_rotation_origin", "Object Rotation Origin"),
-                ("location_shift_axes", "Location Shift Axes"),
+                ("orientation", "Orientation"),
             ],
         }
         return mock_properties.get(section_name, [])

@@ -152,13 +152,11 @@ metadata:
 
 ### orientations
 
-Object origin and rotation settings.
+Orientation function to apply to specimens (defined by each morphospace).
 
 ```yaml
 orientations:
-  object_location_origin: OBJECT  # Origin for location transforms
-  object_rotation_origin: OBJECT  # Origin for rotation transforms
-  location_shift_axes: XYZ         # Axes for location shifts
+  orientation: NONE  # Or morphospace-specific: Default, Aperture Up, etc.
 ```
 
 ### transforms

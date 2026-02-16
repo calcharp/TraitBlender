@@ -107,13 +107,10 @@ Before starting, ensure you have:
     - Edit values
     - Export changes back to TraitBlender
 
-??? note "Step 6: Adjust Orientations"
+??? note "Step 6: Orientations"
     Expand the **"5 Orientations"** panel.
 
-    This panel controls how specimens are oriented relative to the table. The orientation system is designed to help align specimens consistently, similar to Procrustes alignment for 2D images.
-
-    !!! note "Work in Progress"
-        The orientation system is currently under development. Basic positioning works well using the table coordinate system (`tb_coords`), but automatic alignment for consistent specimen rotation is still being refined.
+    Each morphospace can define orientation functions in its `ORIENTATIONS` dictionary. Select an orientation from the dropdown and click **Apply** to orient the specimen. The selected orientation is also applied automatically when running the Imaging Pipeline.
 
 ??? note "Step 7: Configure Transforms"
     Expand the **"6 Transforms"** panel.
@@ -144,8 +141,6 @@ Before starting, ensure you have:
     - **Run Pipeline**: Execute all transforms in sequence
     - **Undo Pipeline**: Revert all changes back to original values
 
-    !!! note "Transform GUI"
-        A full DearPyGui interface for building transforms is in development. Currently, transforms can be built programmatically via Python API or by editing the YAML configuration directly.
 
 ??? note "Step 8: Render Images"
     Expand the **"7 Imaging"** panel.
