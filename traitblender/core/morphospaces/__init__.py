@@ -3,6 +3,8 @@ from .list_morphospaces import (
     get_orientations_for_morphospace,
     get_orientation_names,
     get_hyperparameters_for_morphospace,
+    get_trait_parameters_for_morphospace,
+    get_trait_parameters_with_defaults_for_morphospace,
 )
 
 __all__ = [
@@ -10,4 +12,6 @@ __all__ = [
     'get_orientations_for_morphospace',
     'get_orientation_names',
     'get_hyperparameters_for_morphospace',
+    'get_trait_parameters_for_morphospace',
+    'get_trait_parameters_with_defaults_for_morphospace',
 ] 

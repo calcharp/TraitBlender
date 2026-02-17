@@ -20,14 +20,15 @@ class TRAITBLENDER_OT_edit_dataset(Operator):
         """Execute the edit dataset operation"""
         dataset = context.scene.traitblender_dataset
         
-        # Check if there's CSV data to edit
-        if not dataset.csv:
+        # Get CSV to edit (uses default virtual dataset when no file imported)
+        csv_to_edit = dataset.get_csv_for_editing()
+        if not csv_to_edit:
             self.report({'WARNING'}, "No dataset loaded. Import a dataset first.")
             return {'CANCELLED'}
         
         try:
-            # Call the CSV viewer with the current CSV string
-            result = launch_csv_viewer_with_string(dataset.csv, "Edit Dataset")
+            # Call the CSV viewer with the CSV string (real or default)
+            result = launch_csv_viewer_with_string(csv_to_edit, "Edit Dataset")
             print(f"CSV Viewer result: {result}")
             
             # If result is not None, update the dataset

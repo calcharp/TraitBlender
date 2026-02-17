@@ -1,6 +1,7 @@
 import os
 import importlib.util
 import sys
+import inspect
 from ..helpers import get_asset_path
 
 def list_morphospaces():
@@ -115,4 +116,67 @@ def get_hyperparameters_for_morphospace(morphospace_name):
         return dict(getattr(module, 'HYPERPARAMETERS', {}))
     except Exception as e:
         print(f"TraitBlender: Error loading hyperparameters from {morphospace_name}: {e}")
+        return {}
+
+
+def get_trait_parameters_for_morphospace(morphospace_name):
+    """
+    Get trait parameter names and defaults for a morphospace (sample() params excluding name, hyperparameters).
+    Used for default dataset columns when no file is imported.
+    
+    Returns:
+        list: Ordered list of trait param names (e.g. ['b', 'd', 'z', 'a', 'phi', 'psi', ...])
+    """
+    traits = get_trait_parameters_with_defaults_for_morphospace(morphospace_name)
+    return list(traits.keys())
+
+
+def get_trait_parameters_with_defaults_for_morphospace(morphospace_name):
+    """
+    Get trait parameters and their default values for a morphospace.
+    
+    Returns:
+        dict: {param_name: default_value} in signature order (for default dataset row)
+    """
+    if not morphospace_name:
+        return {}
+    
+    morphospace_modules_path = get_asset_path("morphospace_modules")
+    morphospace_path = os.path.join(morphospace_modules_path, morphospace_name)
+    
+    if not os.path.exists(morphospace_path):
+        return {}
+    
+    try:
+        spec = importlib.util.spec_from_file_location(
+            morphospace_name,
+            os.path.join(morphospace_path, "__init__.py"),
+            submodule_search_locations=[morphospace_path]
+        )
+        if spec is None or spec.loader is None:
+            return {}
+        
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[morphospace_name] = module
+        spec.loader.exec_module(module)
+        
+        sample_func = getattr(module, 'sample', None)
+        if not callable(sample_func):
+            return {}
+        
+        sig = inspect.signature(sample_func)
+        hyperparams = set(getattr(module, 'HYPERPARAMETERS', {}).keys()) | {'hyperparameters'}
+        exclude = {'name'} | hyperparams
+        
+        result = {}
+        for pname, param in sig.parameters.items():
+            if pname in exclude:
+                continue
+            default = param.default
+            if default is inspect.Parameter.empty:
+                default = 0.0
+            result[pname] = default
+        return result
+    except Exception as e:
+        print(f"TraitBlender: Error getting trait params from {morphospace_name}: {e}")
         return {}

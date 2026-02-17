@@ -3,6 +3,7 @@ from bpy.props import StringProperty, EnumProperty
 import pandas as pd
 import os
 from io import StringIO
+from ..morphospaces import get_trait_parameters_with_defaults_for_morphospace
 
 
 def update_csv(self, context):
@@ -128,11 +129,8 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
     )
     
     def _get_sample_items(self):
-        """Get sample items for the enum property"""
+        """Get sample items for the enum property (includes default 't1' when no file imported)."""
         try:
-            if not self.csv:
-                return [("NONE", "No samples", "")]
-            
             rownames = self.rownames
             if not rownames:
                 return [("NONE", "No samples", "")]
@@ -147,8 +145,34 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
             print(f"TraitBlender: Error getting sample items: {e}")
             return [("NONE", "No samples", "")]
     
+    def _get_default_dataframe(self):
+        """Get default DataFrame when no file imported: one row 't1' with trait columns from active morphospace."""
+        try:
+            morphospace_name = bpy.context.scene.traitblender_setup.available_morphospaces
+        except Exception:
+            morphospace_name = ""
+        traits = get_trait_parameters_with_defaults_for_morphospace(morphospace_name)
+        columns = ["species"] + list(traits.keys())
+        default_values = list(traits.values())
+        df = pd.DataFrame([["t1"] + default_values], columns=columns)
+        return df.set_index("species")
+
+    def get_csv_for_editing(self):
+        """Return CSV string for the editor: from csv property, or serialized default when no file imported."""
+        if self.csv:
+            return self.csv
+        if not self.filepath:
+            df = self._get_default_dataframe()
+            # Reset index so species is a column, then export as CSV
+            csv_buffer = StringIO()
+            df.reset_index().to_csv(csv_buffer, index=False)
+            return csv_buffer.getvalue()
+        return ""
+
     def _get_dataframe(self):
-        """Get DataFrame from CSV string"""
+        """Get DataFrame from CSV string, or default (one row 't1') when no file imported."""
+        if not self.csv and not self.filepath:
+            return self._get_default_dataframe()
         if not self.csv:
             return pd.DataFrame()
         try:
