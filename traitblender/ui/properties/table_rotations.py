@@ -1,8 +1,8 @@
 """
 TraitBlender Table Rotation System
 
-Provides rotation system for objects around their bottom-center pivot.
-Allows easy rotation of specimens and objects while maintaining proper pivot points.
+Provides rotation around object pivot: apex (first ring) for Raup shells,
+bottom-center of bounding box for other objects.
 """
 
 import bpy
@@ -10,17 +10,31 @@ import math
 from mathutils import Matrix, Vector, Euler
 from bpy.props import FloatVectorProperty
 
-def rotate_around_bottom_center(obj, rotvec):
+def _get_rotation_pivot_world(obj):
     """
-    Rotate obj around its bottom-center pivot by the axis-angle vector rotvec,
-    adjusted by computing the true delta via quaternions, and including any
-    'Table' object's rotation.
+    Get the rotation pivot in world space.
+    For Raup shells (raup_points_per_ring), use the apex (first ring centroid).
+    Otherwise use bottom-center of bounding box.
     """
-    # compute bottom-center pivot in world space
+    ppb = obj.get("raup_points_per_ring")
+    if ppb and hasattr(obj, "data") and obj.type == "MESH":
+        verts = obj.data.vertices
+        if len(verts) >= ppb:
+            mw = obj.matrix_world
+            pivot_world = sum((mw @ verts[i].co for i in range(ppb)), Vector()) / ppb
+            return pivot_world
     local_verts = [Vector(v) for v in obj.bound_box]
     lowest_z = min(v.z for v in local_verts)
     pivot_local = Vector((0.0, 0.0, lowest_z))
-    pivot_world = obj.matrix_world @ pivot_local
+    return obj.matrix_world @ pivot_local
+
+
+def rotate_around_bottom_center(obj, rotvec):
+    """
+    Rotate obj around its pivot (apex for Raup shells, bottom-center otherwise)
+    by the axis-angle vector rotvec, adjusted via quaternions and Table rotation.
+    """
+    pivot_world = _get_rotation_pivot_world(obj)
 
     # combine user rotation with table rotation (if present)
     total_rot = Vector(rotvec)
@@ -52,7 +66,7 @@ def _get_tb_rotation(self):
 def _set_tb_rotation(self, value):
     """
     Setter for tb_rotation property.
-    Applies rotation around the object's bottom-center pivot.
+    Applies rotation around the object's pivot (apex for Raup shells, bottom-center otherwise).
     
     Args:
         value: Tuple of (x, y, z) rotation angles in radians
@@ -66,7 +80,7 @@ def register_table_rotations():
     """Register the tb_rotation property with all Blender objects."""
     bpy.types.Object.tb_rotation = FloatVectorProperty(
         name="Rotation from Bottom",
-        description="Rotation around object's bottom-center pivot",
+        description="Rotation around object's pivot (apex for shells, bottom-center otherwise)",
         size=3,
         subtype='EULER',
         get=_get_tb_rotation,

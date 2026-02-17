@@ -80,3 +80,39 @@ def get_orientations_for_morphospace(morphospace_name):
     except Exception as e:
         print(f"TraitBlender: Error loading orientations from {morphospace_name}: {e}")
         return {}
+
+
+def get_hyperparameters_for_morphospace(morphospace_name):
+    """
+    Get the HYPERPARAMETERS dictionary from a morphospace module.
+    Returns default values and schema (param names, types from defaults).
+    
+    Returns:
+        dict: HYPERPARAMETERS from the module, or empty dict if not defined
+    """
+    if not morphospace_name:
+        return {}
+    
+    morphospace_modules_path = get_asset_path("morphospace_modules")
+    morphospace_path = os.path.join(morphospace_modules_path, morphospace_name)
+    
+    if not os.path.exists(morphospace_path):
+        return {}
+    
+    try:
+        spec = importlib.util.spec_from_file_location(
+            morphospace_name,
+            os.path.join(morphospace_path, "__init__.py"),
+            submodule_search_locations=[morphospace_path]
+        )
+        if spec is None or spec.loader is None:
+            return {}
+        
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[morphospace_name] = module
+        spec.loader.exec_module(module)
+        
+        return dict(getattr(module, 'HYPERPARAMETERS', {}))
+    except Exception as e:
+        print(f"TraitBlender: Error loading hyperparameters from {morphospace_name}: {e}")
+        return {}

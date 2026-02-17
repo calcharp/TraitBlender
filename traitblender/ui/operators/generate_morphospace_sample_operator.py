@@ -64,10 +64,11 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             sig = inspect.signature(sample_func)
             valid_params = set(sig.parameters.keys()) - {'name'}
             
-            # Get hyperparameters if the morphospace defines them
+            # Get hyperparameters from config (merged with module defaults)
             hyperparameters = None
             if hasattr(morphospace_module, 'HYPERPARAMETERS'):
-                hyperparameters = morphospace_module.HYPERPARAMETERS.copy()
+                morphospace_config = context.scene.traitblender_config.morphospace
+                hyperparameters = morphospace_config.get_hyperparams_for(morphospace_name)
                 # Remove hyperparameters from valid_params so they don't get mapped from dataset
                 valid_params = valid_params - set(hyperparameters.keys()) - {'hyperparameters'}
             
@@ -79,7 +80,7 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                     params[param_name] = value
             
             # Add hyperparameters as a dict parameter if the function accepts it
-            if 'hyperparameters' in sig.parameters:
+            if hyperparameters is not None and 'hyperparameters' in sig.parameters:
                 params['hyperparameters'] = hyperparameters
             
             # Debug: show what will be passed

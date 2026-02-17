@@ -1,5 +1,6 @@
 import bpy
 from bpy.types import Panel
+from ..properties import morphospace_hyperparams
 
 class TRAITBLENDER_PT_main_panel(Panel):
     bl_label = "1 Museum Setup"
@@ -65,7 +66,7 @@ class TRAITBLENDER_PT_config_panel(Panel):
         config_sections = config.get_config_sections()
         if config_sections:
             for section_name, section_obj in config_sections.items():
-                if section_name in ["transforms", "sample"]:
+                if section_name in ["transforms", "sample", "morphospace"]:
                     continue
                 self._draw_config_section(layout, section_name, section_obj)
         else:
@@ -91,10 +92,19 @@ class TRAITBLENDER_PT_morphospaces_panel(Panel):
     def draw(self, context):
         layout = self.layout
         setup = context.scene.traitblender_setup
-        
+
         # Morphospace selection dropdown
         row = layout.row(align=True)
         row.prop(setup, "available_morphospaces", text="Morphospace")
+
+        # Hyperparameters (dynamically from morphospace's HYPERPARAMETERS)
+        morphospace_name = setup.available_morphospaces
+        editor = morphospace_hyperparams.get_hyperparam_editor_for(context, morphospace_name)
+        if editor is not None:
+            box = layout.box()
+            box.label(text="Hyperparameters", icon='SETTINGS')
+            for key in morphospace_hyperparams.get_hyperparam_keys_for(morphospace_name):
+                box.prop(editor, key)
 
 class TRAITBLENDER_PT_datasets_panel(Panel):
     bl_label = "4 Datasets"

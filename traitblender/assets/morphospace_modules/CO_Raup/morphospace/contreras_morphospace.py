@@ -15,7 +15,7 @@ class Contreras_MORPHOSPACE():
                          eps=0.8, h_0=0.1, length=0.015):
 
         t_values = np.arange(0, t, time_step)
-        theta_values = np.arange(0, 2*np.pi, np.pi/points_in_circle)
+        theta_values = np.linspace(0, 2*np.pi, points_in_circle, endpoint=False)
 
         sin_t_values = np.sin(t_values)
         cos_t_values = np.cos(t_values)

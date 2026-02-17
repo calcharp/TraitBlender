@@ -12,6 +12,11 @@
 
 ---
 
+Tomorrow:
+- Fix shell-specific default orientation the rest of the way (aperture alignment with Y, axis convention, etc.)
+
+---
+
 Future enhancements and new features can be added below:
 - Get Transforms more fully fleshed out.
 - Make a plan (even if its not completed) for how to make the sampling go faster for the shell morphospace

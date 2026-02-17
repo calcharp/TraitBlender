@@ -1,4 +1,11 @@
 ---
+# Morphospace hyperparameters (per morphospace). Active morphospace: bpy.data.scenes["Scene"].traitblender_setup.available_morphospaces (default CO_Raup)
+morphospace:
+  hyperparams:
+    CO_Raup:
+      points_in_circle: 40
+      time_step: 0.03
+      use_inner_surface: true
 world:
   color: [0.0, 0.0, 0.0, 1.0]
   strength: 1.0
