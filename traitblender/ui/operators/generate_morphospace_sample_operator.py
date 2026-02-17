@@ -101,19 +101,31 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 if bpy.context.active_object and bpy.context.mode != 'OBJECT':
                     bpy.ops.object.mode_set(mode='OBJECT')
 
+
+                try:
+                    bpy.context.scene.traitblender_orientation.orientation = 'Default'
+                    print(f"Set orientation to: {bpy.context.scene.traitblender_orientation.orientation}")
+                except Exception as e:
+                    traceback.print_exc()
+                    self.report({'Error'}, f"Failed to set orientation: {e}")
+                    return {'CANCELLED'}
+
+                try:
+                    bpy.ops.traitblender.apply_orientation()
+                    print(f"Successfully applied orientation: {bpy.context.scene.traitblender_orientation.orientation}")        
+                except Exception as e:
+                    traceback.print_exc()
+                    self.report({'Error'}, f"Failed to apply orientation: {e}")
+                    return {'CANCELLED'}
+
                 if "Table" not in bpy.data.objects:
                     self.report({'WARNING'}, "Table object missing - run Import Museum first for correct orientation")
-
-                # Apply Default orientation (required for all morphospaces)
-                
+              
                 bpy.context.view_layer.update()
 
-                # Deselect to avoid interactive transform/property controls appearing (slow/awkward)
-                generated_obj.select_set(False)
-                if "Table" in bpy.data.objects:
-                    bpy.context.view_layer.objects.active = bpy.data.objects["Table"]
-                else:
-                    bpy.context.view_layer.objects.active = None
+                # Make the generated sample the active and selected object
+                generated_obj.select_set(True)
+                bpy.context.view_layer.objects.active = generated_obj
 
                 self.report({'INFO'}, f"Generated morphospace sample: {selected_sample_name}")
             except Exception as e:
