@@ -1,6 +1,7 @@
 ---
 # Morphospace hyperparameters (per morphospace). Active morphospace: bpy.data.scenes["Scene"].traitblender_setup.available_morphospaces (default CO_Raup)
 morphospace:
+  name: CO_Raup
   hyperparams:
     CO_Raup:
       points_in_circle: 40
