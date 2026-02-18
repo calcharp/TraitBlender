@@ -4,9 +4,9 @@ morphospace:
   name: CO_Raup
   hyperparams:
     CO_Raup:
-      points_in_circle: 40
-      time_step: 0.03
-      use_inner_surface: true
+      points_in_circle: 10
+      time_step: 0.15
+      use_inner_surface: false
 world:
   color: [0.0, 0.0, 0.0, 1.0]
   strength: 1.0

@@ -65,15 +65,14 @@ ORIENTATIONS = {
 # Hyperparameters: Non-biological parameters (discretization, surface options). From config, not dataset.
 # Regular traits (eps, h_0, length) are passed as sample() params from the dataset.
 HYPERPARAMETERS = {
-    'points_in_circle': 40,      # Number of points around each shell ring (discretization)
-    'time_step': 1/30,           # Time step for shell generation (discretization)
-    'use_inner_surface': True,   # Whether to generate inner surface with thickness
+    'points_in_circle': 10,      # Number of points around each shell ring (discretization)
+    'time_step': 0.15,           # Time step for shell generation (discretization)
+    'use_inner_surface': False,   # Whether to generate inner surface with thickness
 }
 
-def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0, 
-           c_depth=0, c_n=0, n_depth=0, n=0, t=10, 
-           eps=0.8, h_0=0.1, length=0.015,
-           hyperparameters=None):
+def sample(name="Shell", b = 0.2, d = 1.65, z = 0, a = 1, phi = 0, psi = 0, 
+                         c_depth=0.1, c_n = 70, n_depth = 0, n = 0, t = 100,
+                         eps=0.8, h_0=0.1, length=0.15, hyperparameters=None):
     """
     Generate a shell sample using the Contreras morphospace model.
     
