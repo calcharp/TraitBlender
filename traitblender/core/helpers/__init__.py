@@ -21,9 +21,10 @@ from .pretty_type_hint import pretty_type_hint
 
 # Import table coordinates functions
 try:
-    from ..ui.properties.table_coords import z_dist_to_lowest, _get_tb_coords, _set_tb_coords
+    from ..ui.properties.table_coords import _get_tb_coords, _set_tb_coords
+    from ..positioning.get_table_coords import z_dist_to_lowest
 except ImportError:
-    # Fallback if UI module is not available
+    # Fallback if modules are not available
     z_dist_to_lowest = None
     _get_tb_coords = None
     _set_tb_coords = None

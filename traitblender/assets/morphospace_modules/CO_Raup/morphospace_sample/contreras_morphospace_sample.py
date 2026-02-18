@@ -206,15 +206,7 @@ class Contreras_MORPHOSPACE_SAMPLE():
         obj["raup_num_rings"] = num_rings
         obj["raup_points_per_ring"] = points_per_ring
 
-        # Set origin to apex (first ring centroid) so rotation pivot is visible
-        bpy.context.view_layer.objects.active = obj
-        apex_local = sum((Vector(obj.data.vertices[i].co) for i in range(points_per_ring)), Vector()) / points_per_ring
-        cursor_prev = bpy.context.scene.cursor.location.copy()
-        bpy.context.scene.cursor.location = obj.matrix_world @ apex_local
-        bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
-        bpy.context.scene.cursor.location = cursor_prev
-
-        # Move the object to the global origin
+        # Origin is set by orientation (apex) when apply_orientation runs
         bpy.context.view_layer.objects.active = obj
         obj.select_set(True)
         bpy.ops.object.shade_smooth()

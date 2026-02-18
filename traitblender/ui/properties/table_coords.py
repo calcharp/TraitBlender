@@ -12,30 +12,23 @@ from bpy.props import FloatVectorProperty
 # Corner indices for the top face of the Table's bounding box
 CORNERS = [1, 2, 5, 6]
 
-def z_dist_to_lowest(obj):
+def _get_bottom_center_world(obj):
     """
-    Calculate the distance from an object's origin to its lowest vertex.
-    For non-mesh objects (camera, light, etc.), returns 0.
-    
-    Args:
-        obj: Blender object
-        
-    Returns:
-        float: Distance from origin to lowest point, or 0 for non-mesh objects
+    World-space point: geometric center of bounding box with Z projected to the lowest point.
+    bound_box is in local space; we transform to world via matrix_world.
     """
-    # Check if object has mesh data with vertices
-    if not hasattr(obj, 'data') or not hasattr(obj.data, 'vertices'):
-        return 0.0
-    
     mw = obj.matrix_world
-    origin_z = mw.to_translation().z
-    lowest_z = min((mw @ v.co).z for v in obj.data.vertices)
-    return origin_z - lowest_z
+    pts = [mw @ Vector(c) for c in obj.bound_box]
+    center = sum(pts, Vector()) / len(pts)
+    lowest_z = min(p.z for p in pts)
+    return Vector((center.x, center.y, lowest_z))
+
 
 def _get_tb_coords(self):
     """
     Getter for tb_coords property.
-    Returns the object's position relative to Table's top face center in unit local axes.
+    Returns the object's bottom-center (bbox center projected to bottom) relative to
+    Table's top face center, in unit local axes.
     """
     table = bpy.data.objects.get('Table')
     if not table or self is table:
@@ -51,20 +44,21 @@ def _get_tb_coords(self):
     pts = [mw_ref @ Vector(bb[i]) for i in CORNERS]
     top_center = sum(pts, Vector()) / len(pts)
 
-    # Account for object's own bottom lift
-    dz = z_dist_to_lowest(self)
+    # Object's bottom-center in world space (bbox center projected to lowest Z)
+    bottom_center = _get_bottom_center_world(self)
 
-    # World-space vector from top_center+lift to our origin
-    world_dir = self.location - (top_center + Vector((0, 0, dz)))
+    # Vector from table top center to object's bottom-center
+    world_dir = bottom_center - top_center
 
-    # Convert back into Table's *unit* local axes
+    # Convert to Table's unit local axes
     local = rot.inverted() @ world_dir
     return (local.x, local.y, local.z)
 
 def _set_tb_coords(self, value):
     """
     Setter for tb_coords property.
-    Sets the object's position relative to Table's top face center.
+    Places the object so its bottom-center (bbox center projected to bottom) is at
+    the given coordinates relative to Table's top face center.
     
     Args:
         value: Tuple of (x, y, z) coordinates in Table's local space
@@ -81,11 +75,9 @@ def _set_tb_coords(self, value):
     pts = [mw_ref @ Vector(bb[i]) for i in CORNERS]
     top_center = sum(pts, Vector()) / len(pts)
 
-    # Apply *unit* local offset
-    offset_world = rot @ Vector(value)
-
-    dz = z_dist_to_lowest(self)
-    self.location = top_center + offset_world + Vector((0, 0, dz))
+    target_bottom_center = top_center + rot @ Vector(value)
+    current_bottom_center = _get_bottom_center_world(self)
+    self.location += target_bottom_center - current_bottom_center
 
 def register_table_coords():
     """Register the tb_coords property with all Blender objects."""

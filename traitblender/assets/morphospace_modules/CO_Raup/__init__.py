@@ -30,12 +30,34 @@ def get_raup_apex(shell):
     return (world_centroid.x, world_centroid.y, world_centroid.z)
 
 
+def set_origin_at_location(obj, location):
+    """
+    Set the object's origin to the given world-space location via the cursor.
+    Restores the cursor location after setting.
+
+    Args:
+        obj: Blender object (must be mesh)
+        location: (x, y, z) in world space
+    """
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    cursor_prev = bpy.context.scene.cursor.location.copy()
+    bpy.context.scene.cursor.location = Vector(location)
+    bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+    bpy.context.scene.cursor.location = cursor_prev
+    bpy.context.view_layer.update()
+
+
 def _orient_default(sample_obj):
     """
-    Default orientation: center on table, rotate by -t so all apertures align.
+    Default orientation: set origin to apex, center on table, rotate by -t so all apertures align.
     t is the spiral parameter (radians) from the morphospace; the aperture
     position correlates with t, so rotating by -t brings them to a common orientation.
     """
+    apex_world = get_raup_apex(sample_obj)
+    if apex_world != (0.0, 0.0, 0.0):
+        set_origin_at_location(sample_obj, apex_world)
+
     sample_obj.tb_coords = (0.0, 0.0, 0.0)
 
     t_val = 0
@@ -50,16 +72,45 @@ def _orient_default(sample_obj):
         pass
 
     # Use modulo 2π so apertures align regardless of how many whorls (t can be 20+ radians)
-    rotation_z = t_val % (2 * math.pi)
+    rotation_z = (t_val % (math.pi*2)) + 1.4*math.pi
     sample_obj.tb_rotation = (0.0, 0.0, rotation_z)
+
+
+    bpy.context.view_layer.objects.active = sample_obj
+    sample_obj.select_set(True)
+    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+
+    
+    # Ensure centered on table after rotation
+    sample_obj.tb_coords = (0.0, 0.0, 0.0)
     bpy.context.view_layer.update()
+
+
+def _orient_geometric_center_xflipped(sample_obj):
+    """
+    Default orientation plus 180° flip on X. Simple rotation add.
+    """
+    _orient_default(sample_obj)
+
+    bpy.context.view_layer.objects.active = sample_obj
+    sample_obj.select_set(True)
+    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+
+    sample_obj.tb_rotation.x += math.pi
+    sample_obj.tb_rotation.z -= math.pi/2
+
+    bpy.context.view_layer.objects.active = sample_obj
+    sample_obj.select_set(True)
+    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
 
     # Ensure centered on table after rotation
     sample_obj.tb_coords = (0.0, 0.0, 0.0)
+    bpy.context.view_layer.update()
 
 
 ORIENTATIONS = {
     "Default": _orient_default,
+    "Geometric Center, X-Flipped": _orient_geometric_center_xflipped,
 }
 
 # Hyperparameters: Non-biological parameters (discretization, surface options). From config, not dataset.
