@@ -66,9 +66,9 @@ class UIManager:
         # TODO: Implement full add transform dialog with dynamic parameter inputs
         # For now, just add a dummy transform for testing
         transforms_manager.add_transform(
-            property_path="world.color",
-            sampler_name="uniform",
-            params={"low": 0.0, "high": 1.0}
+            property_path="world.color.0",
+            sampler_name="normal",
+            params={"mu": 0.5, "sigma": 0.1}
         )
     
     def create_blender_theme(self):

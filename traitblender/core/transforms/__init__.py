@@ -1,15 +1,15 @@
 """
 TraitBlender Transforms Module
 
-Transform factory system for morphological operations.
+Transform pipeline for data augmentation. Simplified: whitelisted paths, few samplers.
 """
 
-from .transforms import Transform
-from .registry import TRANSFORMS
+from .transforms import Transform, SAMPLERS, SAMPLER_ALLOWED_PATHS
 from .pipeline import TransformPipeline
 
 __all__ = [
     "Transform",
-    "TRANSFORMS",
+    "SAMPLERS",
+    "SAMPLER_ALLOWED_PATHS",
     "TransformPipeline",
 ] 

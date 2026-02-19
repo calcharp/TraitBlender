@@ -28,7 +28,7 @@ from .helpers import (
 
 # Transforms
 from .transforms import (
-    TRANSFORMS,
+    SAMPLERS,
 )
 
 from .positioning import (
@@ -61,7 +61,7 @@ __all__ = [
     "world_to_table_coords",
     "get_depsgraph",
     # Transforms
-    "TRANSFORMS",
+    "SAMPLERS",
     
     # Config
     "CONFIG",

@@ -99,22 +99,22 @@ def launch_transform_editor(yaml_string="", window_title="Transform Pipeline Edi
 
 
 if __name__ == "__main__":
-    # Test data - sample transforms
-    test_yaml = """- property_path: world.color
-  sampler_name: dirichlet
+    # Test data - sample transforms (all univariate)
+    test_yaml = """- property_path: world.color.0
+  sampler_name: normal
   params:
-    alphas: [0.3, 0.3, 0.3, 1]
+    mu: 0.5
+    sigma: 0.1
 - property_path: lamp.power
-  sampler_name: gamma
+  sampler_name: normal
   params:
-    alpha: 2
-    beta: 5
-- property_path: camera.location
+    mu: 10
+    sigma: 2
+- property_path: camera.location.0
   sampler_name: normal
   params:
     mu: 0
     sigma: 0.1
-    n: 3
 """
     
     app = TransformEditor()

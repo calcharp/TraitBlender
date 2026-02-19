@@ -10,7 +10,8 @@ from .property_helper import (
     get_properties_for_section,
     build_property_path,
     parse_property_path,
-    get_available_samplers
+    get_available_samplers,
+    get_available_samplers_for_property
 )
 from .sampler_helper import (
     get_sampler_signature,
@@ -66,7 +67,6 @@ class TransformsManager:
                         print(f"Invalid transform {i}: missing required key '{key}'")
                         return False
             
-            # Strip out _cache_stack and other internal fields for clean editing
             clean_transforms = []
             for t in transforms_list:
                 clean_t = {
@@ -203,8 +203,8 @@ class TransformsManager:
                     dpg.add_text("Property:")
                     dpg.add_spacer(width=5)
                     
-                    # Section combo
-                    default_section_idx = section_names.index(current_section) if current_section in section_names else 0
+                    # Section combo (fallback to 0 if path from old format, e.g. world.color)
+                    default_section_idx = section_names.index(current_section) if current_section and current_section in section_names else 0
                     section_combo_tag = f"section_combo_{index}"
                     dpg.add_combo(
                         tag=section_combo_tag,
@@ -221,7 +221,8 @@ class TransformsManager:
                     properties = get_properties_for_section(current_section) if current_section else []
                     property_names = [p[0] for p in properties]
                     property_display = [p[1] for p in properties]
-                    default_property_idx = property_names.index(current_property) if current_property in property_names else 0
+                    # Fallback to 0 if path not in current property list
+                    default_property_idx = property_names.index(current_property) if current_property and current_property in property_names else 0
                     
                     property_combo_tag = f"property_combo_{index}"
                     dpg.add_combo(
@@ -240,9 +241,13 @@ class TransformsManager:
                     dpg.add_text("Sampler:")
                     dpg.add_spacer(width=10)
                     
-                    samplers = get_available_samplers()
+                    samplers = get_available_samplers_for_property(property_path)
                     sampler_names = [s[0] for s in samplers]
                     sampler_display = [s[1] for s in samplers]
+                    # If current sampler not allowed for this property, use first allowed
+                    if sampler_name not in sampler_names and sampler_names:
+                        self.transforms[index]['sampler_name'] = sampler_names[0]
+                        sampler_name = sampler_names[0]
                     default_sampler_idx = sampler_names.index(sampler_name) if sampler_name in sampler_names else 0
                     
                     sampler_combo_tag = f"sampler_combo_{index}"
@@ -570,13 +575,13 @@ class TransformsManager:
                     del self.transforms[index]['params']['n']
                 print(f"Updated transform {index + 1} property path to: {new_path} (scalar)")
             
-            # Check if dimension changed - if so, regenerate display
+            # Regenerate display: dimension may have changed (parameter inputs),
+            # and allowed samplers may differ per property
             old_dimension = get_property_dimension(old_path)
             new_dimension = get_property_dimension(new_path)
             if old_dimension != new_dimension:
-                # Dimension changed - need to regenerate parameter inputs
                 print(f"  Dimension changed: {old_dimension} → {new_dimension}, regenerating display...")
-                self.update_display()
+            self.update_display()
     
     def _on_sampler_changed(self, index, display_value):
         """Handle sampler selection change"""

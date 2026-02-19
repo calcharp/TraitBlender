@@ -16,8 +16,8 @@ class TransformPipeline:
     
     Example:
         pipeline = TransformPipeline()
-        pipeline.add_transform("world.color", "dirichlet", {"alphas": [0.3, 0.3, 0.3, 1]})
-        pipeline.add_transform("camera.location", "normal", {"mu": 0, "sigma": 1, "n": 3})
+        pipeline.add_transform("world.color.0", "normal", {"mu": 0.5, "sigma": 0.1})
+        pipeline.add_transform("camera.location.0", "normal", {"mu": 0, "sigma": 0.1})
         pipeline.run()  # Execute all transforms
         pipeline.undo()  # Undo all transforms in reverse order
     """

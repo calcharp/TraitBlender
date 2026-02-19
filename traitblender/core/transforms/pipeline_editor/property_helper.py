@@ -1,39 +1,39 @@
 """
-Helper module for getting available properties from TraitBlender config.
-Works both standalone (with mock data) and when integrated with Blender.
+Helper module for getting available properties from SAMPLER_ALLOWED_PATHS.
 """
+
+
+def _get_all_allowed_paths():
+    """Union of all allowed paths across samplers."""
+    try:
+        from ..transforms import SAMPLER_ALLOWED_PATHS
+        paths = set()
+        for lst in SAMPLER_ALLOWED_PATHS.values():
+            paths.update(lst)
+        return paths
+    except (ImportError, AttributeError):
+        return set()
+
 
 def get_available_sections():
     """
-    Get list of available configuration sections.
-    In standalone mode, returns common sections.
-    When integrated, will use bpy.context.scene.traitblender_config.
+    Get list of sections that have at least one transformable path.
     
     Returns:
         list: List of tuples (section_name, display_name)
     """
-    try:
-        import bpy
-        config = bpy.context.scene.traitblender_config
-        sections = config.get_config_sections()
-        return [
-            (section_name, section_name.replace('_', ' ').title()) 
-            for section_name in sections.keys()
-            if section_name.lower() != "transforms"
-        ]
-    except (ImportError, AttributeError):
-        # Standalone mode - return common sections
-        return [
-            ("world", "World"),
-            ("camera", "Camera"),
-            ("lamp", "Lamp"),
-            ("output", "Output"),
-        ]
+    paths = _get_all_allowed_paths()
+    sections = set()
+    for path in paths:
+        if "." in path:
+            section = path.split(".", 1)[0]
+            sections.add(section)
+    return [(s, s.replace('_', ' ').title()) for s in sorted(sections)]
 
 
 def get_properties_for_section(section_name):
     """
-    Get list of properties available in a given section.
+    Get list of properties in a section that are transformable.
     
     Args:
         section_name: Name of the configuration section
@@ -41,45 +41,14 @@ def get_properties_for_section(section_name):
     Returns:
         list: List of tuples (property_name, display_name)
     """
-    try:
-        import bpy
-        config = bpy.context.scene.traitblender_config
-        section_obj = getattr(config, section_name, None)
-        if section_obj and hasattr(section_obj, '__class__') and hasattr(section_obj.__class__, '__annotations__'):
-            return [
-                (prop_name, prop_name.replace('_', ' ').title())
-                for prop_name in section_obj.__class__.__annotations__.keys()
-                if prop_name != "show"
-            ]
-        return []
-    except (ImportError, AttributeError):
-        # Standalone mode - return common properties per section
-        mock_properties = {
-            "world": [
-                ("color", "Color"),
-                ("hdri_path", "HDRI Path"),
-                ("hdri_strength", "HDRI Strength"),
-            ],
-            "camera": [
-                ("location", "Location"),
-                ("rotation", "Rotation"),
-                ("focal_length", "Focal Length"),
-                ("sensor_width", "Sensor Width"),
-            ],
-            "lamp": [
-                ("type", "Type"),
-                ("power", "Power"),
-                ("color", "Color"),
-                ("location", "Location"),
-            ],
-            "output": [
-                ("resolution_x", "Resolution X"),
-                ("resolution_y", "Resolution Y"),
-                ("samples", "Samples"),
-                ("file_format", "File Format"),
-            ],
-        }
-        return mock_properties.get(section_name, [])
+    paths = _get_all_allowed_paths()
+    prefix = section_name + "."
+    result = []
+    for path in paths:
+        if path.startswith(prefix):
+            prop_name = path[len(prefix):]
+            result.append((prop_name, prop_name.replace('_', ' ').title()))
+    return sorted(result)
 
 
 def build_property_path(section, property_name):
@@ -115,40 +84,38 @@ def parse_property_path(property_path):
 
 def get_available_samplers():
     """
-    Get list of available sampler functions.
-    In standalone mode, returns common samplers.
-    When integrated, will use the TRANSFORMS registry.
+    Get list of all sampler functions from SAMPLERS dict.
     
     Returns:
         list: List of tuples (sampler_name, display_name)
     """
     try:
-        # Try to import from TraitBlender
-        import sys
-        import os
-        # Add parent directories to path if needed
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
-        if project_root not in sys.path:
-            sys.path.insert(0, project_root)
-        
-        from core.transforms.registry import TRANSFORMS
+        from ..transforms import SAMPLERS
         return [
-            (sampler_name, sampler_name.replace('_', ' ').title())
-            for sampler_name in sorted(TRANSFORMS.keys())
+            (name, name.replace('_', ' ').title())
+            for name in sorted(SAMPLERS.keys())
         ]
     except (ImportError, AttributeError):
-        # Standalone mode - return actual samplers from registry
-        return [
-            ("uniform", "Uniform"),
-            ("normal", "Normal"),
-            ("beta", "Beta"),
-            ("gamma", "Gamma"),
-            ("dirichlet", "Dirichlet"),
-            ("multivariate_normal", "Multivariate Normal"),
-            ("poisson", "Poisson"),
-            ("exponential", "Exponential"),
-            ("cauchy", "Cauchy"),
-            ("discrete_uniform", "Discrete Uniform"),
-        ]
+        return [("normal", "Normal")]
+
+
+def get_available_samplers_for_property(property_path):
+    """
+    Get list of samplers that are allowed for the given property path.
+    
+    Args:
+        property_path: Full property path (e.g., "world.color")
+        
+    Returns:
+        list: List of tuples (sampler_name, display_name) for samplers that allow this path
+    """
+    try:
+        from ..transforms import SAMPLER_ALLOWED_PATHS
+        result = []
+        for sampler_name, allowed_paths in SAMPLER_ALLOWED_PATHS.items():
+            if property_path in allowed_paths:
+                result.append((sampler_name, sampler_name.replace('_', ' ').title()))
+        return sorted(result)
+    except (ImportError, AttributeError):
+        return [("normal", "Normal")]
 
