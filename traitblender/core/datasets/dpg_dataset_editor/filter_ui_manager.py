@@ -1,5 +1,5 @@
 """
-Filter management module for CSV viewer.
+Filter UI manager for DPG dataset editor.
 Handles filtering logic, UI creation, and filter operations.
 """
 
@@ -7,12 +7,12 @@ import dearpygui.dearpygui as dpg
 import pandas as pd
 
 
-class FilterManager:
-    """Manages filtering operations and UI for the CSV viewer."""
-    
-    def __init__(self, data_manager, table_manager=None):
-        self.data_manager = data_manager
-        self.table_manager = table_manager
+class FilterUIManager:
+    """Manages filter UI and operations for the dataset editor."""
+
+    def __init__(self, dataset_handler, table_ui_manager=None):
+        self.dataset_handler = dataset_handler
+        self.table_ui_manager = table_ui_manager
         self.filter_rows = []  # List of filter row data
         self.next_filter_id = 1  # Counter for unique filter row IDs
     
@@ -180,8 +180,8 @@ class FilterManager:
     
     def update_filter_dropdown(self):
         """Update all filter column dropdowns with current dataframe columns"""
-        if self.data_manager.df_display is not None:
-            column_names = list(self.data_manager.df_display.columns)
+        if self.dataset_handler.df_display is not None:
+            column_names = list(self.dataset_handler.df_display.columns)
             # Update all filter row dropdowns
             for row in self.filter_rows:
                 if dpg.does_item_exist(row['column_combo_tag']):
@@ -211,15 +211,15 @@ class FilterManager:
             return
         
         # Check if we have data loaded
-        if self.data_manager.df_display is None:
+        if self.dataset_handler.df_display is None:
             dpg.set_value(filter_data['filter_type_tag'], "Text")
             filter_data['filter_type'] = "Text"
             self.update_filter_controls(filter_data)
             return
         
         # Auto-detect column type and set filter type
-        if selected_column in self.data_manager.df_display.columns:
-            column_dtype = self.data_manager.df_display[selected_column].dtype
+        if selected_column in self.dataset_handler.df_display.columns:
+            column_dtype = self.dataset_handler.df_display[selected_column].dtype
             if column_dtype in ['int64', 'float64']:
                 # Numeric column - can use both Text and Numeric filtering
                 dpg.configure_item(filter_data['filter_type_tag'], items=["Text", "Numeric"])
@@ -350,7 +350,7 @@ class FilterManager:
     
     def apply_filter(self):
         """Apply all current filters to the dataframe"""
-        if self.data_manager.df_display is None:
+        if self.dataset_handler.df_display is None:
             print("No data to filter")
             return
         
@@ -420,7 +420,7 @@ class FilterManager:
             return
         
         # Apply filter to original data (not the already filtered data)
-        base_data = self.data_manager.df_original.copy()
+        base_data = self.dataset_handler.df_original.copy()
         
         try:
             # Start with all rows (True mask)
@@ -491,14 +491,14 @@ class FilterManager:
                 combined_mask = combined_mask & condition_mask
             
             # Apply the combined filter
-            self.data_manager.df_display = base_data[combined_mask].reset_index(drop=True)
+            self.dataset_handler.df_display = base_data[combined_mask].reset_index(drop=True)
             
             # Update the table display if table manager is available
-            if self.table_manager:
-                self.table_manager.reset_pagination()
-                self.table_manager.update_display()
+            if self.table_ui_manager:
+                self.table_ui_manager.reset_pagination()
+                self.table_ui_manager.update_display()
             
-            print(f"Applied {len(filter_conditions)} filter(s): {len(self.data_manager.df_display)} rows match")
+            print(f"Applied {len(filter_conditions)} filter(s): {len(self.dataset_handler.df_display)} rows match")
             
         except Exception as e:
             print(f"Error applying filters: {str(e)}")
@@ -506,14 +506,14 @@ class FilterManager:
     
     def clear_filter(self):
         """Clear all filters but keep data changes"""
-        if self.data_manager.df_display is not None:
+        if self.dataset_handler.df_display is not None:
             # Reset display to show all data (preserving any changes made)
-            self.data_manager.df_display = self.data_manager.df_original.copy()
+            self.dataset_handler.df_display = self.dataset_handler.df_original.copy()
             
             # Update the table display if table manager is available
-            if self.table_manager:
-                self.table_manager.reset_pagination()
-                self.table_manager.update_display()
+            if self.table_ui_manager:
+                self.table_ui_manager.reset_pagination()
+                self.table_ui_manager.update_display()
             
             print("Filters cleared")
         else:

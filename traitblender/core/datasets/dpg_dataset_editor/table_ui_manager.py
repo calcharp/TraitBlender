@@ -1,5 +1,5 @@
 """
-Table management module for CSV viewer.
+Table UI manager for DPG dataset editor.
 Handles table display, pagination, sorting, and row operations.
 """
 
@@ -7,11 +7,11 @@ import dearpygui.dearpygui as dpg
 import pandas as pd
 
 
-class TableManager:
-    """Manages table display, pagination, sorting, and row operations."""
+class TableUIManager:
+    """Manages table UI, pagination, sorting, and row operations."""
     
-    def __init__(self, data_manager):
-        self.data_manager = data_manager
+    def __init__(self, dataset_handler):
+        self.dataset_handler = dataset_handler
         self.current_page = 0
         self.rows_per_page = 100
         self.visible_rows = 15
@@ -21,7 +21,7 @@ class TableManager:
     
     def update_display(self):
         """Update the table display with current page data"""
-        if self.data_manager.df_display is None:
+        if self.dataset_handler.df_display is None:
             return
         
         # Clear existing table
@@ -29,7 +29,7 @@ class TableManager:
             dpg.delete_item("data_table")
         
         # Calculate pagination
-        total_rows = len(self.data_manager.df_display)
+        total_rows = len(self.dataset_handler.df_display)
         total_pages = (total_rows + self.rows_per_page - 1) // self.rows_per_page
         start_row = self.current_page * self.rows_per_page
         end_row = min(start_row + self.rows_per_page, total_rows)
@@ -43,7 +43,7 @@ class TableManager:
             dpg.add_table_column(label="", width_fixed=True, init_width_or_weight=30)
             
             # Add data columns
-            for col in self.data_manager.df_display.columns:
+            for col in self.dataset_handler.df_display.columns:
                 dpg.add_table_column(label=col, width_fixed=False)
             
             # Add header row manually to control the row column header
@@ -52,7 +52,7 @@ class TableManager:
                 dpg.add_text("")
                 
                 # Add data column headers (clickable for sorting)
-                for j, col in enumerate(self.data_manager.df_display.columns):
+                for j, col in enumerate(self.dataset_handler.df_display.columns):
                     # Add sort indicator to button label
                     if self.sort_column == j:
                         indicator = " ^" if self.sort_ascending else " v"
@@ -81,9 +81,9 @@ class TableManager:
                     dpg.bind_item_theme(row_index_button, "row_index_theme")
                     
                     # Add data cells (editable)
-                    for j, col in enumerate(self.data_manager.df_display.columns):
+                    for j, col in enumerate(self.dataset_handler.df_display.columns):
                         cell_tag = f"cell_{i}_{j}"
-                        cell_value = self.data_manager.df_display.iloc[i, j]
+                        cell_value = self.dataset_handler.df_display.iloc[i, j]
                         
                         # Handle pandas NA values for display
                         if pd.isna(cell_value):
@@ -102,8 +102,6 @@ class TableManager:
         
         # Show pagination controls and update info
         dpg.show_item("pagination_controls")
-        dpg.hide_item("placeholder_text")
-        dpg.hide_item("default_table")  # Hide default table when CSV is loaded
         self.update_pagination_info(total_pages, start_row, end_row, total_rows)
     
     def update_pagination_info(self, total_pages, start_row, end_row, total_rows):
@@ -113,35 +111,35 @@ class TableManager:
     
     def go_to_first_page(self):
         """Go to the first page"""
-        if self.data_manager.df_display is not None and self.current_page > 0:
+        if self.dataset_handler.df_display is not None and self.current_page > 0:
             self.current_page = 0
             self.update_display()
     
     def go_to_previous_page(self):
         """Go to the previous page"""
-        if self.data_manager.df_display is not None and self.current_page > 0:
+        if self.dataset_handler.df_display is not None and self.current_page > 0:
             self.current_page -= 1
             self.update_display()
     
     def go_to_next_page(self):
         """Go to the next page"""
-        if self.data_manager.df_display is not None:
-            total_pages = (len(self.data_manager.df_display) + self.rows_per_page - 1) // self.rows_per_page
+        if self.dataset_handler.df_display is not None:
+            total_pages = (len(self.dataset_handler.df_display) + self.rows_per_page - 1) // self.rows_per_page
             if self.current_page < total_pages - 1:
                 self.current_page += 1
                 self.update_display()
     
     def go_to_last_page(self):
         """Go to the last page"""
-        if self.data_manager.df_display is not None:
-            total_pages = (len(self.data_manager.df_display) + self.rows_per_page - 1) // self.rows_per_page
+        if self.dataset_handler.df_display is not None:
+            total_pages = (len(self.dataset_handler.df_display) + self.rows_per_page - 1) // self.rows_per_page
             self.current_page = total_pages - 1
             self.update_display()
     
     def sort_by_column(self, column_index):
         """Sort the dataframe by the specified column"""
-        if self.data_manager.df_display is not None:
-            column_name = self.data_manager.df_display.columns[column_index]
+        if self.dataset_handler.df_display is not None:
+            column_name = self.dataset_handler.df_display.columns[column_index]
             
             # Toggle sort direction if clicking the same column
             if self.sort_column == column_index:
@@ -151,7 +149,7 @@ class TableManager:
                 self.sort_column = column_index
             
             # Sort the data using data manager
-            success = self.data_manager.sort_data(column_name, self.sort_ascending)
+            success = self.dataset_handler.sort_data(column_name, self.sort_ascending)
             
             if success:
                 # Reset to first page and update display
@@ -160,11 +158,11 @@ class TableManager:
     
     def update_cell_value(self, row, col, new_value):
         """Update the dataframe when a cell value is changed"""
-        success = self.data_manager.update_cell_value(row, col, new_value)
+        success = self.dataset_handler.update_cell_value(row, col, new_value)
         
         if not success:
             # Invalid input - revert to original value
-            original_value = str(self.data_manager.df_display.iloc[row, col])
+            original_value = str(self.dataset_handler.df_display.iloc[row, col])
             # Find the cell input and reset its value
             cell_tag = f"cell_{row}_{col}"
             if dpg.does_item_exist(cell_tag):
@@ -172,7 +170,7 @@ class TableManager:
     
     def show_row_operation_dialog(self, row_index):
         """Show dialog for row operations (Delete/Insert)"""
-        if self.data_manager.df_display is None:
+        if self.dataset_handler.df_display is None:
             print("No data to operate on")
             return
         
@@ -237,11 +235,11 @@ class TableManager:
     def delete_row_direct(self):
         """Delete row directly without confirmation dialog"""
         print("Delete row direct called")
-        if self.data_manager.df_display is not None and self.selected_row_index is not None:
+        if self.dataset_handler.df_display is not None and self.selected_row_index is not None:
             print(f"Deleting row {self.selected_row_index + 1}")
             
             # Delete the row using data manager
-            success = self.data_manager.delete_row(self.selected_row_index)
+            success = self.dataset_handler.delete_row(self.selected_row_index)
             
             if success:
                 # Reset to first page and update display
@@ -257,9 +255,9 @@ class TableManager:
         dpg.delete_item("row_ops_dialog")
 
     def copy_row_direct(self):
-        """Copy the selected row (insert below) using data_manager.copy_row."""
-        if self.data_manager.df_display is not None and self.selected_row_index is not None:
-            success = self.data_manager.copy_row(
+        """Copy the selected row (insert below) using dataset_handler.copy_row."""
+        if self.dataset_handler.df_display is not None and self.selected_row_index is not None:
+            success = self.dataset_handler.copy_row(
                 self.selected_row_index,
                 above_index=self.selected_row_index + 1
             )
@@ -275,7 +273,7 @@ class TableManager:
     def insert_row_direct(self, above=True):
         """Insert row directly with position choice"""
         print(f"Insert row direct called - above: {above}")
-        if self.data_manager.df_display is not None and self.selected_row_index is not None:
+        if self.dataset_handler.df_display is not None and self.selected_row_index is not None:
             position = "above" if above else "below"
             print(f"Inserting row {position} row {self.selected_row_index + 1}")
             
@@ -286,7 +284,7 @@ class TableManager:
                 insert_pos = self.selected_row_index + 1
             
             # Insert the row using data manager
-            success = self.data_manager.add_row(insert_pos)
+            success = self.dataset_handler.add_row(insert_pos)
             
             if success:
                 # Reset to first page and update display
@@ -300,11 +298,6 @@ class TableManager:
         
         # Close the dialog
         dpg.delete_item("row_ops_dialog")
-    
-    def update_default_cell_value(self, row, col, new_value):
-        """Update the default table when a cell value is changed"""
-        # This is just for the default table - no data storage needed
-        pass
     
     def reset_pagination(self):
         """Reset pagination to first page"""

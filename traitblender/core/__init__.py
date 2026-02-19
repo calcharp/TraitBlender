@@ -40,7 +40,7 @@ from .positioning import (
 from .config import CONFIG, config_subsection_register, configs, config_register
 
 # Datasets
-from .datasets import launch_csv_viewer_with_string
+from .datasets import launch_dataset_viewer_with_string
 
 # Config, morphospaces (placeholder for future development)
 # from .morphospaces import *
@@ -70,5 +70,5 @@ __all__ = [
     "configs",
     
     # Datasets
-    "launch_csv_viewer_with_string",
+    "launch_dataset_viewer_with_string",
 ]

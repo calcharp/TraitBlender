@@ -61,12 +61,12 @@ Interactive dataset editor built with DearPyGUI in `core/datasets/dpg_dataset_ed
 
 **Architecture:** The system is organized into four manager classes that coordinate to provide the viewing experience:
 
-- **DataManager** (`data_manager.py`) - Maintains `df_original` (unmodified data) and `df_display` (filtered/sorted view). Handles loading from CSV strings and exporting back to strings.
-- **FilterManager** (`filter_manager.py`) - Tracks active filters and applies case-insensitive substring matching. Multiple filters combine with AND logic. Resets pagination when filters change.
-- **TableManager** (`table_manager.py`) - Handles pagination (50 rows per page), sorting (click headers to toggle), and rendering the visible page slice.
-- **UIManager** (`ui_manager.py`) - Creates the DearPyGUI interface with toolbar, filter section, table display, and pagination controls.
+- **DatasetHandler** (`dataset_handler.py`) - Maintains `df_original` (unmodified data) and `df_display` (filtered/sorted view). Handles loading from CSV strings and exporting back to strings.
+- **FilterUIManager** (`filter_ui_manager.py`) - Tracks active filters and applies case-insensitive substring matching. Multiple filters combine with AND logic. Resets pagination when filters change.
+- **TableUIManager** (`table_ui_manager.py`) - Handles pagination (50 rows per page), sorting (click headers to toggle), and rendering the visible page slice.
+- **AppUIManager** (`app_ui_manager.py`) - Creates the DearPyGUI interface with toolbar, filter section, table display, and pagination controls.
 
-**Integration:** The `launch_csv_viewer_with_string()` function in `csv_viewer.py` is the main entry point. It accepts a CSV string from Blender, launches the viewer window (blocking until closed), and returns the modified CSV string if the user checked "Export Changes", otherwise returns `None`. Operators call this function and update the dataset only if changes were exported.
+**Integration:** The `launch_dataset_viewer_with_string()` function in `dataset_viewer.py` is the main entry point. It accepts a CSV string from Blender, launches the viewer window (blocking until closed), and returns the modified CSV string if the user checked "Export Changes", otherwise returns `None`. Operators call this function and update the dataset only if changes were exported.
 
 ---
 

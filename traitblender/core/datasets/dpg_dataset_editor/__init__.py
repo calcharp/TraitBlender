@@ -2,17 +2,17 @@
 DPG Dataset Editor - DearPyGUI dataset editor for Blender integration.
 """
 
-from .csv_viewer import launch_csv_viewer_with_string, CSVViewer
-from .data_manager import DataManager
-from .filter_manager import FilterManager
-from .table_manager import TableManager
-from .ui_manager import UIManager
+from .dataset_viewer import launch_dataset_viewer_with_string, DatasetViewer
+from .dataset_handler import DatasetHandler
+from .filter_ui_manager import FilterUIManager
+from .table_ui_manager import TableUIManager
+from .app_ui_manager import AppUIManager
 
 __all__ = [
-    'launch_csv_viewer_with_string',
-    'CSVViewer',
-    'DataManager',
-    'FilterManager', 
-    'TableManager',
-    'UIManager'
+    'launch_dataset_viewer_with_string',
+    'DatasetViewer',
+    'DatasetHandler',
+    'FilterUIManager',
+    'TableUIManager',
+    'AppUIManager'
 ]

@@ -1,31 +1,31 @@
 """
-UI management module for CSV viewer.
-Handles GUI creation, theming, and UI layout.
+App UI manager for DPG dataset editor.
+Handles main GUI creation, theming, and layout.
 """
 
 import dearpygui.dearpygui as dpg
 
 
-class UIManager:
-    """Manages GUI creation, theming, and UI layout."""
-    
+class AppUIManager:
+    """Manages main app GUI creation, theming, and layout."""
+
     def __init__(self):
         self.theme_created = False
-    
-    def create_gui(self, data_manager, filter_manager, table_manager):
+
+    def create_gui(self, dataset_handler, filter_ui_manager, table_ui_manager):
         """Create the main GUI"""
         dpg.create_context()
-        
+
         # Create Blender-like theme
         self.create_blender_theme()
-        
+
         # Create main window as primary window
         with dpg.window(tag="main_window", label="", width=-1, height=-1):
             # Create left sidebar
-            self.create_sidebar(data_manager, filter_manager)
-            
+            self.create_sidebar(dataset_handler, filter_ui_manager)
+
             # Create main content area
-            self.create_content_area(table_manager)
+            self.create_content_area(table_ui_manager)
     
     def create_blender_theme(self):
         """Create Blender-like theme"""
@@ -135,7 +135,7 @@ class UIManager:
         dpg.bind_theme(blender_theme)
         self.theme_created = True
     
-    def create_sidebar(self, data_manager, filter_manager):
+    def create_sidebar(self, dataset_handler, filter_ui_manager):
         """Create the left sidebar"""
         with dpg.child_window(tag="sidebar", parent="main_window", width=200, height=-1, pos=(0, 0)):
             dpg.add_spacer(height=10)
@@ -143,8 +143,8 @@ class UIManager:
             # Data Management section
             dpg.add_text("Data Management", color=(100, 150, 200))
             dpg.add_spacer(height=2)
-            dpg.add_button(label="Save Changes", callback=lambda: data_manager.save_changes(), width=180)
-            dpg.add_button(label="Reset to Last Save", callback=lambda: data_manager.reset_to_original(), width=180)
+            dpg.add_button(label="Save Changes", callback=lambda: dataset_handler.save_changes(), width=180)
+            dpg.add_button(label="Reset to Last Save", callback=lambda: dataset_handler.reset_to_original(), width=180)
             dpg.add_spacer(height=5)
             dpg.add_checkbox(label="Export Changes", tag="export_changes_checkbox", default_value=False)
             dpg.add_spacer(height=10)
@@ -154,9 +154,9 @@ class UIManager:
             dpg.add_spacer(height=2)
             
             # Filter control buttons - arranged vertically to ensure visibility
-            dpg.add_button(label="Insert Filter", callback=filter_manager.add_filter_row, width=180)
-            dpg.add_button(label="Apply Filters", callback=filter_manager.apply_filter, width=180)
-            dpg.add_button(label="Clear All", callback=filter_manager.clear_filter, width=180)
+            dpg.add_button(label="Insert Filter", callback=filter_ui_manager.add_filter_row, width=180)
+            dpg.add_button(label="Apply Filters", callback=filter_ui_manager.apply_filter, width=180)
+            dpg.add_button(label="Clear All", callback=filter_ui_manager.clear_filter, width=180)
             
             dpg.add_spacer(height=2)
             
@@ -164,9 +164,9 @@ class UIManager:
             dpg.add_child_window(tag="filter_rows_container", width=-1, height=200, no_scrollbar=False)
             
             # Initialize with one filter row
-            filter_manager.add_filter_row()
+            filter_ui_manager.add_filter_row()
     
-    def create_content_area(self, table_manager):
+    def create_content_area(self, table_ui_manager):
         """Create the main content area"""
         with dpg.child_window(tag="content_area", parent="main_window", width=-1, height=-1, pos=(200, 0)):
             dpg.add_spacer(height=10)
@@ -176,80 +176,15 @@ class UIManager:
             dpg.add_spacer(height=5, parent="pagination_controls")
             
             # Page navigation buttons - create a horizontal layout manually
-            dpg.add_button(label="<< First", callback=table_manager.go_to_first_page, width=60, height=25, parent="pagination_controls", pos=(10, 30))
-            dpg.add_button(label="< Prev", callback=table_manager.go_to_previous_page, width=60, height=25, parent="pagination_controls", pos=(80, 30))
-            dpg.add_button(label="Next >", callback=table_manager.go_to_next_page, width=60, height=25, parent="pagination_controls", pos=(150, 30))
-            dpg.add_button(label="Last >>", callback=table_manager.go_to_last_page, width=60, height=25, parent="pagination_controls", pos=(220, 30))
+            dpg.add_button(label="<< First", callback=table_ui_manager.go_to_first_page, width=60, height=25, parent="pagination_controls", pos=(10, 30))
+            dpg.add_button(label="< Prev", callback=table_ui_manager.go_to_previous_page, width=60, height=25, parent="pagination_controls", pos=(80, 30))
+            dpg.add_button(label="Next >", callback=table_ui_manager.go_to_next_page, width=60, height=25, parent="pagination_controls", pos=(150, 30))
+            dpg.add_button(label="Last >>", callback=table_ui_manager.go_to_last_page, width=60, height=25, parent="pagination_controls", pos=(220, 30))
             
             dpg.add_text("Page info", tag="pagination_info", parent="pagination_controls", pos=(10, 60))
             
             dpg.add_separator()
             dpg.add_spacer(height=5)
-            
-            # Default table (always visible)
-            self.create_default_table(table_manager)
-    
-    def create_default_table(self, table_manager):
-        """Create the default table"""
-        with dpg.table(tag="default_table", parent="content_area", 
-                      header_row=False, resizable=True, policy=dpg.mvTable_SizingStretchProp):
-            
-            # Add row index column first (display only, no header)
-            dpg.add_table_column(label="", width_fixed=True, init_width_or_weight=30)
-            
-            # Add Species column
-            dpg.add_table_column(label="Species", width_fixed=False)
-            
-            # Add Trait columns (Trait 1 through Trait 9)
-            for i in range(1, 10):
-                dpg.add_table_column(label=f"Trait {i}", width_fixed=False)
-            
-            # Add header row manually to control the row column header
-            with dpg.table_row():
-                # Empty cell for row column (just background)
-                dpg.add_text("")
-                
-                # Add data column headers
-                dpg.add_text("Species")
-                for i in range(1, 10):
-                    dpg.add_text(f"Trait {i}")
-            
-            # Add 5 data rows
-            for i in range(5):
-                with dpg.table_row():
-                    # Add row index (1-based) with hover highlighting
-                    default_row_index_button = dpg.add_button(
-                        label=str(i + 1),
-                        width=-1,
-                        height=0,  # Auto height
-                        callback=lambda s, a, u: print("Row operations not available for default table"),
-                        user_data=i
-                    )
-                    dpg.bind_item_theme(default_row_index_button, "row_index_theme")
-                    
-                    # Add Species cell (editable)
-                    species_tag = f"default_species_{i}"
-                    dpg.add_input_text(
-                        tag=species_tag,
-                        default_value=f"Species {i + 1}",
-                        width=-1,
-                        callback=lambda s, a, u: table_manager.update_default_cell_value(u[0], u[1], a)
-                    )
-                    dpg.set_item_user_data(species_tag, (i, 0))
-                    
-                    # Add Trait cells (editable)
-                    for j in range(1, 10):
-                        trait_tag = f"default_trait_{i}_{j}"
-                        dpg.add_input_text(
-                            tag=trait_tag,
-                            default_value="-",
-                            width=-1,
-                            callback=lambda s, a, u: table_manager.update_default_cell_value(u[0], u[1], a)
-                        )
-                        dpg.set_item_user_data(trait_tag, (i, j))
-        
-        # Table will be created here when CSV is imported (initially hidden)
-        dpg.add_text("Import a CSV file to view and edit its contents", tag="placeholder_text", show=False)
     
     def on_viewport_resize(self):
         """Handle viewport resize events"""
