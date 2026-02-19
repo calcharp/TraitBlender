@@ -1,6 +1,6 @@
 """
 Helper module for sampler parameter information.
-Uses hardcoded signatures for supported samplers.
+Uses signatures from supported samplers in the transforms module.
 """
 
 import inspect
@@ -14,7 +14,7 @@ def get_sampler_signature(sampler_name):
         dict: Parameter info per param name (type_str, default, required)
     """
     try:
-        from .. import SAMPLERS
+        from ..transforms import SAMPLERS
         if sampler_name not in SAMPLERS:
             return {}
         func = SAMPLERS[sampler_name]
@@ -146,4 +146,3 @@ def format_parameter_value(value):
     if isinstance(value, (list, tuple)):
         return ", ".join(str(v) for v in value)
     return str(value)
-

@@ -16,6 +16,19 @@ from .asset_path import get_asset_path
 from .config_validator import validate_config_path, get_config_path_info, list_config_properties
 from .config_path import resolve_config_path, parse_component_path, COMPONENT_TO_INDEX
 from .property_type_checker import get_property_type, VALID_PROPERTY_TYPES
+from .transform_property_helper import (
+    get_available_sections,
+    get_properties_for_section,
+    build_property_path,
+    parse_property_path,
+    get_available_samplers,
+    get_available_samplers_for_property,
+)
+from .transform_sampler_helper import (
+    get_sampler_signature,
+    validate_parameter_value,
+    format_parameter_value,
+)
 from .scene_cleaner import clear_scene
 from .pretty_type_hint import pretty_type_hint
 
@@ -53,6 +66,16 @@ __all__ = [
     "resolve_config_path",
     "parse_component_path",
     "COMPONENT_TO_INDEX",
+    # Transform property/sampler helpers (for DPG transforms editor)
+    "get_available_sections",
+    "get_properties_for_section",
+    "build_property_path",
+    "parse_property_path",
+    "get_available_samplers",
+    "get_available_samplers_for_property",
+    "get_sampler_signature",
+    "validate_parameter_value",
+    "format_parameter_value",
     # Property type checker functions
     "get_property_type",
     "VALID_PROPERTY_TYPES",

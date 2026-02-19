@@ -1,12 +1,12 @@
 """
-Helper module for getting available properties from SAMPLER_ALLOWED_PATHS.
+Helper module for getting available transform properties from SAMPLER_ALLOWED_PATHS.
 """
 
 
 def _get_all_allowed_paths():
     """Union of all allowed paths across samplers."""
     try:
-        from .. import SAMPLER_ALLOWED_PATHS
+        from ..transforms import SAMPLER_ALLOWED_PATHS
         paths = set()
         for lst in SAMPLER_ALLOWED_PATHS.values():
             paths.update(lst)
@@ -90,7 +90,7 @@ def get_available_samplers():
         list: List of tuples (sampler_name, display_name)
     """
     try:
-        from .. import SAMPLERS
+        from ..transforms import SAMPLERS
         return [
             (name, name.replace('_', ' ').title())
             for name in sorted(SAMPLERS.keys())
@@ -110,7 +110,7 @@ def get_available_samplers_for_property(property_path):
         list: List of tuples (sampler_name, display_name) for samplers that allow this path
     """
     try:
-        from .. import SAMPLER_ALLOWED_PATHS
+        from ..transforms import SAMPLER_ALLOWED_PATHS
         result = []
         for sampler_name, allowed_paths in SAMPLER_ALLOWED_PATHS.items():
             if property_path in allowed_paths:
@@ -118,4 +118,3 @@ def get_available_samplers_for_property(property_path):
         return sorted(result)
     except (ImportError, AttributeError):
         return [("normal", "Normal")]
-

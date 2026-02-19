@@ -5,7 +5,7 @@ Manages the transform pipeline data and operations.
 
 import yaml
 import dearpygui.dearpygui as dpg
-from .property_helper import (
+from ...helpers.transform_property_helper import (
     get_available_sections,
     get_properties_for_section,
     build_property_path,
@@ -13,7 +13,7 @@ from .property_helper import (
     get_available_samplers,
     get_available_samplers_for_property
 )
-from .sampler_helper import (
+from ...helpers.transform_sampler_helper import (
     get_sampler_signature,
     validate_parameter_value,
     format_parameter_value
