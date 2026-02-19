@@ -1,5 +1,5 @@
 """
-Transforms Manager
+Transform Pipeline Manager
 Manages the transform pipeline data and operations.
 """
 
@@ -18,13 +18,9 @@ from ...helpers.transform_sampler_helper import (
     validate_parameter_value,
     format_parameter_value
 )
-from .property_dimension_helper import (
-    get_property_dimension,
-    should_auto_set_n_parameter
-)
 
 
-class TransformsManager:
+class TransformPipelineManager:
     """Manages transform pipeline data and operations."""
     
     def __init__(self):
@@ -164,11 +160,6 @@ class TransformsManager:
         # Get sampler signature for dynamic parameter inputs
         param_signature = get_sampler_signature(sampler_name)
         
-        # Auto-set 'n' parameter based on property dimension
-        should_auto_set, dimension = should_auto_set_n_parameter(property_path)
-        if should_auto_set and dimension is not None:
-            self.transforms[index]['params']['n'] = dimension
-        
         # Highlight if this was just moved
         is_highlighted = (index == self.last_moved_index)
         title_color = (150, 220, 150) if is_highlighted else (100, 150, 200)
@@ -291,9 +282,6 @@ class TransformsManager:
         required = param_info['required']
         property_path = self.transforms[index].get('property_path', '')
         
-        # Get property dimension for sizing vector/matrix inputs
-        dimension = get_property_dimension(property_path)
-        
         # Label with type hint and required indicator
         label_text = f"  {param_name} ({type_str})"
         if required:
@@ -305,10 +293,10 @@ class TransformsManager:
         # Create appropriate input widget based on type
         if type_str == 'list[float]':
             # Vector input - row of float inputs
-            self._create_vector_input(index, param_name, current_value, dimension)
+            self._create_vector_input(index, param_name, current_value, None)
         elif type_str == 'list[int]':
             # Vector input - row of int inputs
-            self._create_vector_input(index, param_name, current_value, dimension, is_int=True)
+            self._create_vector_input(index, param_name, current_value, None, is_int=True)
         else:
             # Scalar input
             self._create_scalar_input(index, param_name, current_value, type_str)
@@ -394,9 +382,7 @@ class TransformsManager:
             
             # Get or create the vector
             if param_name not in self.transforms[index]['params']:
-                # Determine size from property dimension
-                property_path = self.transforms[index].get('property_path', '')
-                dimension = get_property_dimension(property_path) or 3
+                dimension = 3  # Default for vector params
                 self.transforms[index]['params'][param_name] = [0] * dimension if is_int else [0.0] * dimension
             
             # Update the specific element
@@ -474,26 +460,13 @@ class TransformsManager:
         """Update the property path for a transform and auto-set 'n' parameter"""
         if 0 <= index < len(self.transforms):
             new_path = build_property_path(section, property_name)
-            old_path = self.transforms[index]['property_path']
             self.transforms[index]['property_path'] = new_path
             
-            # Auto-set 'n' parameter based on new property dimension
-            should_auto_set, dimension = should_auto_set_n_parameter(new_path)
-            if should_auto_set and dimension is not None:
-                self.transforms[index]['params']['n'] = dimension
-                print(f"Updated transform {index + 1} property path to: {new_path} (n={dimension})")
-            else:
-                # Scalar property - remove 'n' if it exists
-                if 'n' in self.transforms[index]['params']:
-                    del self.transforms[index]['params']['n']
-                print(f"Updated transform {index + 1} property path to: {new_path} (scalar)")
+            # Scalar properties only - remove 'n' if it exists
+            if 'n' in self.transforms[index]['params']:
+                del self.transforms[index]['params']['n']
+            print(f"Updated transform {index + 1} property path to: {new_path}")
             
-            # Regenerate display: dimension may have changed (parameter inputs),
-            # and allowed samplers may differ per property
-            old_dimension = get_property_dimension(old_path)
-            new_dimension = get_property_dimension(new_path)
-            if old_dimension != new_dimension:
-                print(f"  Dimension changed: {old_dimension} → {new_dimension}, regenerating display...")
             self.update_display()
     
     def _on_sampler_changed(self, index, display_value):
@@ -519,4 +492,3 @@ class TransformsManager:
         # app_data contains the drag_data (source index)
         if isinstance(app_data, int) and app_data != drop_target_index:
             self.move_transform(app_data, drop_target_index)
-

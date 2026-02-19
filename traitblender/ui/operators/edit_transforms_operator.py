@@ -16,8 +16,8 @@ class TRAITBLENDER_OT_edit_transforms(Operator):
     
     def execute(self, context):
         try:
-            # Import the transforms editor from core module
-            from ...core.transforms.dpg_transforms_editor import launch_transform_editor
+            # Import the transform pipeline editor from core module
+            from ...core.transforms.dpg_transforms_editor import launch_transform_pipeline_editor
             
             # Get current pipeline state from config
             config = context.scene.traitblender_config
@@ -25,7 +25,7 @@ class TRAITBLENDER_OT_edit_transforms(Operator):
             
             # Launch editor (blocking call)
             self.report({'INFO'}, "Launching transform pipeline editor...")
-            new_state = launch_transform_editor(current_state)
+            new_state = launch_transform_pipeline_editor(current_state)
             
             # Update config if changes were exported
             if new_state is not None:

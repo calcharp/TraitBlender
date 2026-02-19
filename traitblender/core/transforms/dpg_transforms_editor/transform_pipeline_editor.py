@@ -4,16 +4,16 @@ Standalone DearPyGUI app for editing transform pipelines.
 """
 
 import dearpygui.dearpygui as dpg
-from .transforms_manager import TransformsManager
+from .transform_pipeline_manager import TransformPipelineManager
 from .ui_manager import UIManager
 
 
-class TransformEditor:
-    """Main transform editor application that coordinates all managers."""
+class TransformPipelineEditor:
+    """Main transform pipeline editor application that coordinates all managers."""
     
     def __init__(self):
         # Initialize managers
-        self.transforms_manager = TransformsManager()
+        self.transform_pipeline_manager = TransformPipelineManager()
         self.ui_manager = UIManager()
         
         # Export state
@@ -22,12 +22,12 @@ class TransformEditor:
     
     def load_pipeline_from_yaml(self, yaml_string):
         """Load pipeline data from YAML string (for Blender integration)"""
-        success = self.transforms_manager.load_from_yaml(yaml_string)
+        success = self.transform_pipeline_manager.load_from_yaml(yaml_string)
         return success
     
     def create_gui(self):
         """Create the main GUI"""
-        self.ui_manager.create_gui(self.transforms_manager)
+        self.ui_manager.create_gui(self.transform_pipeline_manager)
     
     def run(self, window_title="Transform Pipeline Editor"):
         """Run the application"""
@@ -38,14 +38,14 @@ class TransformEditor:
         dpg.set_primary_window("main_window", True)
         
         # If we have data loaded, update the display now that GUI is ready
-        if self.transforms_manager.has_transforms():
-            self.transforms_manager.update_display()
+        if self.transform_pipeline_manager.has_transforms():
+            self.transform_pipeline_manager.update_display()
         
         dpg.start_dearpygui()
         
         # Store export state and YAML data before destroying context
         self.export_requested = self.get_export_state()
-        self.final_yaml_data = self.transforms_manager.get_yaml_string()
+        self.final_yaml_data = self.transform_pipeline_manager.get_yaml_string()
         
         dpg.destroy_context()
     
@@ -58,12 +58,12 @@ class TransformEditor:
     
     def get_yaml_string(self):
         """Get current pipeline as YAML string (for Blender integration)"""
-        return self.transforms_manager.get_yaml_string()
+        return self.transform_pipeline_manager.get_yaml_string()
 
 
-def launch_transform_editor(yaml_string="", window_title="Transform Pipeline Editor"):
+def launch_transform_pipeline_editor(yaml_string="", window_title="Transform Pipeline Editor"):
     """
-    Launch the transform editor with pipeline data from a YAML string (for Blender integration)
+    Launch the transform pipeline editor with pipeline data from a YAML string (for Blender integration)
     
     Args:
         yaml_string (str): Pipeline state as YAML string
@@ -74,7 +74,7 @@ def launch_transform_editor(yaml_string="", window_title="Transform Pipeline Edi
     """
     try:
         # Create the editor instance
-        app = TransformEditor()
+        app = TransformPipelineEditor()
         
         # Load pipeline data from YAML string (if provided)
         if yaml_string:
@@ -92,32 +92,7 @@ def launch_transform_editor(yaml_string="", window_title="Transform Pipeline Edi
             return None
             
     except Exception as e:
-        print(f"Error launching transform editor: {e}")
+        print(f"Error launching transform pipeline editor: {e}")
         import traceback
         traceback.print_exc()
         return None
-
-
-if __name__ == "__main__":
-    # Test data - sample transforms (all univariate)
-    test_yaml = """- property_path: world.color.r
-  sampler_name: normal
-  params:
-    mu: 0.5
-    sigma: 0.1
-- property_path: lamp.power
-  sampler_name: normal
-  params:
-    mu: 10
-    sigma: 2
-- property_path: camera.location.x
-  sampler_name: normal
-  params:
-    mu: 0
-    sigma: 0.1
-"""
-    
-    app = TransformEditor()
-    app.load_pipeline_from_yaml(test_yaml)
-    app.run()
-

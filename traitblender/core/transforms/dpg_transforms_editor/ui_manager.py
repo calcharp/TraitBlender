@@ -12,7 +12,7 @@ class UIManager:
     def __init__(self):
         self.theme_created = False
     
-    def create_gui(self, transforms_manager):
+    def create_gui(self, pipeline_manager):
         """Create the main GUI"""
         dpg.create_context()
         
@@ -29,12 +29,12 @@ class UIManager:
             with dpg.group(horizontal=True):
                 dpg.add_button(
                     label="Add Transform",
-                    callback=lambda: self._show_add_transform_dialog(transforms_manager),
+                    callback=lambda: self._show_add_transform_dialog(pipeline_manager),
                     width=120
                 )
                 dpg.add_button(
                     label="Clear All",
-                    callback=lambda: transforms_manager.clear_all(),
+                    callback=lambda: pipeline_manager.clear_all(),
                     width=120
                 )
             
@@ -61,11 +61,11 @@ class UIManager:
                 # Transform cards will be added here
                 pass
     
-    def _show_add_transform_dialog(self, transforms_manager):
+    def _show_add_transform_dialog(self, pipeline_manager):
         """Show dialog to add a new transform (placeholder for now)"""
         # TODO: Implement full add transform dialog with dynamic parameter inputs
         # For now, just add a dummy transform for testing
-        transforms_manager.add_transform(
+        pipeline_manager.add_transform(
             property_path="world.color.r",
             sampler_name="normal",
             params={"mu": 0.5, "sigma": 0.1}
