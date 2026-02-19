@@ -4,6 +4,7 @@ Transform class: samples a value and assigns it to a property path.
 
 import copy
 import bpy
+from mathutils import Euler, Vector
 
 from .samplers import SAMPLERS, SAMPLER_ALLOWED_PATHS
 
@@ -13,11 +14,20 @@ def _resolve_path(path):
     return "bpy.context.scene.traitblender_config." + path
 
 
+_COMPONENT_TO_INDEX = {
+    "x": 0, "y": 1, "z": 2,
+    "r": 0, "g": 1, "b": 2, "a": 3,
+}
+
+
 def _parse_component_path(path):
-    """If path has 3+ parts and last is numeric, return (parent_path, index). Else None."""
+    """If path has 3+ parts and last is x/y/z or r/g/b/a, return (parent_path, index). Else None."""
     parts = path.split(".")
-    if len(parts) >= 3 and parts[-1].isdigit():
-        return ".".join(parts[:-1]), int(parts[-1])
+    if len(parts) < 3:
+        return None
+    last = parts[-1].lower()
+    if last in _COMPONENT_TO_INDEX:
+        return ".".join(parts[:-1]), _COMPONENT_TO_INDEX[last]
     return None
 
 
@@ -57,7 +67,12 @@ class Transform:
                 parent_path, idx = parsed
                 full_parent = _resolve_path(parent_path)
                 vec = eval(full_parent, {"bpy": bpy})
-                arr = list(vec) if hasattr(vec, "__iter__") and not isinstance(vec, str) else [vec]
+                if isinstance(vec, Euler):
+                    arr = [float(vec.x), float(vec.y), float(vec.z)]
+                elif isinstance(vec, Vector):
+                    arr = [float(vec[i]) for i in range(len(vec))]
+                else:
+                    arr = list(vec) if hasattr(vec, "__iter__") and not isinstance(vec, str) else [vec]
                 return arr[idx] if idx < len(arr) else 0.0
             value = eval(self._full_path, {"bpy": bpy})
             if hasattr(value, "__iter__") and not isinstance(value, str):
@@ -73,10 +88,24 @@ class Transform:
                 parent_path, idx = parsed
                 full_parent = _resolve_path(parent_path)
                 vec = eval(full_parent, {"bpy": bpy})
-                arr = list(vec) if hasattr(vec, "__iter__") and not isinstance(vec, str) else [vec]
+                # Extract components as floats (Euler/Vector need explicit extraction)
+                if isinstance(vec, Euler):
+                    arr = [float(vec.x), float(vec.y), float(vec.z)]
+                elif isinstance(vec, Vector):
+                    arr = [float(vec[i]) for i in range(len(vec))]
+                else:
+                    arr = list(vec) if hasattr(vec, "__iter__") and not isinstance(vec, str) else [vec]
+                    arr = [float(x) for x in arr]
                 arr = arr + [0.0] * (idx - len(arr) + 1) if idx >= len(arr) else arr
                 arr[idx] = float(value)
-                exec(f"{full_parent} = tuple(arr)", {"bpy": bpy, "arr": arr, "tuple": tuple})
+                # Preserve Blender types: Euler for rotation, Vector for position
+                if isinstance(vec, Euler):
+                    new_val = Euler(tuple(arr), vec.order)
+                elif isinstance(vec, Vector):
+                    new_val = Vector(arr)
+                else:
+                    new_val = tuple(arr)
+                exec(f"{full_parent} = new_val", {"bpy": bpy, "new_val": new_val})
             else:
                 exec(f"{self._full_path} = value", {"bpy": bpy, "value": value})
         except Exception as e:

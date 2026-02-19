@@ -1,7 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - TRANSFORMS
-- core/transforms/transform_pipeline.py
 - core/transforms/samplers.py
 - core/transforms/transform.py
 - core/transforms/transforms.py

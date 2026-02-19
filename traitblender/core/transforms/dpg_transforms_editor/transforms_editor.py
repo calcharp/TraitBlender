@@ -100,7 +100,7 @@ def launch_transform_editor(yaml_string="", window_title="Transform Pipeline Edi
 
 if __name__ == "__main__":
     # Test data - sample transforms (all univariate)
-    test_yaml = """- property_path: world.color.0
+    test_yaml = """- property_path: world.color.r
   sampler_name: normal
   params:
     mu: 0.5
@@ -110,7 +110,7 @@ if __name__ == "__main__":
   params:
     mu: 10
     sigma: 2
-- property_path: camera.location.0
+- property_path: camera.location.x
   sampler_name: normal
   params:
     mu: 0

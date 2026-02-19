@@ -16,8 +16,8 @@ class TransformPipeline:
     
     Example:
         pipeline = TransformPipeline()
-        pipeline.add_transform("world.color.0", "normal", {"mu": 0.5, "sigma": 0.1})
-        pipeline.add_transform("camera.location.0", "normal", {"mu": 0, "sigma": 0.1})
+        pipeline.add_transform("world.color.r", "normal", {"mu": 0.5, "sigma": 0.1})
+        pipeline.add_transform("camera.location.x", "normal", {"mu": 0, "sigma": 0.1})
         pipeline.run()  # Execute all transforms
         pipeline.undo()  # Undo all transforms in reverse order
     """
@@ -46,7 +46,7 @@ class TransformPipeline:
             TransformPipeline: Self for method chaining
             
         Example:
-            pipeline.add_transform("world.color", "uniform", {"low": 0, "high": 1})
+            pipeline.add_transform("world.color.r", "normal", {"mu": 0.5, "sigma": 0.1})
         """
         transform = Transform(property_path, sampler_name, params)
         self._transforms.append(transform)
