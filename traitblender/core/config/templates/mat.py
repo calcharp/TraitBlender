@@ -7,8 +7,8 @@ class MatConfig(TraitBlenderConfig):
 
     # Table coordinates in meters
     location: bpy.props.FloatVectorProperty(
-        name="Mat Location (Relative to Table Surface)",
-        description="Mat location in table coordinates (origin at table top center, Z is table normal) in meters",
+        name="Mat Location",
+        description="Mat location in world coordinates in meters",
         subtype='TRANSLATION',
         size=3,
             get=get_property("bpy.data.objects['Mat'].location", object_dependencies={"objects": ["Mat"]}),

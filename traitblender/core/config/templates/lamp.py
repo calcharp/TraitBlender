@@ -8,8 +8,8 @@ class LampConfig(TraitBlenderConfig):
 
     # Table coordinates in meters
     location: bpy.props.FloatVectorProperty(
-        name="Lamp Location (Relative to Table Surface)",
-        description="Lamp location in table coordinates (origin at table top center, Z is table normal) in meters",
+        name="Lamp Location",
+        description="Lamp location in meters",
         default=(0.0, 0.0, 0.0),
         subtype='TRANSLATION',
             get=get_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]}),

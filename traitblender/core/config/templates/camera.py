@@ -7,8 +7,8 @@ class CameraConfig(TraitBlenderConfig):
     print_index = 2
     # Table coordinates in meters
     location: bpy.props.FloatVectorProperty(
-        name="Location (Relative to Table Surface)",
-        description="Camera location in table coordinates (origin at table top center, Z is table normal) in meters",
+        name="Location",
+        description="Camera location in world coordinates in meters",
         default=(0.0, 0.0, 0.0),
         subtype='TRANSLATION',
             get=get_property("bpy.data.objects['Camera'].location", object_dependencies={"objects": ["Camera"]}),

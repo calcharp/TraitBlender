@@ -77,7 +77,7 @@ def get_default(property_path: str, prop_type: str):
     return 0.0
 
 
-def get_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False):
+def get_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False, default=None):
     """Create a getter function for a Blender property.
     
     Args:
@@ -89,7 +89,7 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
                                             If any dependency is missing, the getter returns None.
                                             Example: {"objects": ["Camera"], "cameras": ["Camera"]}
         strict_error_reporting (bool, optional): If True, raises RuntimeError with property path instead of warning.
-                                               Useful for debugging type mismatches.
+        default: Optional value to return when deps missing or eval fails. If None, uses type-based default.
     
     Returns:
         function: A getter function that returns the value of the specified Blender property
@@ -112,7 +112,7 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
     
     def get(self):
         if not _check_object_dependencies(object_dependencies):
-            val = get_default(property_path, prop_type)
+            val = default if default is not None else get_default(property_path, prop_type)
             if strict_error_reporting:
                 raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
             warnings.warn(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()", UserWarning)
@@ -126,7 +126,7 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
                 return options.index(value)
             return value
         except Exception as e:
-            val = get_default(property_path, prop_type)
+            val = default if default is not None else get_default(property_path, prop_type)
             if strict_error_reporting:
                 raise RuntimeError(f"[TraitBlender] Error accessing property: {property_path}\nError: {str(e)}")
             warnings.warn(f"[TraitBlender] Error accessing property: {property_path}", UserWarning)
@@ -134,7 +134,7 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
     return get
 
 
-def set_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False):
+def set_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False, fail_silently: bool = False):
     """Create a setter function for a Blender property.
     
     Args:
@@ -147,6 +147,7 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
                                             Example: {"objects": ["Camera"], "cameras": ["Camera"]}
         strict_error_reporting (bool, optional): If True, raises RuntimeError with property path instead of warning.
                                                Useful for debugging type mismatches.
+        fail_silently (bool, optional): If True, on exception returns without raising. Use when target may not exist.
     
     Returns:
         function: A setter function that sets the value of the specified Blender property
@@ -183,6 +184,8 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
             # Use exec with bpy and value in the namespace for complex Blender properties
             exec(f"{property_path} = value", {"bpy": bpy, "value": value})
         except Exception as e:
+            if fail_silently:
+                return
             import traceback
             if strict_error_reporting:
                 raise RuntimeError(f"[TraitBlender] Error setting property '{property_path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}")

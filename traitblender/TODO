@@ -1,16 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - CONFIG
-- core/config/traitblender_config.py
-- core/config/registration/__init__.py
-- core/config/registration/config_subsection_register.py
-- core/config/registration/config_register.py
-- core/config/templates/__init__.py
-- core/config/templates/camera.py
-- core/config/templates/lamp.py
-- core/config/templates/mat.py
-- core/config/templates/metadata.py
-- core/config/templates/morphospace.py
 - core/config/templates/sample.py
 - core/config/templates/transforms.py
 - core/config/templates/world.py

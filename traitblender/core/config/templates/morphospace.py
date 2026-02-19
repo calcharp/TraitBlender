@@ -6,27 +6,11 @@ hyperparams: Per-morphospace hyperparameter overrides {morphospace_name: {param:
 Defaults are defined by each morphospace module's HYPERPARAMETERS export.
 """
 
-import bpy
 from bpy.props import StringProperty
 import yaml
 from .. import config_subsection_register, TraitBlenderConfig
+from ...helpers import get_property, set_property
 from ...morphospaces import get_hyperparameters_for_morphospace
-
-
-def _get_morphospace_name(self):
-    """Get selected morphospace from setup."""
-    try:
-        return bpy.context.scene.traitblender_setup.available_morphospaces
-    except Exception:
-        return "CO_Raup"
-
-
-def _set_morphospace_name(self, value):
-    """Set selected morphospace on setup."""
-    try:
-        bpy.context.scene.traitblender_setup.available_morphospaces = value
-    except Exception:
-        pass
 
 
 @config_subsection_register("morphospace")
@@ -39,8 +23,8 @@ class MorphospaceConfig(TraitBlenderConfig):
         name="Morphospace",
         description="Selected morphospace module (syncs with morphospaces panel)",
         default="CO_Raup",
-        get=_get_morphospace_name,
-        set=_set_morphospace_name,
+        get=get_property("bpy.context.scene.traitblender_setup.available_morphospaces", object_dependencies=None, default="CO_Raup"),
+        set=set_property("bpy.context.scene.traitblender_setup.available_morphospaces", object_dependencies=None, fail_silently=True),
     )
 
     hyperparams_state: StringProperty(
