@@ -109,11 +109,11 @@ transforms.undo()
 specimen = bpy.data.objects["species_name"]
 
 # Position relative to table center
-specimen.tb_coords = (0.0, 0.0, 0.0)  # Center of table
+specimen.tb_location = (0.0, 0.0, 0.0)  # Center of table
 specimen.tb_rotation = (0.0, 0.0, 0.0)  # Aligned with table
 
 # Move to different position
-specimen.tb_coords = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
+specimen.tb_location = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
 ```
 
 ### 7. Export/Import Configuration
@@ -169,7 +169,7 @@ for species_name in dataset.rownames:
     
     # Position on table
     specimen = bpy.data.objects[species_name]
-    specimen.tb_coords = (0.0, 0.0, 0.0)
+    specimen.tb_location = (0.0, 0.0, 0.0)
     
     # Optional: Apply transforms for variation
     transforms = config.transforms
@@ -316,7 +316,7 @@ print(config_yaml)
 
 ### Tips for API Usage:
 - Always run `setup_scene()` before using other features
-- Use table coordinates (`tb_coords`) for consistent positioning
+- Use table coordinates (`tb_location`) for consistent positioning
 - Serialize configurations to YAML for reproducibility
 - Test transforms on single specimens before batch processing
 - Use try/except blocks for robust error handling

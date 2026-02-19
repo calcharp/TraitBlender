@@ -41,9 +41,9 @@ def z_dist_to_lowest(obj):
     return origin_z - lowest_z
 
 
-def world_to_table_coords(world_point, precision=4):
+def world_to_tb_location(world_point, precision=4):
     """
-    Convert a world-space point to the Table's local coordinate system (tb_coords).
+    Convert a world-space point to the Table's local coordinate system (tb_location).
 
     Args:
         world_point (Vector): A mathutils.Vector in world-space.
@@ -65,9 +65,6 @@ def world_to_table_coords(world_point, precision=4):
     return (round(local.x, precision),
             round(local.y, precision),
             round(local.z, precision))
-
-
-
 
 
 def get_table_axes_coords(length=1.0, precision=4):
@@ -96,8 +93,6 @@ def get_table_axes_coords(length=1.0, precision=4):
 
     # include lift for each axis (if needed, using z_dist_to_lowest on a sample object)
     return {
-        axis: world_to_table_coords(pt, precision)
+        axis: world_to_tb_location(pt, precision)
         for axis, pt in axes_world.items()
     }
-
-

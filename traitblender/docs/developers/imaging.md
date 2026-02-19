@@ -359,7 +359,7 @@ blender --background scene.blend --python render_script.py
 **Problem: Renders are blank/black**
 - Check camera position (`config.camera.location`)
 - Verify lamp power (`config.lamp.power`)
-- Ensure specimen is positioned on table (`obj.tb_coords`)
+- Ensure specimen is positioned on table (`obj.tb_location`)
 
 **Problem: Renders are slow**
 - Switch to EEVEE engine

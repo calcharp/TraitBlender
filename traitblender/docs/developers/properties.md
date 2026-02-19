@@ -11,7 +11,7 @@ Properties in TraitBlender are Blender property groups and custom properties tha
 **Key Principle**: Properties don't exist as standalone Python variables. They are **tied to either the scene or to particular objects**:
 
 - **Scene-level properties**: Registered on `bpy.types.Scene` (e.g., `context.scene.traitblender_config`)
-- **Object-level properties**: Registered on `bpy.types.Object` (e.g., `obj.tb_coords`)
+- **Object-level properties**: Registered on `bpy.types.Object` (e.g., `obj.tb_location`)
 
 Properties are registered with Blender's type system, making them accessible throughout the add-on and persistent across Blender sessions. They become part of Blender's data model, not just temporary Python variables, so they can be saved and exported with the rest of the scene via the .blend file.
 
@@ -31,7 +31,7 @@ Properties in `ui/properties/` typically follow this pattern:
 1. **Define data structures** using `bpy.types.PropertyGroup`
 2. **Register with Blender** using `bpy.props.PointerProperty` or direct registration
 3. **Store TraitBlender state** (configuration, datasets, setup options)
-4. **Provide custom properties** on Blender objects (like `tb_coords`, `tb_rotation`)
+4. **Provide custom properties** on Blender objects (like `tb_location`, `tb_rotation`)
 
 **Example**:
 ```python

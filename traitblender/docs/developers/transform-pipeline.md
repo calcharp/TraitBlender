@@ -35,7 +35,7 @@ The pipeline includes 10 statistical distributions (uniform, normal, beta, gamma
 
 ## Transform Class
 
-The `Transform` class (in `core/transforms/transforms.py`) represents a single property randomization. Each transform has:
+The `Transform` class (in `core/transforms/transform.py`) represents a single property randomization. Each transform has:
 
 - **Property path**: Which config property to randomize (e.g., `"world.color"`, `"camera.location[2]"`)
 - **Sampler name**: Which statistical distribution to use (e.g., `"uniform"`, `"normal"`)

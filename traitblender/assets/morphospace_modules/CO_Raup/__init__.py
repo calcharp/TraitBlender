@@ -58,7 +58,7 @@ def _orient_default(sample_obj):
     if apex_world != (0.0, 0.0, 0.0):
         set_origin_at_location(sample_obj, apex_world)
 
-    sample_obj.tb_coords = (0.0, 0.0, 0.0)
+    sample_obj.tb_location = (0.0, 0.0, 0.0)
 
     t_val = 0
     try:
@@ -82,7 +82,7 @@ def _orient_default(sample_obj):
 
     
     # Ensure centered on table after rotation
-    sample_obj.tb_coords = (0.0, 0.0, 0.0)
+    sample_obj.tb_location = (0.0, 0.0, 0.0)
     bpy.context.view_layer.update()
 
 
@@ -104,7 +104,7 @@ def _orient_geometric_center_xflipped(sample_obj):
     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
 
     # Ensure centered on table after rotation
-    sample_obj.tb_coords = (0.0, 0.0, 0.0)
+    sample_obj.tb_location = (0.0, 0.0, 0.0)
     bpy.context.view_layer.update()
 
 

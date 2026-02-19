@@ -32,7 +32,7 @@ from .transforms import (
 )
 
 from .positioning import (
-    world_to_table_coords,
+    world_to_tb_location,
     get_depsgraph,
 )
 
@@ -58,7 +58,7 @@ __all__ = [
     "clear_scene",
     
     # Positioning
-    "world_to_table_coords",
+    "world_to_tb_location",
     "get_depsgraph",
     # Transforms
     "SAMPLERS",

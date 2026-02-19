@@ -1,9 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - TRANSFORMS
-- core/transforms/samplers.py
-- core/transforms/transform.py
-- core/transforms/transforms.py
 - core/transforms/dpg_transforms_editor/__init__.py
 - core/transforms/dpg_transforms_editor/property_dimension_helper.py
 - core/transforms/dpg_transforms_editor/property_helper.py
@@ -44,7 +41,7 @@ UI - PROPERTIES
 - ui/properties/morphospace_hyperparams.py
 - ui/properties/orientation_properties.py
 - ui/properties/setup_properties.py
-- ui/properties/table_coords.py
+- ui/properties/tb_location.py
 - ui/properties/table_rotations.py
 
 

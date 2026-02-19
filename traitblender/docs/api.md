@@ -310,7 +310,7 @@
     - A dataset sample must be selected (via `traitblender_dataset.sample`)
     - Dataset must be loaded with data
     
-    **Note**: The generated object is automatically positioned at the center of the table (tb_coords = (0, 0, 0)) and named after the selected sample.
+    **Note**: The generated object is automatically positioned at the center of the table (tb_location = (0, 0, 0)) and named after the selected sample.
     
     **Example**:
     ```python
@@ -765,7 +765,7 @@
     
     ## Object Properties
     
-    **`bpy.data.objects["ObjectName"].tb_coords`**
+    **`bpy.data.objects["ObjectName"].tb_location`**
     
     Table coordinates property for positioning objects relative to the table surface.
     
@@ -778,14 +778,14 @@
     obj = bpy.data.objects["MySpecimen"]
     
     # Get current table coordinates
-    coords = obj.tb_coords
+    coords = obj.tb_location
     print(f"Table coordinates: {coords}")
     
     # Set position at table center
-    obj.tb_coords = (0.0, 0.0, 0.0)
+    obj.tb_location = (0.0, 0.0, 0.0)
     
     # Move 1 meter along X axis
-    obj.tb_coords = (1.0, 0.0, 0.0)
+    obj.tb_location = (1.0, 0.0, 0.0)
     ```
     
     ---
@@ -818,7 +818,7 @@
     
     ```python
     obj = bpy.data.objects["MySpecimen"]
-    obj.tb_coords = (0.0, 0.0, 0.0)
+    obj.tb_location = (0.0, 0.0, 0.0)
     obj.tb_rotation = (0.0, 0.0, 0.0)
     ```
     

@@ -94,7 +94,7 @@ This page provides detailed documentation for developers working on TraitBlender
     
     ## How It Works
     
-    ### Table Coordinates (`tb_coords`)
+    ### Table Coordinates (`tb_location`)
     
     A custom `FloatVectorProperty` on all objects that represents position relative to the Table's top face center:
     - **Getter**: Calculates object's position in table's local coordinate system
@@ -118,9 +118,9 @@ This page provides detailed documentation for developers working on TraitBlender
     
     ## Key Components
     
-    - **`ui/properties/table_coords.py`**: `tb_coords` property registration
+    - **`ui/properties/tb_location.py`**: `tb_location` property registration
     - **`ui/properties/table_rotations.py`**: `tb_rotation` property registration
-    - **`core/positioning/get_table_coords.py`**: Coordinate transformation utilities
+    - **`core/positioning/get_tb_location.py`**: Coordinate transformation utilities
     - **`core/positioning/origins.py`**: Origin calculation functions
     
     ## Adding a New Origin Type
@@ -143,14 +143,14 @@ This page provides detailed documentation for developers working on TraitBlender
     
     ## Common Pitfalls
     
-    - **Table Object Missing**: `tb_coords` getter/setter check for Table object, but operations may fail if Table doesn't exist
+    - **Table Object Missing**: `tb_location` getter/setter check for Table object, but operations may fail if Table doesn't exist
     - **Coordinate System**: Table coordinates use table's rotation, not world axes. Objects rotate with table.
     - **Bottom-Center Calculation**: `tb_rotation` uses lowest Z vertex, which may not be accurate for all object types
     
     ## Related Systems
     
     - [Orientations Config](#configuration-system): Uses origin functions for positioning
-    - [Morphospace Development](#morphospace-development): Generated objects use `tb_coords` for placement
+    - [Morphospace Development](#morphospace-development): Generated objects use `tb_location` for placement
 
 ---
 
@@ -191,7 +191,7 @@ This page provides detailed documentation for developers working on TraitBlender
     
     - **`core/transforms/registry.py`**: Transform registry and sampler functions
     - **`core/transforms/transform_registry_decorator.py`**: `@register_transform` decorator
-    - **`core/transforms/transforms.py`**: `Transform` class
+    - **`core/transforms/transform.py`**: `Transform` class
     - **`core/transforms/transform_pipeline.py`**: `TransformPipeline` class
     - **`core/config/config_templates/transforms.py`**: Config integration
     
@@ -302,7 +302,7 @@ This page provides detailed documentation for developers working on TraitBlender
     ## Related Systems
     
     - [Dataset Management](#dataset-management): Provides data to morphospaces
-    - [Positioning System](#scene-assets): Generated objects use `tb_coords` for placement
+    - [Positioning System](#scene-assets): Generated objects use `tb_location` for placement
 
 ---
 

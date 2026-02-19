@@ -4,7 +4,7 @@ TraitBlender Transform Pipeline
 A factory pipeline for creating and managing multiple transforms.
 """
 
-from .transforms import Transform
+from .transform import Transform
 
 
 class TransformPipeline:

@@ -84,7 +84,7 @@ Morphospace System
    sample_obj.to_blender()
    ↓
 9. Position on table
-   obj.tb_coords = (0, 0, 0)
+   obj.tb_location = (0, 0, 0)
    obj.tb_rotation = (0, 0, 0)
 ```
 
@@ -159,7 +159,7 @@ Morphospaces **must** export an `ORIENTATIONS` dict with at least a callable `"D
 ```python
 def _orient_default(sample_obj):
     """Center on table, rotate so aperture face is orthogonal to table Y axis."""
-    sample_obj.tb_coords = (0.0, 0.0, 0.0)
+    sample_obj.tb_location = (0.0, 0.0, 0.0)
     # ... compute aperture plane from vertex group, rotate to align ...
 
 ORIENTATIONS = {

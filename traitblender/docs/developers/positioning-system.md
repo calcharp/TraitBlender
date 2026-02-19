@@ -8,7 +8,7 @@ The Positioning System provides a table-centric coordinate system for precise sp
 
 **Key Features:**
 
-- **Table Coordinates (`tb_coords`)**: Position objects relative to table surface (0,0,0 = table center)
+- **Table Coordinates (`tb_location`)**: Position objects relative to table surface (0,0,0 = table center)
 - **Table Rotation (`tb_rotation`)**: Rotate objects around their bottom-center pivot point
 - **Custom Origins (`PLACEMENT_LOCAL_ORIGINS_TB`)**: Four origin calculation methods for morphological consistency
 - **Automatic Z-Calculation**: Objects automatically placed on table surface
@@ -29,7 +29,7 @@ The Positioning System provides a table-centric coordinate system for precise sp
 
 ```
 Positioning System
-├── Table Coordinates (tb_coords)
+├── Table Coordinates (tb_location)
 │   ├── Custom FloatVectorProperty (3D vector)
 │   ├── Getter: world → table space
 │   ├── Setter: table → world space
@@ -50,18 +50,18 @@ Positioning System
 └── Coordinate Utilities
     ├── get_table_top_center(): Find table center in world space
     ├── z_dist_to_lowest(): Distance from origin to lowest point
-    └── world_to_table_coords(): Coordinate transformation
+    └── world_to_tb_location(): Coordinate transformation
 ```
 
 ### Data Flow
 
 ```
 1. User positions specimen in table space
-   obj.tb_coords = (0.5, 0.5, 0)  # X, Y, Z in table space
+   obj.tb_location = (0.5, 0.5, 0)  # X, Y, Z in table space
    ↓
 2. Setter converts to world space
    table_center = get_table_top_center()
-   world_pos = table_center + tb_coords
+   world_pos = table_center + tb_location
    ↓
 3. Auto-calculate Z (on table surface)
    z_offset = z_dist_to_lowest(obj, origin_type)
@@ -71,16 +71,16 @@ Positioning System
    obj.location = world_pos
    ↓
 5. Getter converts back to table space (for display)
-   tb_coords = world_to_table_coords(obj.location)
+   tb_location = world_to_tb_location(obj.location)
 ```
 
 ---
 
-## Table Coordinates (`tb_coords`)
+## Table Coordinates (`tb_location`)
 
 ### Overview
 
-`tb_coords` is a custom `FloatVectorProperty` registered on `bpy.types.Object` that provides a table-centric coordinate system. Objects are positioned relative to the table surface rather than world origin.
+`tb_location` is a custom `FloatVectorProperty` registered on `bpy.types.Object` that provides a table-centric coordinate system. Objects are positioned relative to the table surface rather than world origin.
 
 **Convention:**
 - **(0, 0, 0)**: Center of table surface
@@ -90,18 +90,18 @@ Positioning System
 
 ### Registration
 
-Defined in `ui/properties/table_coords.py`:
+Defined in `ui/properties/tb_location.py`:
 
 ```python
-bpy.types.Object.tb_coords = FloatVectorProperty(
+bpy.types.Object.tb_location = FloatVectorProperty(
     name="Table Coordinates",
     description="Position relative to table center (X, Y, Z in table space)",
     size=3,
     default=(0.0, 0.0, 0.0),
     subtype='TRANSLATION',
     unit='LENGTH',
-    get=get_tb_coords,
-    set=set_tb_coords
+    get=_get_tb_location,
+    set=_set_tb_location
 )
 ```
 
@@ -111,12 +111,12 @@ bpy.types.Object.tb_coords = FloatVectorProperty(
 - `unit='LENGTH'`: Uses scene units (meters)
 - `get/set`: Custom getters/setters for coordinate transformation
 
-### The Getter: `get_tb_coords()`
+### The Getter: `get_tb_location()`
 
 Converts object's world position to table space for display:
 
 ```python
-def get_tb_coords(self):
+def get_tb_location(self):
     """
     Convert object's world position to table coordinates.
     
@@ -146,16 +146,16 @@ def get_tb_coords(self):
 3. Return table-relative position
 
 **When it's called:**
-- When UI displays `tb_coords` property
-- When reading `obj.tb_coords` in Python
+- When UI displays `tb_location` property
+- When reading `obj.tb_location` in Python
 - After object is moved (for UI update)
 
-### The Setter: `set_tb_coords()`
+### The Setter: `set_tb_location()`
 
 Converts table coordinates to world position and places object on table:
 
 ```python
-def set_tb_coords(self, value):
+def _set_tb_location(self, value):
     """
     Set object position from table coordinates.
     
@@ -193,8 +193,8 @@ def set_tb_coords(self, value):
 5. Set object's world position
 
 **When it's called:**
-- When user changes `tb_coords` in UI
-- When setting `obj.tb_coords = (x, y, z)` in Python
+- When user changes `tb_location` in UI
+- When setting `obj.tb_location = (x, y, z)` in Python
 - During specimen generation (initial placement)
 
 ### Z-Offset Calculation
@@ -686,12 +686,12 @@ obj.location = center
 obj.location.z += z_dist_to_lowest(obj, "MEAN")
 ```
 
-### `world_to_table_coords()`
+### `world_to_tb_location()`
 
 Converts world position to table coordinates.
 
 ```python
-def world_to_table_coords(world_pos):
+def world_to_tb_location(world_pos):
     """
     Convert world position to table coordinates.
     
@@ -716,11 +716,11 @@ def world_to_table_coords(world_pos):
 obj.location = (10, 5, 3)
 
 # Convert to table space
-tb_coords = world_to_table_coords(obj.location)
-print(f"Table coords: {tb_coords}")
+tb_location = world_to_tb_location(obj.location)
+print(f"Table coords: {tb_location}")
 
 # Can also use property
-print(f"Same as: {obj.tb_coords}")
+print(f"Same as: {obj.tb_location}")
 ```
 
 ### `z_dist_to_lowest()`

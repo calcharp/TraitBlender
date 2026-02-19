@@ -4,7 +4,7 @@ from ...helpers import get_property, set_property
 
 
 def _sample_object_path(attr):
-    """Return path_getter (self) -> str | None for sample object's attribute (tb_coords, tb_rotation)."""
+    """Return path_getter (self) -> str | None for sample object's attribute (tb_location, tb_rotation)."""
 
     def path_getter(self):
         try:
@@ -34,14 +34,14 @@ class SampleConfig(TraitBlenderConfig):
         set=set_property("", path_getter=_sample_object_path("tb_rotation"), fail_silently=True),
     )
 
-    tb_coords: bpy.props.FloatVectorProperty(
+    tb_location: bpy.props.FloatVectorProperty(
         name="Sample Position",
-        description="Table coordinates of the generated sample object",
+        description="Table location of the generated sample object",
         default=(0.0, 0.0, 0.0),
         subtype='TRANSLATION',
         size=3,
-        get=get_property("", path_getter=_sample_object_path("tb_coords"), default=(0.0, 0.0, 0.0)),
-        set=set_property("", path_getter=_sample_object_path("tb_coords"), fail_silently=True),
+        get=get_property("", path_getter=_sample_object_path("tb_location"), default=(0.0, 0.0, 0.0)),
+        set=set_property("", path_getter=_sample_object_path("tb_location"), fail_silently=True),
     )
 
     def _to_yaml(self, indent_level=0, parent_path=""):

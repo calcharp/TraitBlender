@@ -6,29 +6,8 @@ import copy
 import bpy
 from mathutils import Euler, Vector
 
+from ..helpers import resolve_config_path, parse_component_path
 from .samplers import SAMPLERS, SAMPLER_ALLOWED_PATHS
-
-
-def _resolve_path(path):
-    """Resolve path to config property."""
-    return "bpy.context.scene.traitblender_config." + path
-
-
-_COMPONENT_TO_INDEX = {
-    "x": 0, "y": 1, "z": 2,
-    "r": 0, "g": 1, "b": 2, "a": 3,
-}
-
-
-def _parse_component_path(path):
-    """If path has 3+ parts and last is x/y/z or r/g/b/a, return (parent_path, index). Else None."""
-    parts = path.split(".")
-    if len(parts) < 3:
-        return None
-    last = parts[-1].lower()
-    if last in _COMPONENT_TO_INDEX:
-        return ".".join(parts[:-1]), _COMPONENT_TO_INDEX[last]
-    return None
 
 
 class Transform:
@@ -57,15 +36,15 @@ class Transform:
         self.property_path = property_path
         self.sampler_name = sampler_name
         self.params = params or {}
-        self._full_path = _resolve_path(property_path)
+        self._full_path = resolve_config_path(property_path)
         self._cache_stack = []
 
     def _get_property_value(self):
         try:
-            parsed = _parse_component_path(self.property_path)
+            parsed = parse_component_path(self.property_path)
             if parsed:
                 parent_path, idx = parsed
-                full_parent = _resolve_path(parent_path)
+                full_parent = resolve_config_path(parent_path)
                 vec = eval(full_parent, {"bpy": bpy})
                 if isinstance(vec, Euler):
                     arr = [float(vec.x), float(vec.y), float(vec.z)]
@@ -83,10 +62,10 @@ class Transform:
 
     def _set_property_value(self, value):
         try:
-            parsed = _parse_component_path(self.property_path)
+            parsed = parse_component_path(self.property_path)
             if parsed:
                 parent_path, idx = parsed
-                full_parent = _resolve_path(parent_path)
+                full_parent = resolve_config_path(parent_path)
                 vec = eval(full_parent, {"bpy": bpy})
                 # Extract components as floats (Euler/Vector need explicit extraction)
                 if isinstance(vec, Euler):

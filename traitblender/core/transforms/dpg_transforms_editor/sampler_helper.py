@@ -14,7 +14,7 @@ def get_sampler_signature(sampler_name):
         dict: Parameter info per param name (type_str, default, required)
     """
     try:
-        from ..transforms import SAMPLERS
+        from .. import SAMPLERS
         if sampler_name not in SAMPLERS:
             return {}
         func = SAMPLERS[sampler_name]

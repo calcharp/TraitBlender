@@ -4,23 +4,23 @@ The positioning system provides a custom coordinate system relative to the museu
 
 ## Table Coordinates System
 
-TraitBlender uses a custom coordinate system (`tb_coords`) that positions objects relative to the table's top surface center. This ensures consistent placement regardless of table orientation or position.
+TraitBlender uses a custom coordinate system (`tb_location`) that positions objects relative to the table's top surface center. This ensures consistent placement regardless of table orientation or position.
 
 ### Table Coordinates Property
 
-All Blender objects have a `tb_coords` property that provides table-relative positioning:
+All Blender objects have a `tb_location` property that provides table-relative positioning:
 
 ```python
 # Get an object
 obj = bpy.data.objects["MyObject"]
 
 # Position relative to table center
-obj.tb_coords = (0.0, 0.0, 0.0)  # Center of table
-obj.tb_coords = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
-obj.tb_coords = (0.0, 0.5, 0.1)  # Offset in X, Y, and Z
+obj.tb_location = (0.0, 0.0, 0.0)  # Center of table
+obj.tb_location = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
+obj.tb_location = (0.0, 0.5, 0.1)  # Offset in X, Y, and Z
 
 # Get current table coordinates
-current_pos = obj.tb_coords
+current_pos = obj.tb_location
 print(f"Table coordinates: {current_pos}")
 ```
 
@@ -36,18 +36,18 @@ obj.tb_rotation = (0.0, 0.0, 1.57)  # 90 degrees around table's Z axis
 
 ## Coordinate Conversion Functions
 
-### world_to_table_coords
+### world_to_tb_location
 
-Convert a world-space point to table coordinates.
+Convert a world-space point to table location (tb_location coordinates).
 
 ```python
-from core.positioning import world_to_table_coords
+from core.positioning import world_to_tb_location
 from mathutils import Vector
 
-# Convert world position to table coordinates
+# Convert world position to table location
 world_point = Vector((1.0, 2.0, 3.0))
-table_coords = world_to_table_coords(world_point)
-print(f"Table coordinates: {table_coords}")
+tb_location = world_to_tb_location(world_point)
+print(f"Table location: {tb_location}")
 ```
 
 **Parameters:**
@@ -103,16 +103,16 @@ bpy.ops.traitblender.generate_morphospace_sample()
 specimen = bpy.data.objects["species_name"]
 
 # Position at table center
-specimen.tb_coords = (0.0, 0.0, 0.0)
+specimen.tb_location = (0.0, 0.0, 0.0)
 
 # Move to different position
-specimen.tb_coords = (0.3, 0.0, 0.0)  # 0.3 units along table X axis
+specimen.tb_location = (0.3, 0.0, 0.0)  # 0.3 units along table X axis
 ```
 
 ### Converting Between Coordinate Systems
 
 ```python
-from core.positioning import world_to_table_coords, get_table_top_center
+from core.positioning import world_to_tb_location, get_table_top_center
 from mathutils import Vector
 
 # Get table center in world space
@@ -120,11 +120,11 @@ table_center = get_table_top_center()
 
 # Convert world position to table coordinates
 world_pos = Vector((1.5, 2.0, 0.5))
-table_pos = world_to_table_coords(world_pos)
+table_pos = world_to_tb_location(world_pos)
 
 # Use table coordinates to position object
 obj = bpy.data.objects["MyObject"]
-obj.tb_coords = table_pos
+obj.tb_location = table_pos
 ```
 
 ### Working with Multiple Objects
@@ -141,7 +141,7 @@ positions = [
 for name, pos in zip(specimens, positions):
     if name in bpy.data.objects:
         obj = bpy.data.objects[name]
-        obj.tb_coords = pos
+        obj.tb_location = pos
 ```
 
 ## How Table Coordinates Work
@@ -153,7 +153,7 @@ The table coordinate system:
 3. **Z-axis**: Normal to the table surface (upward)
 4. **Automatic lift**: Accounts for object's lowest vertex to place on table surface
 
-When you set `obj.tb_coords = (x, y, z)`:
+When you set `obj.tb_location = (x, y, z)`:
 - `x, y`: Position along table surface
 - `z`: Height above/below table surface
 - The object is automatically lifted so its bottom touches the table
@@ -168,10 +168,10 @@ bpy.ops.traitblender.generate_morphospace_sample()
 
 # The specimen is automatically set to table center
 specimen = bpy.data.objects[dataset.sample]
-print(f"Initial position: {specimen.tb_coords}")  # (0.0, 0.0, 0.0)
+print(f"Initial position: {specimen.tb_location}")  # (0.0, 0.0, 0.0)
 
 # Adjust position
-specimen.tb_coords = (0.2, 0.0, 0.0)  # Move along table X axis
+specimen.tb_location = (0.2, 0.0, 0.0)  # Move along table X axis
 ```
 
 ## Best Practices
@@ -187,7 +187,7 @@ The table coordinate system requires the "Table" object to exist in the scene:
 
 ```python
 try:
-    obj.tb_coords = (0.0, 0.0, 0.0)
+    obj.tb_location = (0.0, 0.0, 0.0)
 except RuntimeError as e:
     print(f"Error: Table object not found. Run bpy.ops.traitblender.setup_scene() first")
 ```
