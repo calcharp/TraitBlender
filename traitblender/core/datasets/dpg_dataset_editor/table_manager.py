@@ -204,8 +204,18 @@ class TableManager:
             parent="row_ops_dialog"
         )
         dpg.add_spacer(height=5, parent="row_ops_dialog")
+
+        # Copy Row button
+        dpg.add_button(
+            label="Copy Row",
+            callback=self.copy_row_direct,
+            width=-1,
+            height=30,
+            parent="row_ops_dialog"
+        )
+        dpg.add_spacer(height=5, parent="row_ops_dialog")
         
-        # Insert button
+        # Insert Row button
         dpg.add_button(
             label="Insert Row",
             callback=lambda: self.insert_row_direct(above=True),
@@ -245,7 +255,23 @@ class TableManager:
         
         # Close the dialog
         dpg.delete_item("row_ops_dialog")
-    
+
+    def copy_row_direct(self):
+        """Copy the selected row (insert below) using data_manager.copy_row."""
+        if self.data_manager.df_display is not None and self.selected_row_index is not None:
+            success = self.data_manager.copy_row(
+                self.selected_row_index,
+                above_index=self.selected_row_index + 1
+            )
+            if success:
+                self.current_page = 0
+                self.update_display()
+            else:
+                print("Failed to copy row")
+        else:
+            print("No data or selected row index not found")
+        dpg.delete_item("row_ops_dialog")
+
     def insert_row_direct(self, above=True):
         """Insert row directly with position choice"""
         print(f"Insert row direct called - above: {above}")

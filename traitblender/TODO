@@ -1,8 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - DATASETS
-- core/datasets/dpg_dataset_editor/__init__.py
-- core/datasets/dpg_dataset_editor/csv_viewer.py
 - core/datasets/dpg_dataset_editor/data_manager.py
 - core/datasets/dpg_dataset_editor/filter_manager.py
 - core/datasets/dpg_dataset_editor/table_manager.py

@@ -44,12 +44,6 @@ class CSVViewer:
             self.table_manager
         )
         
-        # Only create default data if no data is already loaded
-        if self.data_manager.df_original is None:
-            self.data_manager.create_default_data()
-            # Update filter dropdowns with the default data
-            self.filter_manager.update_filter_dropdown()
-    
     def run(self, window_title="CSV Viewer"):
         """Run the application"""
         self.create_gui()

@@ -30,21 +30,6 @@ class DataManager:
             print(f"Error loading CSV from string: {e}")
             return False
     
-    def create_default_data(self):
-        """Create default data for the filter dropdowns"""
-        # Create a simple default dataframe with mixed data types
-        data = {
-            'Species': ['Species A', 'Species B', 'Species C', 'Species D', 'Species E'],
-            'Body_Mass_g': [100.5, 250.0, 75.2, 500.0, 150.8],
-            'Max_Lifespan_years': [10, 15, 8, 20, 12],
-            'Feeding_Type': ['Carnivore', 'Herbivore', 'Omnivore', 'Carnivore', 'Herbivore'],
-            'Is_Endangered': [True, False, True, False, True],
-            'Is_Nocturnal': [False, True, False, True, False]
-        }
-        
-        self.df_original = pd.DataFrame(data)
-        self.df_display = self.df_original.copy()
-    
     def save_changes(self):
         """Save current display state as the new original"""
         if self.df_display is not None:
@@ -161,7 +146,28 @@ class DataManager:
         ]).reset_index(drop=True)
         
         return True
-    
+
+    def copy_row(self, source_row_index, above_index=None):
+        """Add a new row by copying values from an existing row."""
+        if self.df_display is None or source_row_index >= len(self.df_display):
+            return False
+
+        new_row = self.df_display.iloc[source_row_index].to_dict()
+        new_row_df = pd.DataFrame([new_row])
+
+        if above_index is not None:
+            insert_pos = above_index
+        else:
+            insert_pos = len(self.df_display)
+
+        self.df_display = pd.concat([
+            self.df_display.iloc[:insert_pos],
+            new_row_df,
+            self.df_display.iloc[insert_pos:]
+        ]).reset_index(drop=True)
+
+        return True
+
     def delete_row(self, row_index):
         """Delete a row from the dataframe"""
         if self.df_display is None or row_index >= len(self.df_display):
