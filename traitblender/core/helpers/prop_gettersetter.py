@@ -77,12 +77,13 @@ def get_default(property_path: str, prop_type: str):
     return 0.0
 
 
-def get_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False, default=None):
+def get_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False, default=None, path_getter=None):
     """Create a getter function for a Blender property.
     
     Args:
         property_path (str): The Blender property path (e.g., 
-                           'bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value')
+                           'bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value').
+                           Ignored when path_getter is provided.
         options (list, optional): List of enum options for pattern matching. If provided, 
                                  the getter will return an int index instead of a string.
         object_dependencies (dict, optional): Dictionary mapping object types to lists of required names.
@@ -90,6 +91,8 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
                                             Example: {"objects": ["Camera"], "cameras": ["Camera"]}
         strict_error_reporting (bool, optional): If True, raises RuntimeError with property path instead of warning.
         default: Optional value to return when deps missing or eval fails. If None, uses type-based default.
+        path_getter (callable, optional): (self) -> str | None. Returns the property path at runtime.
+                                         When None, uses default. Use for dynamic paths (e.g. sample object).
     
     Returns:
         function: A getter function that returns the value of the specified Blender property
@@ -108,17 +111,21 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
         >>> value = getter(self)  # Returns None if Camera doesn't exist
     """
     
-    prop_type = get_property_type(property_path, in_config=False)
+    prop_type = get_property_type(property_path, in_config=False) if not path_getter else "FloatVectorProperty"
     
     def get(self):
+        path = path_getter(self) if path_getter else property_path
+        if path is None:
+            val = default if default is not None else (0.0, 0.0, 0.0)
+            return val if options is None else 0
         if not _check_object_dependencies(object_dependencies):
-            val = default if default is not None else get_default(property_path, prop_type)
+            val = default if default is not None else get_default(path, prop_type)
             if strict_error_reporting:
-                raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
-            warnings.warn(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()", UserWarning)
+                raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
+            warnings.warn(f"[TraitBlender] Missing required Blender objects for property: {path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()", UserWarning)
             return val if options is None else 0
         try:
-            value = eval(property_path)
+            value = eval(path)
             # If options are provided, treat this as an enum and return the index
             if options is not None:
                 if value not in options:
@@ -126,20 +133,21 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
                 return options.index(value)
             return value
         except Exception as e:
-            val = default if default is not None else get_default(property_path, prop_type)
+            val = default if default is not None else get_default(path, prop_type)
             if strict_error_reporting:
-                raise RuntimeError(f"[TraitBlender] Error accessing property: {property_path}\nError: {str(e)}")
-            warnings.warn(f"[TraitBlender] Error accessing property: {property_path}", UserWarning)
+                raise RuntimeError(f"[TraitBlender] Error accessing property: {path}\nError: {str(e)}")
+            warnings.warn(f"[TraitBlender] Error accessing property: {path}", UserWarning)
             return val if options is None else 0
     return get
 
 
-def set_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False, fail_silently: bool = False):
+def set_property(property_path: str, options: list = None, object_dependencies: dict = None, strict_error_reporting: bool = False, fail_silently: bool = False, path_getter=None):
     """Create a setter function for a Blender property.
     
     Args:
         property_path (str): The Blender property path (e.g., 
-                           'bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value')
+                           'bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value').
+                           Ignored when path_getter is provided.
         options (list, optional): List of enum options for pattern matching. If provided, 
                                  the setter will convert integer indices to string values.
         object_dependencies (dict, optional): Dictionary mapping object types to lists of required names.
@@ -148,6 +156,8 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
         strict_error_reporting (bool, optional): If True, raises RuntimeError with property path instead of warning.
                                                Useful for debugging type mismatches.
         fail_silently (bool, optional): If True, on exception returns without raising. Use when target may not exist.
+        path_getter (callable, optional): (self) -> str | None. Returns the property path at runtime.
+                                         When None, does nothing. Use for dynamic paths (e.g. sample object).
     
     Returns:
         function: A setter function that sets the value of the specified Blender property
@@ -166,9 +176,12 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
         >>> setter(self, 1)  # Does nothing if Camera doesn't exist
     """
     def set(self, value):
+        path = path_getter(self) if path_getter else property_path
+        if path is None:
+            return  # No valid path (e.g. no sample selected)
         if not _check_object_dependencies(object_dependencies):
             if strict_error_reporting:
-                raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {property_path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
+                raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
             return  # Silently do nothing if dependencies are missing
         
         try:
@@ -182,13 +195,13 @@ def set_property(property_path: str, options: list = None, object_dependencies: 
                     raise RuntimeError(f"Enum value '{value}' not found in options list: {options}")
             
             # Use exec with bpy and value in the namespace for complex Blender properties
-            exec(f"{property_path} = value", {"bpy": bpy, "value": value})
+            exec(f"{path} = value", {"bpy": bpy, "value": value})
         except Exception as e:
             if fail_silently:
                 return
             import traceback
             if strict_error_reporting:
-                raise RuntimeError(f"[TraitBlender] Error setting property '{property_path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}")
-            warnings.warn(f"Error setting property '{property_path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}", UserWarning)
-            raise RuntimeError(f"Failed to set value for property '{property_path}': {e}")
+                raise RuntimeError(f"[TraitBlender] Error setting property '{path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}")
+            warnings.warn(f"Error setting property '{path}' to value '{value}': {e}\nTraceback: {traceback.format_exc()}", UserWarning)
+            raise RuntimeError(f"Failed to set value for property '{path}': {e}")
     return set

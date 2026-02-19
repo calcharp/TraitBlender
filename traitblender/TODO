@@ -1,7 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - CONFIG
-- core/config/templates/sample.py
 - core/config/templates/transforms.py
 - core/config/templates/world.py
 

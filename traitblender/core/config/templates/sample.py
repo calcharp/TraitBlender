@@ -1,43 +1,49 @@
 import bpy
 from .. import config_subsection_register, TraitBlenderConfig
+from ...helpers import get_property, set_property
+
+
+def _sample_object_path(attr):
+    """Return path_getter (self) -> str | None for sample object's attribute (tb_coords, tb_rotation)."""
+
+    def path_getter(self):
+        try:
+            name = bpy.context.scene.traitblender_dataset.sample
+            if name and name in bpy.data.objects:
+                return f"bpy.data.objects['{name}'].{attr}"
+        except Exception:
+            pass
+        return None
+
+    return path_getter
 
 
 @config_subsection_register("sample")
 class SampleConfig(TraitBlenderConfig):
     print_index = 8
-    
+
     # This configuration should not appear in the config file
     # It's only for UI controls in the datasets panel
-    
-    def _get_sample_object_name(self):
-        """Get the current sample object name from the dataset."""
-        try:
-            return bpy.context.scene.traitblender_dataset.sample
-        except:
-            return None
-    
-    def _get_rotation(self):
-        """Get the rotation of the current sample object."""
-        obj_name = self._get_sample_object_name()
-        if obj_name and obj_name in bpy.data.objects:
-            return bpy.data.objects[obj_name].rotation_euler
-        return (0.0, 0.0, 0.0)
-    
-    def _set_rotation(self, value):
-        """Set the rotation of the current sample object."""
-        obj_name = self._get_sample_object_name()
-        if obj_name and obj_name in bpy.data.objects:
-            bpy.data.objects[obj_name].rotation_euler = value
-    
-    rotation: bpy.props.FloatVectorProperty(
+
+    tb_rotation: bpy.props.FloatVectorProperty(
         name="Sample Rotation",
         description="The rotation of the generated sample object",
         default=(0.0, 0.0, 0.0),
         subtype='EULER',
-        get=lambda self: self._get_rotation(),
-        set=lambda self, value: self._set_rotation(value)
+        get=get_property("", path_getter=_sample_object_path("tb_rotation"), default=(0.0, 0.0, 0.0)),
+        set=set_property("", path_getter=_sample_object_path("tb_rotation"), fail_silently=True),
     )
-    
+
+    tb_coords: bpy.props.FloatVectorProperty(
+        name="Sample Position",
+        description="Table coordinates of the generated sample object",
+        default=(0.0, 0.0, 0.0),
+        subtype='TRANSLATION',
+        size=3,
+        get=get_property("", path_getter=_sample_object_path("tb_coords"), default=(0.0, 0.0, 0.0)),
+        set=set_property("", path_getter=_sample_object_path("tb_coords"), fail_silently=True),
+    )
+
     def _to_yaml(self, indent_level=0, parent_path=""):
         """Override to prevent this configuration from appearing in YAML output."""
-        return ""  # Return empty string so it doesn't appear in config file 
+        return ""
