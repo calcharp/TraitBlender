@@ -1,8 +1,8 @@
 import bpy
-from ..register_config import register, TraitBlenderConfig
+from .. import config_subsection_register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
-@register("world")
+@config_subsection_register("world")
 class WorldConfig(TraitBlenderConfig):
     print_index = 1
     

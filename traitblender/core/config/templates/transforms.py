@@ -2,9 +2,9 @@ import bpy
 from bpy.props import StringProperty
 from ...transforms.pipeline import TransformPipeline
 import yaml
-from ..register_config import register, TraitBlenderConfig
+from .. import config_subsection_register, TraitBlenderConfig
 
-@register("transforms")
+@config_subsection_register("transforms")
 class TransformPipelineConfig(TraitBlenderConfig):
     pipeline_state: StringProperty(
         name="Pipeline State",

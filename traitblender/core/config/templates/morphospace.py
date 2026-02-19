@@ -9,7 +9,7 @@ Defaults are defined by each morphospace module's HYPERPARAMETERS export.
 import bpy
 from bpy.props import StringProperty
 import yaml
-from ..register_config import register, TraitBlenderConfig
+from .. import config_subsection_register, TraitBlenderConfig
 from ...morphospaces import get_hyperparameters_for_morphospace
 
 
@@ -29,7 +29,7 @@ def _set_morphospace_name(self, value):
         pass
 
 
-@register("morphospace")
+@config_subsection_register("morphospace")
 class MorphospaceConfig(TraitBlenderConfig):
     """Stores morphospace selection and hyperparameter overrides per morphospace."""
 

@@ -1,17 +1,9 @@
 # TraitBlender Config Module
-# Configuration management for TraitBlender 
 
-CONFIG = {}
-
-
-
-
-from .register_config import register
+from .registration import CONFIG, config_subsection_register, config_register
+from .traitblender_config import TraitBlenderConfig
 
 # Import config templates to ensure decorators are executed
-from .config_templates import configs
+from .templates import configs
 
-from .register_config import configure_traitblender
-
-
-__all__ = ["CONFIG", "register", "configure_traitblender", "configs"]
+__all__ = ["CONFIG", "config_subsection_register", "config_register", "configs", "TraitBlenderConfig"]

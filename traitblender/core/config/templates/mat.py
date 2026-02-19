@@ -1,7 +1,7 @@
 import bpy
-from ..register_config import register, TraitBlenderConfig
+from .. import config_subsection_register, TraitBlenderConfig
 from ...helpers import get_property, set_property
-@register("mat")
+@config_subsection_register("mat")
 class MatConfig(TraitBlenderConfig):
     print_index = 4
 

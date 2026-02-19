@@ -1,8 +1,8 @@
 import bpy
-from ..register_config import register, TraitBlenderConfig
+from .. import config_subsection_register, TraitBlenderConfig
 
 
-@register("sample")
+@config_subsection_register("sample")
 class SampleConfig(TraitBlenderConfig):
     print_index = 8
     

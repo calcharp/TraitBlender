@@ -1,8 +1,8 @@
 import bpy
-from ..register_config import register, TraitBlenderConfig
+from .. import config_subsection_register, TraitBlenderConfig
 from ...helpers import get_property, set_property
 
-@register("lamp")
+@config_subsection_register("lamp")
 class LampConfig(TraitBlenderConfig):
     print_index = 3
 

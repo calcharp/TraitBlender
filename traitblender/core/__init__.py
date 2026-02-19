@@ -37,7 +37,7 @@ from .positioning import (
 )
 
 # Config
-from .config import CONFIG, register, configs, configure_traitblender
+from .config import CONFIG, config_subsection_register, configs, config_register
 
 # Datasets
 from .datasets import launch_csv_viewer_with_string
@@ -65,8 +65,8 @@ __all__ = [
     
     # Config
     "CONFIG",
-    "register",
-    "configure_traitblender",
+    "config_subsection_register",
+    "config_register",
     "configs",
     
     # Datasets

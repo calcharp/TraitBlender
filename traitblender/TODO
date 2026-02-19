@@ -1,31 +1,95 @@
-✅ COMPLETED:
-- Transforms GUI fully set up
-- Interactive dataset editor working
-- TransformPipelineConfig undo functionality fixed
-- Imaging pipeline operator implemented (timer-based batch rendering)
+CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
----
+CORE - CONFIG
+- core/config/traitblender_config.py
+- core/config/registration/__init__.py
+- core/config/registration/config_subsection_register.py
+- core/config/registration/config_register.py
+- core/config/templates/__init__.py
+- core/config/templates/camera.py
+- core/config/templates/lamp.py
+- core/config/templates/mat.py
+- core/config/templates/metadata.py
+- core/config/templates/morphospace.py
+- core/config/templates/sample.py
+- core/config/templates/transforms.py
+- core/config/templates/world.py
 
-🚧 IN PROGRESS:
-- Orientations system (rotation origin functionality needs implementation)
-- Hyperparameters system testing: Need to rebuild package and import into Blender to verify changes didn't break anything (use_inner_surface, points_in_circle, time_step moved to HYPERPARAMETERS dict)
+CORE - DATASETS
+- core/datasets/__init__.py
+- core/datasets/traitblender_dataset.py
+- core/datasets/csv_viewer_module/__init__.py
+- core/datasets/csv_viewer_module/csv_viewer.py
+- core/datasets/csv_viewer_module/data_manager.py
+- core/datasets/csv_viewer_module/filter_manager.py
+- core/datasets/csv_viewer_module/table_manager.py
+- core/datasets/csv_viewer_module/ui_manager.py
 
----
+CORE - HELPERS
+- core/helpers/__init__.py
+- core/helpers/asset_manager.py
+- core/helpers/config_validator.py
+- core/helpers/import_texture.py
+- core/helpers/object_validator.py
+- core/helpers/pretty_type_hint.py
+- core/helpers/prop_gettersetter.py
+- core/helpers/property_type_checker.py
+- core/helpers/property_type_mapping.py
+- core/helpers/scene_cleaner.py
 
-Tomorrow:
-- Fix shell-specific default orientation the rest of the way (aperture alignment with Y, axis convention, etc.)
+CORE - MORPHOSPACES
+- core/morphospaces/__init__.py
+- core/morphospaces/list_morphospaces.py
 
----
+CORE - POSITIONING
+- core/positioning/__init__.py
+- core/positioning/get_table_coords.py
 
-Future enhancements and new features can be added below:
-- Get Transforms more fully fleshed out.
-- Make a plan (even if its not completed) for how to make the sampling go faster for the shell morphospace
-- Better integration with HPCs
-- Morphospace hyperparameters system: Add support for distinguishing biological traits from hyperparameters (e.g., points_in_circle, time_step, inner/outer surface flag). These should be configurable separately from dataset traits and have sensible defaults.
+CORE - TRANSFORMS
+- core/transforms/__init__.py
+- core/transforms/pipeline.py
+- core/transforms/samplers.py
+- core/transforms/transform.py
+- core/transforms/transforms.py
+- core/transforms/pipeline_editor/__init__.py
+- core/transforms/pipeline_editor/property_dimension_helper.py
+- core/transforms/pipeline_editor/property_helper.py
+- core/transforms/pipeline_editor/sampler_helper.py
+- core/transforms/pipeline_editor/transforms_editor.py
+- core/transforms/pipeline_editor/transforms_manager.py
+- core/transforms/pipeline_editor/ui_manager.py
 
+ASSETS - MORPHOSPACE MODULES
+- assets/morphospace_modules/CO_Raup/__init__.py
+- assets/morphospace_modules/CO_Raup/morphospace/__init__.py
+- assets/morphospace_modules/CO_Raup/morphospace/contreras_morphospace.py
+- assets/morphospace_modules/CO_Raup/morphospace_sample/__init__.py
+- assets/morphospace_modules/CO_Raup/morphospace_sample/contreras_morphospace_sample.py
 
+ASSETS - CONFIGS
+- assets/configs/default.yaml
 
-- Make documentation building work
+UI - OPERATORS
+- ui/__init__.py
+- ui/operators/__init__.py
+- ui/operators/apply_orientation_operator.py
+- ui/operators/clear_scene_operator.py
+- ui/operators/configure_traitblender.py
+- ui/operators/edit_dataset_operator.py
+- ui/operators/edit_transforms_operator.py
+- ui/operators/generate_morphospace_sample_operator.py
+- ui/operators/import_dataset_operator.py
+- ui/operators/setup_scene_operator.py
+- ui/operators/transforms_operators.py
 
+UI - PANELS
+- ui/panels/__init__.py
+- ui/panels/main_panel.py
 
-cls; rm -f traitblender-2.0.0.zip; blender --command extension build --source-dir ./traitblender 
+UI - PROPERTIES
+- ui/properties/__init__.py
+- ui/properties/morphospace_hyperparams.py
+- ui/properties/orientation_properties.py
+- ui/properties/setup_properties.py
+- ui/properties/table_coords.py
+- ui/properties/table_rotations.py

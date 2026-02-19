@@ -5,7 +5,7 @@ import ast
 
 def find_registered_classes():
     """
-    Dynamically discover all classes that use the @register decorator
+    Dynamically discover all classes that use the @config_subsection_register decorator
     by scanning through Python files in this directory.
     """
     config_classes = []
@@ -19,7 +19,7 @@ def find_registered_classes():
         filepath = os.path.join(current_dir, filename)
         
         try:
-            # Parse the file to find classes with @register decorator
+            # Parse the file to find classes with @config_subsection_register decorator
             with open(filepath, 'r', encoding='utf-8') as f:
                 tree = ast.parse(f.read())
             
@@ -29,10 +29,10 @@ def find_registered_classes():
                     # Check if the class has decorators
                     if node.decorator_list:
                         for decorator in node.decorator_list:
-                            # Check if it's a function call (like @register("name"))
+                            # Check if it's a function call (like @config_subsection_register("name"))
                             if isinstance(decorator, ast.Call):
-                                if isinstance(decorator.func, ast.Name) and decorator.func.id == 'register':
-                                    # Found a class with @register decorator
+                                if isinstance(decorator.func, ast.Name) and decorator.func.id == 'config_subsection_register':
+                                    # Found a class with @config_subsection_register decorator
                                     module_name = filename[:-3]  # Remove .py extension
                                     try:
                                         # Import the module and get the class
@@ -41,9 +41,9 @@ def find_registered_classes():
                                         config_classes.append(class_obj)
                                     except (ImportError, AttributeError) as e:
                                         print(f"Warning: Could not import {node.name} from {module_name}: {e}")
-                            # Check if it's just a name (like @register)
-                            elif isinstance(decorator, ast.Name) and decorator.id == 'register':
-                                # Found a class with @register decorator
+                            # Check if it's just a name (like @config_subsection_register)
+                            elif isinstance(decorator, ast.Name) and decorator.id == 'config_subsection_register':
+                                # Found a class with @config_subsection_register decorator
                                 module_name = filename[:-3]  # Remove .py extension
                                 try:
                                     # Import the module and get the class
