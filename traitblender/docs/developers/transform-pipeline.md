@@ -67,7 +67,7 @@ The Transform class uses `_get_property_value()` and `_set_property_value()` to 
 
 ## TransformPipeline Class
 
-The `TransformPipeline` class (in `core/transforms/pipeline.py`) manages multiple transforms as a group. It maintains a list of `Transform` objects and an execution history.
+The `TransformPipeline` class (in `core/transforms/transform_pipeline.py`) manages multiple transforms as a group. It maintains a list of `Transform` objects and an execution history.
 
 **Core methods:**
 

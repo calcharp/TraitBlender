@@ -1,18 +1,17 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - TRANSFORMS
-- core/transforms/__init__.py
-- core/transforms/pipeline.py
+- core/transforms/transform_pipeline.py
 - core/transforms/samplers.py
 - core/transforms/transform.py
 - core/transforms/transforms.py
-- core/transforms/pipeline_editor/__init__.py
-- core/transforms/pipeline_editor/property_dimension_helper.py
-- core/transforms/pipeline_editor/property_helper.py
-- core/transforms/pipeline_editor/sampler_helper.py
-- core/transforms/pipeline_editor/transforms_editor.py
-- core/transforms/pipeline_editor/transforms_manager.py
-- core/transforms/pipeline_editor/ui_manager.py
+- core/transforms/dpg_transforms_editor/__init__.py
+- core/transforms/dpg_transforms_editor/property_dimension_helper.py
+- core/transforms/dpg_transforms_editor/property_helper.py
+- core/transforms/dpg_transforms_editor/sampler_helper.py
+- core/transforms/dpg_transforms_editor/transforms_editor.py
+- core/transforms/dpg_transforms_editor/transforms_manager.py
+- core/transforms/dpg_transforms_editor/ui_manager.py
 
 ASSETS - MORPHOSPACE MODULES
 - assets/morphospace_modules/CO_Raup/__init__.py

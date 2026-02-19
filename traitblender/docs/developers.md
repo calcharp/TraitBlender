@@ -192,7 +192,7 @@ This page provides detailed documentation for developers working on TraitBlender
     - **`core/transforms/registry.py`**: Transform registry and sampler functions
     - **`core/transforms/transform_registry_decorator.py`**: `@register_transform` decorator
     - **`core/transforms/transforms.py`**: `Transform` class
-    - **`core/transforms/pipeline.py`**: `TransformPipeline` class
+    - **`core/transforms/transform_pipeline.py`**: `TransformPipeline` class
     - **`core/config/config_templates/transforms.py`**: Config integration
     
     ## Adding a New Sampler Function

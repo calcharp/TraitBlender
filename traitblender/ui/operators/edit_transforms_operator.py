@@ -17,7 +17,7 @@ class TRAITBLENDER_OT_edit_transforms(Operator):
     def execute(self, context):
         try:
             # Import the transforms editor from core module
-            from ...core.transforms.pipeline_editor import launch_transform_editor
+            from ...core.transforms.dpg_transforms_editor import launch_transform_editor
             
             # Get current pipeline state from config
             config = context.scene.traitblender_config

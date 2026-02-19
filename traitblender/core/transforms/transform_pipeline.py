@@ -287,11 +287,3 @@ class TransformPipeline:
     def __setitem__(self, index, value):
         """Set a transform at a specific index."""
         self._transforms[index] = value
-
-
-def register():
-    pass
-
-
-def unregister():
-    pass 

@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import StringProperty
-from ...transforms.pipeline import TransformPipeline
+from ...transforms.transform_pipeline import TransformPipeline
 import yaml
 from .. import config_subsection_register, TraitBlenderConfig
 
