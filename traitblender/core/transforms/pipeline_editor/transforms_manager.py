@@ -303,10 +303,7 @@ class TransformsManager:
         dpg.add_spacer(height=2)
         
         # Create appropriate input widget based on type
-        if type_str == 'list[list[float]]':
-            # Matrix input - grid of float inputs
-            self._create_matrix_input(index, param_name, current_value, dimension)
-        elif type_str == 'list[float]':
+        if type_str == 'list[float]':
             # Vector input - row of float inputs
             self._create_vector_input(index, param_name, current_value, dimension)
         elif type_str == 'list[int]':
@@ -360,52 +357,6 @@ class TransformsManager:
                 
                 if i < size - 1:
                     dpg.add_spacer(width=3)
-    
-    def _create_matrix_input(self, index, param_name, current_value, dimension):
-        """Create a matrix input as a grid of input boxes."""
-        # Determine matrix size (assume square matrix based on dimension)
-        if current_value and isinstance(current_value, (list, tuple)) and current_value:
-            rows = len(current_value)
-            cols = len(current_value[0]) if isinstance(current_value[0], (list, tuple)) else rows
-        elif dimension:
-            rows = cols = dimension
-        else:
-            rows = cols = 3  # Default 3×3
-        
-        dpg.add_spacer(width=10, height=2)
-        
-        for row_idx in range(rows):
-            with dpg.group(horizontal=True):
-                dpg.add_spacer(width=10)
-                
-                for col_idx in range(cols):
-                    input_tag = f"param_input_{index}_{param_name}_{row_idx}_{col_idx}"
-                    
-                    # Get value from current_value if available
-                    if (current_value and isinstance(current_value, (list, tuple)) and 
-                        row_idx < len(current_value) and 
-                        isinstance(current_value[row_idx], (list, tuple)) and 
-                        col_idx < len(current_value[row_idx])):
-                        value = current_value[row_idx][col_idx]
-                    else:
-                        # Default: identity matrix
-                        value = 1.0 if row_idx == col_idx else 0.0
-                    
-                    dpg.add_input_text(
-                        tag=input_tag,
-                        default_value=str(value),
-                        width=60,
-                        callback=lambda s, a, u: self._on_matrix_element_changed(
-                            u['index'], u['param_name'], u['row_idx'], u['col_idx'], a
-                        ),
-                        user_data={'index': index, 'param_name': param_name, 'row_idx': row_idx, 'col_idx': col_idx}
-                    )
-                    
-                    if col_idx < cols - 1:
-                        dpg.add_spacer(width=3)
-            
-            if row_idx < rows - 1:
-                dpg.add_spacer(height=3)
     
     def _on_scalar_changed(self, index, param_name, value_str, type_str):
         """Handle scalar parameter value change with validation."""
@@ -463,44 +414,6 @@ class TransformsManager:
             if dpg.does_item_exist(input_tag):
                 dpg.configure_item(input_tag, color=(255, 100, 100, 255))
             print(f"Invalid value for '{param_name}'[{element_idx}]: must be {'int' if is_int else 'float'}")
-    
-    def _on_matrix_element_changed(self, index, param_name, row_idx, col_idx, value_str):
-        """Handle matrix element change."""
-        if not (0 <= index < len(self.transforms)):
-            return
-        
-        input_tag = f"param_input_{index}_{param_name}_{row_idx}_{col_idx}"
-        
-        try:
-            # Convert value
-            value = float(value_str)
-            
-            # Get or create the matrix
-            if param_name not in self.transforms[index]['params']:
-                # Determine size from property dimension
-                property_path = self.transforms[index].get('property_path', '')
-                dimension = get_property_dimension(property_path) or 3
-                # Initialize identity matrix
-                self.transforms[index]['params'][param_name] = [
-                    [1.0 if i == j else 0.0 for j in range(dimension)]
-                    for i in range(dimension)
-                ]
-            
-            # Update the specific element
-            current_matrix = self.transforms[index]['params'][param_name]
-            if row_idx < len(current_matrix) and col_idx < len(current_matrix[row_idx]):
-                current_matrix[row_idx][col_idx] = value
-                
-                # Set input field to normal color
-                if dpg.does_item_exist(input_tag):
-                    dpg.configure_item(input_tag, color=(255, 255, 255, 255))
-                
-                print(f"Updated transform {index + 1} parameter '{param_name}'[{row_idx}][{col_idx}] = {value}")
-        except ValueError:
-            # Show validation error with red text
-            if dpg.does_item_exist(input_tag):
-                dpg.configure_item(input_tag, color=(255, 100, 100, 255))
-            print(f"Invalid value for '{param_name}'[{row_idx}][{col_idx}]: must be float")
     
     def _on_section_changed(self, index, display_value, sender):
         """Handle section selection change"""

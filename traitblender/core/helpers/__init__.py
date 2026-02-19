@@ -4,19 +4,18 @@ TraitBlender Core Helpers
 Utility functions and helpers for the TraitBlender add-on.
 """
 
-import os
 from .import_texture import apply_material, get_texture_info, VALID_TEXTURES, set_textures
 from .object_validator import (
     ObjectNotFoundError,
     must_exist,
     check_object_exists,
 )   
-from .prop_gettersetter import get_property, set_property
-from .asset_manager import get_addon_root, get_user_data_dir, get_asset_path, init_user_dirs
+from .property_getset import get_property, set_property
+from .asset_manager import get_addon_root, get_user_data_dir, init_user_dirs
+from .asset_path import get_asset_path
 from .config_validator import validate_config_path, get_config_path_info, list_config_properties
 from .property_type_checker import get_property_type, VALID_PROPERTY_TYPES
 from .scene_cleaner import clear_scene
-from .property_type_mapping import get_bpy_prop_from_type_hint
 from .pretty_type_hint import pretty_type_hint
 
 # Import table coordinates functions
@@ -28,25 +27,6 @@ except ImportError:
     z_dist_to_lowest = None
     _get_tb_coords = None
     _set_tb_coords = None
-
-def get_asset_path(*path_parts):
-    """
-    Get the full path to an asset in the addon's assets directory.
-    
-    Args:
-        *path_parts: Path components relative to the assets directory
-        
-    Returns:
-        str: Full path to the asset
-        
-    Example:
-        get_asset_path("objects", "table", "table.fbx")
-        get_asset_path("textures", "wood.png")
-    """
-    # Get the addon root directory (3 levels up from this file)
-    addon_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    assets_dir = os.path.join(addon_dir, "assets")
-    return os.path.join(assets_dir, *path_parts)
 
 __all__ = [
     "get_asset_path",
@@ -73,8 +53,6 @@ __all__ = [
     "VALID_PROPERTY_TYPES",
     # Scene cleaner functions
     "clear_scene",
-    # Property type mapping
-    "get_bpy_prop_from_type_hint",
     "pretty_type_hint",
     # Table coordinates functions
     "z_dist_to_lowest",

@@ -1,17 +1,5 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
-CORE - HELPERS
-- core/helpers/__init__.py
-- core/helpers/asset_manager.py
-- core/helpers/config_validator.py
-- core/helpers/import_texture.py
-- core/helpers/object_validator.py
-- core/helpers/pretty_type_hint.py
-- core/helpers/prop_gettersetter.py
-- core/helpers/property_type_checker.py
-- core/helpers/property_type_mapping.py
-- core/helpers/scene_cleaner.py
-
 CORE - MORPHOSPACES
 - core/morphospaces/__init__.py
 - core/morphospaces/list_morphospaces.py

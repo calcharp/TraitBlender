@@ -74,7 +74,7 @@ The `TraitBlenderConfig` base class provides these methods (see `core/config/reg
 
 ### Getters and Setters
 
-Config properties use dynamic getters/setters defined in `core/helpers/prop_gettersetter.py`:
+Config properties use dynamic getters/setters defined in `core/helpers/property_getset.py`:
 
 ```python
 # In a config template:

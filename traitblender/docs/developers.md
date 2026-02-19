@@ -40,7 +40,7 @@ This page provides detailed documentation for developers working on TraitBlender
     
     - **`core/config/register_config.py`**: Base `TraitBlenderConfig` class and `@register` decorator
     - **`core/config/config_templates/`**: Individual config section classes
-    - **`core/helpers/prop_gettersetter.py`**: Dynamic property getters/setters
+    - **`core/helpers/property_getset.py`**: Dynamic property getters/setters
     - **`core/helpers/config_validator.py`**: Property path validation
     
     ## Adding a New Config Section
