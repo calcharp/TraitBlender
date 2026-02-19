@@ -6,7 +6,7 @@ Operator for editing the dataset CSV data using the CSV editor GUI.
 
 import bpy
 from bpy.types import Operator
-from ...core.datasets.csv_viewer_module import launch_csv_viewer_with_string
+from ...core.datasets.dpg_dataset_editor import launch_csv_viewer_with_string
 
 class TRAITBLENDER_OT_edit_dataset(Operator):
     """Edit dataset using CSV editor"""

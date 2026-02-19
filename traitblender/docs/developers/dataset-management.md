@@ -57,7 +57,7 @@ The PropertyGroup provides familiar pandas-like methods for data access:
 
 ## CSV Viewer System
 
-Interactive dataset editor built with DearPyGUI in `core/datasets/csv_viewer_module/`. The viewer provides filtering, sorting, pagination, and editing capabilities for viewing and modifying datasets outside of Blender's normal UI.
+Interactive dataset editor built with DearPyGUI in `core/datasets/dpg_dataset_editor/`. The viewer provides filtering, sorting, pagination, and editing capabilities for viewing and modifying datasets outside of Blender's normal UI.
 
 **Architecture:** The system is organized into four manager classes that coordinate to provide the viewing experience:
 

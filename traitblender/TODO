@@ -1,14 +1,12 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 CORE - DATASETS
-- core/datasets/__init__.py
-- core/datasets/traitblender_dataset.py
-- core/datasets/csv_viewer_module/__init__.py
-- core/datasets/csv_viewer_module/csv_viewer.py
-- core/datasets/csv_viewer_module/data_manager.py
-- core/datasets/csv_viewer_module/filter_manager.py
-- core/datasets/csv_viewer_module/table_manager.py
-- core/datasets/csv_viewer_module/ui_manager.py
+- core/datasets/dpg_dataset_editor/__init__.py
+- core/datasets/dpg_dataset_editor/csv_viewer.py
+- core/datasets/dpg_dataset_editor/data_manager.py
+- core/datasets/dpg_dataset_editor/filter_manager.py
+- core/datasets/dpg_dataset_editor/table_manager.py
+- core/datasets/dpg_dataset_editor/ui_manager.py
 
 CORE - HELPERS
 - core/helpers/__init__.py

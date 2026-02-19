@@ -6,8 +6,8 @@ from io import StringIO
 from ..morphospaces import get_trait_parameters_with_defaults_for_morphospace
 
 
-def update_csv(self, context):
-    """Reset sample selection when CSV data changes"""
+def reset_sample_on_csv_change(self, context):
+    """Reset sample selection when CSV data changes."""
     # Reset sample to first item when CSV changes
     if hasattr(self, 'sample'):
         try:
@@ -102,7 +102,7 @@ def update_filepath(self, context):
         else:
             print(f"TraitBlender: Failed to import dataset: {str(e)}")
 
-
+# This naming convention is different than the one for the TraitBlenderConfig, because it is a PropertyGroup and follows standard bpy naming convention for that.
 class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
     """Property group for TraitBlender dataset management."""
     
@@ -110,7 +110,7 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
         name="CSV Data",
         description="CSV dataset content as string",
         default="",
-        update=update_csv
+        update=reset_sample_on_csv_change
     )
     
     filepath: StringProperty(

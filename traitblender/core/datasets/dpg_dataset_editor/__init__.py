@@ -1,5 +1,5 @@
 """
-CSV Viewer Module for Blender Integration
+DPG Dataset Editor - DearPyGUI dataset editor for Blender integration.
 """
 
 from .csv_viewer import launch_csv_viewer_with_string, CSVViewer

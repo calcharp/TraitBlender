@@ -6,7 +6,7 @@ Contains dataset management functionality for TraitBlender.
 
 import bpy
 from . import traitblender_dataset
-from .csv_viewer_module import launch_csv_viewer_with_string
+from .dpg_dataset_editor import launch_csv_viewer_with_string
 
 classes = [
     traitblender_dataset.TRAITBLENDER_PG_dataset,
