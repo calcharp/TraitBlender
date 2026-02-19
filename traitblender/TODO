@@ -1,9 +1,5 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
-CORE - MORPHOSPACES
-- core/morphospaces/__init__.py
-- core/morphospaces/list_morphospaces.py
-
 CORE - POSITIONING
 - core/positioning/__init__.py
 - core/positioning/get_table_coords.py
