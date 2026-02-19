@@ -74,3 +74,7 @@ UI - PROPERTIES
 - ui/properties/setup_properties.py
 - ui/properties/table_coords.py
 - ui/properties/table_rotations.py
+
+
+
+Note that the size parameter in the shell isn't quite working. Or it does, but maybe the size on the x-axis of the shells isnt what we care about. 
