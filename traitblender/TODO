@@ -1,9 +1,5 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
-CORE - CONFIG
-- core/config/templates/transforms.py
-- core/config/templates/world.py
-
 CORE - DATASETS
 - core/datasets/__init__.py
 - core/datasets/traitblender_dataset.py
