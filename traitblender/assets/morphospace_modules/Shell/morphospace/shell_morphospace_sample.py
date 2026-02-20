@@ -110,12 +110,14 @@ class ShellMorphospaceSample():
         obj = bpy.context.active_object
         obj.name = self.name
 
-        # Store mesh structure for orientation (last ring of outer_surface = aperture)
+        # Store mesh structure for orientation on scene (not on object, so they don't appear in Item tab)
         outer_points = self.data["outer_surface"]
         num_rings = len(outer_points)
         points_per_ring = len(outer_points[0])
-        obj["raup_num_rings"] = num_rings
-        obj["raup_points_per_ring"] = points_per_ring
+        scene = bpy.context.scene
+        if hasattr(scene, "traitblender_sample") and scene.traitblender_sample and scene.traitblender_sample.props:
+            scene.traitblender_sample.props.raup_num_rings = num_rings
+            scene.traitblender_sample.props.raup_points_per_ring = points_per_ring
 
         # Origin is set by orientation (apex) when apply_orientation runs
         bpy.context.view_layer.objects.active = obj

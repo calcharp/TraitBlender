@@ -20,7 +20,17 @@ def get_raup_apex(shell):
     obj = bpy.data.objects.get(shell) if isinstance(shell, str) else shell
     if not obj:
         return (0.0, 0.0, 0.0)
-    ppb = obj.get("raup_points_per_ring")
+    scene = bpy.context.scene
+    if (
+        not hasattr(scene, "traitblender_dataset")
+        or not scene.traitblender_dataset
+        or getattr(scene.traitblender_dataset, "sample", None) != obj.name
+        or not hasattr(scene, "traitblender_sample")
+        or not scene.traitblender_sample
+        or not scene.traitblender_sample.props
+    ):
+        return (0.0, 0.0, 0.0)
+    ppb = scene.traitblender_sample.props.raup_points_per_ring
     if not ppb or not hasattr(obj, "data") or obj.type != "MESH":
         return (0.0, 0.0, 0.0)
     mw = obj.matrix_world
