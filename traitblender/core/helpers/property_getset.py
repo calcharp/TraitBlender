@@ -2,7 +2,7 @@ import bpy
 import warnings
 import inspect
 import mathutils
-from .property_type_checker import get_property_type
+from .get_property_type import get_property_type
 
 
 def _check_object_dependencies(object_dependencies):

@@ -1,7 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 UI - OPERATORS
-- ui/operators/clear_scene_operator.py
 - ui/operators/configure_traitblender.py
 - ui/operators/edit_dataset_operator.py
 - ui/operators/edit_transforms_operator.py

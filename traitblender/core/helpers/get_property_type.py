@@ -1,7 +1,7 @@
 """
-TraitBlender Property Type Checker
+Get Blender property type for a given property path (config or full path).
 
-Helper functions for checking Blender property types to ensure proper YAML representation.
+Used for proper YAML representation of config properties.
 """
 
 import bpy
@@ -69,35 +69,23 @@ def get_property_type(property_path: str, in_config: bool = True):
             
         else:
             # Handle full Blender paths
-            # Use a more robust approach to handle complex paths with nested brackets
-            
-            # First, try to evaluate the entire path to get the property value
-            # This will help us determine if the path is valid
             try:
-                # Evaluate the full path to get the actual property value
                 property_value = eval(property_path, {"bpy": bpy})
             except Exception:
                 return None
             
-            # Now we need to get the parent object and property name
-            # We'll do this by working backwards from the end of the path
-            
-            # Find the last property access (after the last dot)
             last_dot_index = property_path.rfind('.')
             if last_dot_index == -1:
                 return None
             
-            # Split into object path and property name
             object_path = property_path[:last_dot_index]
             property_name = property_path[last_dot_index + 1:]
             
-            # Evaluate the object path to get the parent object
             try:
                 current = eval(object_path, {"bpy": bpy})
             except Exception:
                 return None
             
-            # Get the property's RNA information
             if not hasattr(current, 'bl_rna') or not hasattr(current.bl_rna, 'properties'):
                 return None
             
@@ -106,15 +94,11 @@ def get_property_type(property_path: str, in_config: bool = True):
             
             property_rna = current.bl_rna.properties[property_name]
         
-        # Get the RNA type name
         rna_type_name = property_rna.rna_type.identifier
-        
-        # Check if it's an array property
         is_array = False
         if hasattr(property_rna, 'is_array'):
             is_array = property_rna.is_array
         
-        # Map the base type to the correct property type based on is_array
         if rna_type_name == 'FloatProperty':
             return 'FloatVectorProperty' if is_array else 'FloatProperty'
         elif rna_type_name == 'IntProperty':
@@ -128,4 +112,4 @@ def get_property_type(property_path: str, in_config: bool = True):
             
     except Exception as e:
         print(f"Error getting property type for '{property_path}': {e}")
-        return None 
+        return None

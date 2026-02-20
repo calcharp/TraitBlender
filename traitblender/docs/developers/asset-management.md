@@ -90,7 +90,7 @@ Asset Management
 
 Resolves paths to bundled assets relative to add-on root.
 
-**Location:** `core/helpers/asset_path.py`
+**Location:** `core/helpers/addon_helpers.py`
 
 ```python
 def get_asset_path(*path_parts):
@@ -116,9 +116,8 @@ def get_asset_path(*path_parts):
     import os
     
     # Get add-on root directory
-    # __file__ is in core/helpers/asset_path.py
-    # Root is two levels up: ../../
-    addon_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    # Uses get_addon_root() from addon_helpers
+    addon_root = get_addon_root()
     
     # Build path: addon_root/assets/path_parts
     asset_path = os.path.join(addon_root, "assets", *path_parts)
@@ -292,7 +291,7 @@ else:
 
 Creates user data directories on add-on first run.
 
-**Location:** `core/helpers/init_user_dirs.py`
+**Location:** `core/helpers/addon_helpers.py`
 
 ```python
 def init_user_dirs():
@@ -398,7 +397,7 @@ with open(log_path, 'a') as f:
 
 Applies material to Blender object, optionally with textures.
 
-**Location:** `core/helpers/apply_material.py`
+**Location:** `core/helpers/material_helpers.py`
 
 ```python
 def apply_material(obj, material_name, textures=None):

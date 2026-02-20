@@ -1,7 +1,7 @@
 """
-Object Validation Decorator
+Object helpers.
 
-A decorator that ensures required objects exist in the Blender scene before executing functions.
+Validation utilities: ensure required objects exist in the Blender scene (check_object_exists, must_exist decorator).
 """
 
 import bpy
@@ -41,5 +41,3 @@ def must_exist(name: str):
             return func(*args, **kwargs)
         return wrapper
     return decorator
-
-
