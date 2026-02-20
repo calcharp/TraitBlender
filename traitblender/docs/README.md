@@ -30,7 +30,7 @@ TraitBlender is a Blender add-on designed for researchers and institutions worki
 ### Key Features
 
 - **Museum-style specimen imaging** - Professional lighting and camera setups
-- **Morphospace visualization** - Generate 3D specimens from mathematical models (currently CO_Raup shell morphospace)
+- **Morphospace visualization** - Generate 3D specimens from mathematical models (currently Shell (Default) morphospace)
 - **Dataset integration** - Import CSV/Excel files with automatic species column detection
 - **Statistical transforms** - 10+ probability distributions for data augmentation
 - **Table coordinate system** - Consistent positioning relative to museum table
@@ -42,7 +42,7 @@ TraitBlender is a Blender add-on designed for researchers and institutions worki
 
 1. **Setup** - Load museum scene with table, lighting, and camera
 2. **Configure** - Adjust scene settings via GUI or YAML config
-3. **Select Morphospace** - Choose mathematical model (e.g., CO_Raup)
+3. **Select Morphospace** - Choose mathematical model (e.g., Shell (Default))
 4. **Import Dataset** - Load CSV/Excel with morphological traits
 5. **Generate Specimens** - Create 3D models from dataset parameters
 6. **Apply Transforms** - Add statistical variation for data augmentation

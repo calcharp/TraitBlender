@@ -64,13 +64,13 @@ Before starting, ensure you have:
 ??? note "Step 4: Select a Morphospace"
     Expand the **"3 Morphospaces"** panel.
 
-    TraitBlender generates 3D specimens from mathematical models called morphospaces. By default, TraitBlender includes the **CO_Raup** morphospace, which combines:
+    TraitBlender generates 3D specimens from mathematical models called morphospaces. By default, TraitBlender includes the **Shell (Default)** morphospace, which combines:
     - The morphospace developed by [Contreras-Figueroa and Aragón](https://www.mdpi.com/1424-2818/15/3/431) (a generalization of Raup's classic shell space)
     - [Okabe and Yoshimura's](https://doi.org/10.1038/srep42445) allometric shell thickness function
 
     This creates fully 3D models of molluscan shells with realistic geometry.
 
-    Select **CO_Raup** from the dropdown (it should be the only option by default).
+    Select **Shell (Default)** from the dropdown (it should be the only option by default).
 
 ??? note "Step 5: Import and Manage Datasets"
     Expand the **"4 Datasets"** panel.
@@ -90,7 +90,7 @@ Before starting, ensure you have:
     - **First column**: Species/specimen names (automatically detected)
     - **Remaining columns**: Morphological traits that map to morphospace parameters
 
-    For CO_Raup, the parameters include: `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `time_step`, `points_in_circle`, `eps`, `h_0`, `length`
+    For Shell (Default), the parameters include: `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `time_step`, `points_in_circle`, `eps`, `h_0`, `length`
 
     ### Generate a Specimen
 

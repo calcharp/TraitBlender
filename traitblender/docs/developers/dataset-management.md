@@ -138,7 +138,7 @@ setup = bpy.context.scene.traitblender_setup
 dataset = bpy.context.scene.traitblender_dataset
 
 # Select morphospace and sample
-setup.available_morphospaces = "CO_Raup"
+setup.available_morphospaces = "Shell (Default)"
 dataset.sample = "SpeciesName"
 
 # Get row data

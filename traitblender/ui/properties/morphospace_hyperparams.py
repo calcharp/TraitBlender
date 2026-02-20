@@ -81,22 +81,27 @@ def create_hyperparams_property_group(morphospace_name, hyperparams_dict):
 def _do_build_editors():
     """Actually build and register editors. Must run outside draw/readonly context."""
     global _hyperparam_editor_registry, _editors_built
-    from ...core.morphospaces import list_morphospaces, get_hyperparameters_for_morphospace
+    from ...core.morphospaces import (
+        list_morphospaces,
+        get_hyperparameters_for_morphospace,
+        get_morphospace_display_name,
+    )
 
     _hyperparam_editor_registry.clear()
-    for morphospace_name in list_morphospaces():
-        hyperparams = get_hyperparameters_for_morphospace(morphospace_name)
+    for folder_name in list_morphospaces():
+        hyperparams = get_hyperparameters_for_morphospace(folder_name)
         if not hyperparams:
             continue
 
-        cls = create_hyperparams_property_group(morphospace_name, hyperparams)
+        identifier = get_morphospace_display_name(folder_name)
+        cls = create_hyperparams_property_group(identifier, hyperparams)
         bpy.utils.register_class(cls)
 
-        safe_name = morphospace_name.replace(".", "_").replace(" ", "_")
+        safe_name = identifier.replace(".", "_").replace(" ", "_")
         attr_name = f"traitblender_hyperparams_{safe_name}"
 
         setattr(bpy.types.Scene, attr_name, bpy.props.PointerProperty(type=cls))
-        _hyperparam_editor_registry[morphospace_name] = (cls, attr_name)
+        _hyperparam_editor_registry[identifier] = (cls, attr_name)
     _editors_built = True
 
 
@@ -173,10 +178,10 @@ def get_hyperparam_editor_for(context, morphospace_name):
     return getattr(context.scene, attr_name, None)
 
 
-def get_hyperparam_keys_for(morphospace_name):
+def get_hyperparam_keys_for(morphospace_identifier):
     """Get ordered list of hyperparam keys for a morphospace."""
     _ensure_editors_built()
-    if morphospace_name not in _hyperparam_editor_registry:
+    if morphospace_identifier not in _hyperparam_editor_registry:
         return []
     from ...core.morphospaces import get_hyperparameters_for_morphospace
-    return list(get_hyperparameters_for_morphospace(morphospace_name).keys())
+    return list(get_hyperparameters_for_morphospace(morphospace_identifier).keys())

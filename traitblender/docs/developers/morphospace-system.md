@@ -59,7 +59,7 @@ Morphospace System
 
 ```
 1. User selects morphospace
-   setup.available_morphospaces = "CO_Raup"
+   setup.available_morphospaces = "Shell (Default)"
    ↓
 2. User selects dataset sample
    dataset.sample = "SpeciesName"
@@ -219,7 +219,7 @@ def sample(name="Shape", radius=1.0, height=2.0, segments=32):
     return SimpleSample(name, radius, height, segments)
 ```
 
-### Example: Complex Morphospace (CO_Raup)
+### Example: Complex Morphospace (Shell Default)
 
 ```python
 def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
@@ -342,9 +342,9 @@ class SimpleCylinderSample:
         bpy.context.view_layer.update()
 ```
 
-### Example: Complex Mesh (CO_Raup)
+### Example: Complex Mesh (Shell Default)
 
-The CO_Raup morphospace generates shells with inner/outer surfaces and aperture:
+The Shell (Default) morphospace generates shells with inner/outer surfaces and aperture:
 
 ```python
 class Contreras_MORPHOSPACE_SAMPLE:

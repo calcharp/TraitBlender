@@ -4,6 +4,9 @@ from mathutils import Vector
 from .morphospace.contreras_morphospace import Contreras_MORPHOSPACE
 from .morphospace_sample.contreras_morphospace_sample import Contreras_MORPHOSPACE_SAMPLE
 
+# Display name for GUI and config references. Folder name remains the internal identifier.
+NAME = "Shell (Default)"
+
 
 def get_raup_apex(shell):
     """
@@ -147,4 +150,4 @@ def sample(name="Shell", b = 0.2, d = 1.65, z = 0, a = 1, phi = 0, psi = 0,
         **merged_hyperparams
     )
 
-__all__ = ['sample', 'HYPERPARAMETERS', 'ORIENTATIONS', 'get_raup_apex']
+__all__ = ['NAME', 'sample', 'HYPERPARAMETERS', 'ORIENTATIONS', 'get_raup_apex']

@@ -1,9 +1,8 @@
 """
 Morphospace configuration.
 
-name: Selected morphospace (syncs with traitblender_setup.available_morphospaces), default CO_Raup.
-hyperparams: Per-morphospace hyperparameter overrides {morphospace_name: {param: value}}.
-Defaults are defined by each morphospace module's HYPERPARAMETERS export.
+name: Selected morphospace (syncs with traitblender_setup.available_morphospaces), default Shell (Default).
+hyperparams: Flat hyperparameter overrides {param: value}. Defaults from morphospace module's HYPERPARAMETERS.
 """
 
 from bpy.props import StringProperty
@@ -15,26 +14,26 @@ from ...morphospaces import get_hyperparameters_for_morphospace
 
 @config_subsection_register("morphospace")
 class MorphospaceConfig(TraitBlenderConfig):
-    """Stores morphospace selection and hyperparameter overrides per morphospace."""
+    """Stores morphospace selection and hyperparameter overrides."""
 
     print_index = -1  # Put near start of config
 
     name: StringProperty(
         name="Morphospace",
         description="Selected morphospace module (syncs with morphospaces panel)",
-        default="CO_Raup",
-        get=get_property("bpy.context.scene.traitblender_setup.available_morphospaces", object_dependencies=None, default="CO_Raup"),
+        default="Shell (Default)",
+        get=get_property("bpy.context.scene.traitblender_setup.available_morphospaces", object_dependencies=None, default="Shell (Default)"),
         set=set_property("bpy.context.scene.traitblender_setup.available_morphospaces", object_dependencies=None, fail_silently=True),
     )
 
     hyperparams_state: StringProperty(
         name="Hyperparameters State",
-        description="YAML: per-morphospace hyperparameter overrides {morphospace_name: {param: value}}",
+        description="YAML: hyperparameter overrides {param: value}",
         default="",
     )
 
     def _get_hyperparams_dict(self):
-        """Parse hyperparams_state to dict."""
+        """Parse hyperparams_state to flat dict {param: value}."""
         if not self.hyperparams_state or not self.hyperparams_state.strip():
             return {}
         try:
@@ -45,7 +44,7 @@ class MorphospaceConfig(TraitBlenderConfig):
             return {}
 
     def _set_hyperparams_dict(self, data):
-        """Serialize dict to hyperparams_state."""
+        """Serialize flat dict to hyperparams_state."""
         if not data:
             self.hyperparams_state = ""
             return
@@ -55,20 +54,15 @@ class MorphospaceConfig(TraitBlenderConfig):
             print(f"TraitBlender: Error serializing morphospace hyperparams: {e}")
 
     def get_hyperparams_for(self, morphospace_name):
-        """
-        Get merged hyperparameters for a morphospace.
-        Module defaults + config overrides.
-        """
+        """Get merged hyperparameters. Module defaults + config overrides."""
         module_defaults = get_hyperparameters_for_morphospace(morphospace_name)
-        overrides = self._get_hyperparams_dict().get(morphospace_name, {})
+        overrides = self._get_hyperparams_dict()
         return {**module_defaults, **overrides}
 
     def set_hyperparam(self, morphospace_name, key, value):
-        """Set one hyperparameter for a morphospace."""
+        """Set one hyperparameter."""
         data = self._get_hyperparams_dict()
-        if morphospace_name not in data:
-            data[morphospace_name] = {}
-        data[morphospace_name][key] = value
+        data[key] = value
         self._set_hyperparams_dict(data)
 
     def get_hyperparam(self, morphospace_name, key):
@@ -86,15 +80,11 @@ class MorphospaceConfig(TraitBlenderConfig):
         if not data:
             result.append(f"{indent}  {{}}")
         else:
-            for morphospace_name, params in sorted(data.items()):
-                if not params:
-                    continue
-                result.append(f"{indent}  {morphospace_name}:")
-                for k, v in sorted(params.items()):
-                    if isinstance(v, bool):
-                        result.append(f"{indent}    {k}: {str(v).lower()}")
-                    else:
-                        result.append(f"{indent}    {k}: {v}")
+            for k, v in sorted(data.items()):
+                if isinstance(v, bool):
+                    result.append(f"{indent}  {k}: {str(v).lower()}")
+                else:
+                    result.append(f"{indent}  {k}: {v}")
         return "\n".join(result)
 
     def to_dict(self):

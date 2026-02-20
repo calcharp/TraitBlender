@@ -1,25 +1,22 @@
 import bpy
 from bpy.types import Operator
-import importlib
-import importlib.util
-import sys
-import os
 import inspect
-from ...core.helpers import get_asset_path
+from ...core.morphospaces import load_morphospace_module
 import traceback
+
 
 class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
     """Generate a morphospace sample using the selected morphospace and dataset row"""
-    
+
     bl_idname = "traitblender.generate_morphospace_sample"
     bl_label = "Generate Morphospace Sample"
     bl_description = "Generate a morphospace sample using selected morphospace and dataset row"
     bl_options = {'REGISTER', 'UNDO'}
-    
+
     def execute(self, context):
         setup = context.scene.traitblender_setup
         dataset = context.scene.traitblender_dataset
-        
+
         if not setup.available_morphospaces:
             self.report({'ERROR'}, "No morphospace selected")
             return {'CANCELLED'}
@@ -27,37 +24,21 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             self.report({'ERROR'}, "No dataset sample selected")
             return {'CANCELLED'}
         try:
-            morphospace_name = setup.available_morphospaces
-            morphospace_modules_path = get_asset_path("morphospace_modules")
-            morphospace_path = os.path.join(morphospace_modules_path, morphospace_name)
-            if not os.path.exists(morphospace_path):
-                self.report({'ERROR'}, f"Morphospace module not found: {morphospace_path}")
+            morphospace_identifier = setup.available_morphospaces
+            morphospace_module = load_morphospace_module(morphospace_identifier)
+            if morphospace_module is None:
+                self.report({'ERROR'}, f"Morphospace not found: {morphospace_identifier}")
                 return {'CANCELLED'}
-            
-            # Create a proper module spec that handles the package structure
-            spec = importlib.util.spec_from_file_location(
-                morphospace_name, 
-                os.path.join(morphospace_path, "__init__.py"),
-                submodule_search_locations=[morphospace_path]
-            )
-            if spec is None or spec.loader is None:
-                self.report({'ERROR'}, f"Failed to create module spec for {morphospace_name}")
+
+            sample_func = getattr(morphospace_module, 'sample', None)
+            orientations = getattr(morphospace_module, 'ORIENTATIONS', {})
+            if not callable(sample_func):
+                self.report({'ERROR'}, f"Morphospace '{morphospace_identifier}' has no 'sample' function")
                 return {'CANCELLED'}
-            
-            try:
-                morphospace_module = importlib.util.module_from_spec(spec)
-                sys.modules[morphospace_name] = morphospace_module
-                spec.loader.exec_module(morphospace_module)
-                sample_func = getattr(morphospace_module, 'sample')
-                orientations = getattr(morphospace_module, 'ORIENTATIONS', {})
-                if 'Default' not in orientations or not callable(orientations.get('Default')):
-                    self.report({'ERROR'}, f"Morphospace '{morphospace_name}' must define ORIENTATIONS with a callable 'Default'")
-                    return {'CANCELLED'}
-            except (ImportError, AttributeError) as e:
-                traceback.print_exc()
-                self.report({'ERROR'}, f"Failed to import morphospace module: {e}")
+            if 'Default' not in orientations or not callable(orientations.get('Default')):
+                self.report({'ERROR'}, f"Morphospace '{morphospace_identifier}' must define ORIENTATIONS with a callable 'Default'")
                 return {'CANCELLED'}
-            
+
             selected_sample_name = dataset.sample
             row_data = dataset.loc(selected_sample_name)
             # Get the argument names for the sample function (excluding 'name')
@@ -68,7 +49,7 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             hyperparameters = None
             if hasattr(morphospace_module, 'HYPERPARAMETERS'):
                 morphospace_config = context.scene.traitblender_config.morphospace
-                hyperparameters = morphospace_config.get_hyperparams_for(morphospace_name)
+                hyperparameters = morphospace_config.get_hyperparams_for(morphospace_identifier)
                 # Remove hyperparameters from valid_params so they don't get mapped from dataset
                 valid_params = valid_params - set(hyperparameters.keys()) - {'hyperparameters'}
             
@@ -84,7 +65,7 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 params['hyperparameters'] = hyperparameters
             
             # Debug: show what will be passed
-            print(f"Calling {morphospace_name}.sample with name={selected_sample_name} and params={params}")
+            print(f"Calling {morphospace_identifier}.sample with name={selected_sample_name} and params={params}")
             try:
                 sample_obj = sample_func(name=selected_sample_name, **params)
                 sample_obj.to_blender()

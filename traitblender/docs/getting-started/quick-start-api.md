@@ -50,7 +50,7 @@ print(f"Rows: {dataset.rownames}")
 ```python
 # Set morphospace (must match folder name in assets/morphospace_modules/)
 setup = bpy.context.scene.traitblender_setup
-setup.available_morphospaces = "CO_Raup"
+setup.available_morphospaces = "Shell (Default)"
 
 # Select a sample from dataset
 dataset = bpy.context.scene.traitblender_dataset
@@ -157,7 +157,7 @@ dataset.filepath = "/path/to/your/dataset.csv"
 
 # Set morphospace
 setup = bpy.context.scene.traitblender_setup
-setup.available_morphospaces = "CO_Raup"
+setup.available_morphospaces = "Shell (Default)"
 
 # Process each species in dataset
 for species_name in dataset.rownames:

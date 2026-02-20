@@ -1,6 +1,6 @@
 import bpy
 from bpy.props import StringProperty, EnumProperty
-from ...core.morphospaces import list_morphospaces
+from ...core.morphospaces import list_morphospaces, get_morphospace_display_name
 
 
 class TraitBlenderSetupProperties(bpy.types.PropertyGroup):
@@ -21,13 +21,13 @@ class TraitBlenderSetupProperties(bpy.types.PropertyGroup):
     )
     
     def _get_morphospace_items(self):
-        """Get available morphospaces for the enum."""
+        """Get available morphospaces for the enum. Identifier = NAME from module (or folder if no NAME)."""
         items = []
         try:
             morphospaces = list_morphospaces()
-            for name in morphospaces:
-                # Use the literal folder name for both value and display
-                items.append((name, name, f"Morphospace: {name}"))
+            for folder_name in morphospaces:
+                identifier = get_morphospace_display_name(folder_name)
+                items.append((identifier, identifier, f"Morphospace: {identifier}"))
         except Exception as e:
             print(f"Error getting morphospace items: {e}")
-        return items 
+        return items

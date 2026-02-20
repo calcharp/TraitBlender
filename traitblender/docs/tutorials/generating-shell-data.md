@@ -143,7 +143,7 @@ write.csv(snails, "snails.csv", row.names = FALSE)
 After generating your dataset:
 
 1. Import the CSV file into TraitBlender using the **Datasets** panel
-2. Select a morphospace (e.g., CO_Raup)
+2. Select a morphospace (e.g., Shell (Default))
 3. Generate specimens using the **Generate Sample** button
 4. Configure your scene and render images
 
