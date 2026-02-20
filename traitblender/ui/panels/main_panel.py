@@ -2,6 +2,31 @@ import bpy
 from bpy.types import Panel
 from ..properties import morphospace_hyperparams
 
+# Deferred sync of imaging orientation_options (cannot modify ID in draw context)
+_pending_orientation_sync = None  # (scene_name, [orientation_names]) or None
+
+
+def _sync_imaging_orientations_timer():
+    """One-shot timer: add missing orientation_options for the pending scene."""
+    global _pending_orientation_sync
+    if not _pending_orientation_sync:
+        return None
+    scene_name, orientation_names = _pending_orientation_sync
+    _pending_orientation_sync = None
+    scene = bpy.data.scenes.get(scene_name)
+    if not scene or not hasattr(scene, "traitblender_config"):
+        return None
+    config = scene.traitblender_config
+    if not hasattr(config, "imaging"):
+        return None
+    items = config.imaging.orientation_options
+    for name in orientation_names:
+        if next((x for x in items if x.name == name), None) is None:
+            item = items.add()
+            item.name = name
+            item.enabled = True
+    return None  # one-shot
+
 class TRAITBLENDER_PT_main_panel(Panel):
     bl_label = "1 Museum Setup"
     bl_idname = "TRAITBLENDER_PT_main_panel"
@@ -188,14 +213,36 @@ class TRAITBLENDER_PT_imaging_panel(Panel):
     def draw(self, context):
         layout = self.layout
         config = context.scene.traitblender_config
+        setup = context.scene.traitblender_setup
         
         # Rendering directory
         row = layout.row(align=True)
         row.prop(config.output, "rendering_directory", text="Rendering Directory")
         
-        # Images per specimen
+        # Images per orientation
         row = layout.row(align=True)
-        row.prop(config.output, "images_per_view", text="Images Per Species")
+        row.prop(config.imaging, "images_per_orientation", text="Images Per Orientation")
+        
+        # Orientations (from current morphospace): sync via timer (cannot write in draw), then draw checkboxes
+        from ...core.morphospaces import get_orientation_names
+        morphospace_name = setup.available_morphospaces
+        orientation_names = get_orientation_names(morphospace_name) if morphospace_name else []
+        if orientation_names:
+            items = config.imaging.orientation_options
+            missing = [n for n in orientation_names if next((x for x in items if x.name == n), None) is None]
+            if missing:
+                global _pending_orientation_sync
+                if _pending_orientation_sync is None:
+                    _pending_orientation_sync = (context.scene.name, list(orientation_names))
+                    bpy.app.timers.register(_sync_imaging_orientations_timer, first_interval=0.01)
+            box = layout.box()
+            box.label(text="Orientations to render", icon='ORIENTATION_VIEW')
+            for name in orientation_names:
+                item = next((x for x in items if x.name == name), None)
+                if item is None:
+                    continue  # will appear after timer runs
+                row = box.row()
+                row.prop(item, "enabled", text=name)
         
         # Imaging pipeline button
         row = layout.row(align=True)
