@@ -1,14 +1,5 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
-ASSETS - MORPHOSPACE MODULES
-- assets/morphospace_modules/Shell/__init__.py
-- assets/morphospace_modules/Shell/morphospace/__init__.py
-- assets/morphospace_modules/Shell/morphospace/shell_morphospace.py
-- assets/morphospace_modules/Shell/morphospace/shell_morphospace_sample.py
-
-ASSETS - CONFIGS
-- assets/configs/default.yaml
-
 UI - OPERATORS
 - ui/__init__.py
 - ui/operators/__init__.py
