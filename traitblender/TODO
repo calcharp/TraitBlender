@@ -4,8 +4,7 @@ ASSETS - MORPHOSPACE MODULES
 - assets/morphospace_modules/CO_Raup/__init__.py
 - assets/morphospace_modules/CO_Raup/morphospace/__init__.py
 - assets/morphospace_modules/CO_Raup/morphospace/contreras_morphospace.py
-- assets/morphospace_modules/CO_Raup/morphospace_sample/__init__.py
-- assets/morphospace_modules/CO_Raup/morphospace_sample/contreras_morphospace_sample.py
+- assets/morphospace_modules/CO_Raup/morphospace/contreras_morphospace_sample.py
 
 ASSETS - CONFIGS
 - assets/configs/default.yaml

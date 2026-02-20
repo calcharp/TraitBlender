@@ -36,8 +36,7 @@ Morphospace System
 │
 ├── Module Structure
 │   ├── __init__.py (contains sample() function)
-│   ├── morphospace/ (mathematical model classes)
-│   └── morphospace_sample/ (Blender conversion classes)
+│   └── morphospace/ (mathematical model + Blender conversion)
 │
 ├── Loading (generate_morphospace_sample_operator)
 │   ├── importlib dynamic loading
@@ -98,11 +97,9 @@ Morphospace System
 assets/morphospace_modules/
 └── MyMorphospace/                    # Module name (folder)
     ├── __init__.py                   # Required: Contains sample() function
-    ├── morphospace/                  # Optional: Mathematical model
-    │   ├── __init__.py
-    │   └── my_morphospace.py         # Model implementation
-    └── morphospace_sample/           # Optional: Blender conversion
+    └── morphospace/                  # Mathematical model + Blender conversion
         ├── __init__.py
+        ├── my_morphospace.py        # Model implementation
         └── my_morphospace_sample.py  # Sample class with to_blender()
 ```
 
@@ -117,8 +114,7 @@ Must contain a `sample()` function as the entry point:
 ```python
 # assets/morphospace_modules/MyMorphospace/__init__.py
 
-from .morphospace.my_morphospace import MyMorphospace_MORPHOSPACE
-from .morphospace_sample.my_morphospace_sample import MyMorphospace_MORPHOSPACE_SAMPLE
+from .morphospace import MyMorphospace_MORPHOSPACE, MyMorphospace_MORPHOSPACE_SAMPLE
 
 def sample(name="Specimen", param1=1.0, param2=2.0, param3=0.5):
     """
@@ -657,18 +653,15 @@ For complex morphospaces, separate concerns:
 ```
 MyMorphospace/
 ├── __init__.py                   # Entry point with sample()
-├── morphospace/
-│   ├── __init__.py
-│   └── my_morphospace.py         # Mathematical model
-└── morphospace_sample/
-    ├── __init__.py
+└── morphospace/
+    ├── __init__.py               # Exports MORPHOSPACE and MORPHOSPACE_SAMPLE
+    ├── my_morphospace.py         # Mathematical model
     └── my_morphospace_sample.py  # Blender conversion
 ```
 
 **`__init__.py`:**
 ```python
-from .morphospace.my_morphospace import MyMORPHOSPACE
-from .morphospace_sample.my_morphospace_sample import MyMORPHOSPACE_SAMPLE
+from .morphospace import MyMORPHOSPACE, MyMORPHOSPACE_SAMPLE
 
 def sample(name="Specimen", **params):
     morphospace = MyMORPHOSPACE()
@@ -703,7 +696,7 @@ class MyMORPHOSPACE:
         return geometry_data
 ```
 
-**`morphospace_sample/my_morphospace_sample.py`:**
+**`morphospace/my_morphospace_sample.py`:**
 ```python
 import bpy
 

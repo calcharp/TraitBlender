@@ -218,8 +218,9 @@ TraitBlender/
     ├── morphospace_modules/
     │   ├── CO_Raup/
     │   │   ├── __init__.py
-    │   │   ├── morphospace/
-    │   │   └── morphospace_sample/
+    │   │   └── morphospace/
+    │   │       ├── contreras_morphospace.py
+    │   │       └── contreras_morphospace_sample.py
     │   └── [other morphospaces]/
     │
     ├── scenes/

@@ -1,6 +1,6 @@
 from .helpers import get_raup_apex
 from .morphospace.contreras_morphospace import Contreras_MORPHOSPACE
-from .morphospace_sample.contreras_morphospace_sample import Contreras_MORPHOSPACE_SAMPLE
+from .morphospace import Contreras_MORPHOSPACE_SAMPLE
 from .orientations import ORIENTATIONS
 
 # Display name for GUI and config references. Folder name remains the internal identifier.
