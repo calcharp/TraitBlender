@@ -9,9 +9,7 @@ import os
 import re
 from PIL import ImageColor
 
-
-# Supported texture types
-VALID_TEXTURES = {"DIFFUSE", "AO", "ROUGHNESS", "METALLIC", "NORMAL", "DISPLACEMENT"}
+from .constants import VALID_TEXTURES
 
 
 def apply_material(object_name: str, textures_path: str = None, hex_color: str = None, existing_material_name: str = None, new_material_name: str = None):

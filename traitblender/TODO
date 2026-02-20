@@ -1,9 +1,6 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 UI - OPERATORS
-- ui/__init__.py
-- ui/operators/__init__.py
-- ui/operators/apply_orientation_operator.py
 - ui/operators/clear_scene_operator.py
 - ui/operators/configure_traitblender.py
 - ui/operators/edit_dataset_operator.py
@@ -30,3 +27,6 @@ UI - PROPERTIES
 Note that the size parameter in the shell isn't quite working. Or it does, but maybe the size on the x-axis of the shells isnt what we care about. 
 
 Make the raup_num_rings and raup_points_per_ring properties immutable and not visible in the GUI.
+
+DO NOT REMOVE:
+cls; rm -rf traitblender-2.0.0.zip; blender --command extension build --source-dir TraitBlender/

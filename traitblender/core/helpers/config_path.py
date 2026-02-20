@@ -4,10 +4,7 @@ TraitBlender Config Path Helpers
 Utilities for resolving and parsing config property paths, including vector component access.
 """
 
-COMPONENT_TO_INDEX = {
-    "x": 0, "y": 1, "z": 2,
-    "r": 0, "g": 1, "b": 2, "a": 3,
-}
+from .constants import COMPONENT_TO_INDEX
 
 
 def resolve_config_path(path: str) -> str:

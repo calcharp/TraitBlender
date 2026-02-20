@@ -11,7 +11,9 @@ from .object_validator import (
     check_object_exists,
 )   
 from .property_getset import get_property, set_property
-from .asset_manager import get_addon_root, get_user_data_dir, init_user_dirs
+from .get_addon_root import get_addon_root
+from .get_user_data_dir import get_user_data_dir
+from .init_user_dirs import init_user_dirs
 from .asset_path import get_asset_path
 from .config_validator import validate_config_path, get_config_path_info, list_config_properties
 from .config_path import resolve_config_path, parse_component_path, COMPONENT_TO_INDEX
@@ -29,7 +31,7 @@ from .transform_sampler_helper import (
     validate_parameter_value,
     format_parameter_value,
 )
-from .scene_cleaner import clear_scene
+from .clear_scene import clear_scene
 from .pretty_type_hint import pretty_type_hint
 
 # Import table location functions
@@ -79,7 +81,7 @@ __all__ = [
     # Property type checker functions
     "get_property_type",
     "VALID_PROPERTY_TYPES",
-    # Scene cleaner functions
+    # Clear scene
     "clear_scene",
     "pretty_type_hint",
     # Table location functions

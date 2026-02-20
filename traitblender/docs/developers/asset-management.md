@@ -90,7 +90,7 @@ Asset Management
 
 Resolves paths to bundled assets relative to add-on root.
 
-**Location:** `core/helpers/asset_manager.py`
+**Location:** `core/helpers/asset_path.py`
 
 ```python
 def get_asset_path(*path_parts):
@@ -116,7 +116,7 @@ def get_asset_path(*path_parts):
     import os
     
     # Get add-on root directory
-    # __file__ is in core/helpers/asset_manager.py
+    # __file__ is in core/helpers/asset_path.py
     # Root is two levels up: ../../
     addon_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     
@@ -292,7 +292,7 @@ else:
 
 Creates user data directories on add-on first run.
 
-**Location:** `core/helpers/asset_manager.py`
+**Location:** `core/helpers/init_user_dirs.py`
 
 ```python
 def init_user_dirs():

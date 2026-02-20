@@ -1,5 +1,5 @@
 """
-TraitBlender Scene Cleaner
+Clear scene helper.
 
 Helper functions for clearing and cleaning Blender scenes.
 """
@@ -72,4 +72,4 @@ def clear_scene(include_materials=True, include_meshes=True, include_curves=True
     
     print(f"[TraitBlender] Scene cleared: {removed_counts['objects']} objects, {removed_counts['materials']} materials, {removed_counts['meshes']} meshes, {removed_counts['curves']} curves, {removed_counts['lights']} lights, {removed_counts['cameras']} cameras removed")
     
-    return removed_counts 
+    return removed_counts

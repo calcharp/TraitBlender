@@ -6,18 +6,7 @@ Helper functions for checking Blender property types to ensure proper YAML repre
 
 import bpy
 
-
-# Valid Blender property types from bpy.props
-VALID_PROPERTY_TYPES = {
-    'BoolProperty',
-    'BoolVectorProperty', 
-    'EnumProperty',
-    'FloatProperty',
-    'FloatVectorProperty',
-    'IntProperty',
-    'IntVectorProperty',
-    'StringProperty'
-}
+from .constants import VALID_PROPERTY_TYPES
 
 
 def get_property_type(property_path: str, in_config: bool = True):
