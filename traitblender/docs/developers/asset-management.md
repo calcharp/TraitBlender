@@ -178,8 +178,8 @@ get_asset_path("configs")
 → .../assets/configs/
 
 # Multiple components
-get_asset_path("morphospace_modules", "CO_Raup", "__init__.py")
-→ .../assets/morphospace_modules/CO_Raup/__init__.py
+get_asset_path("morphospace_modules", "Shell", "__init__.py")
+→ .../assets/morphospace_modules/Shell/__init__.py
 
 # Deeply nested
 get_asset_path("materials", "specimens", "shell_material.blend")
@@ -216,11 +216,11 @@ TraitBlender/
     │   └── default.yaml           # Default configuration
     │
     ├── morphospace_modules/
-    │   ├── CO_Raup/
+    │   ├── Shell/
     │   │   ├── __init__.py
     │   │   └── morphospace/
-    │   │       ├── contreras_morphospace.py
-    │   │       └── contreras_morphospace_sample.py
+    │   │       ├── shell_morphospace.py
+    │   │       └── shell_morphospace_sample.py
     │   └── [other morphospaces]/
     │
     ├── scenes/
@@ -236,7 +236,7 @@ TraitBlender/
 **Access bundled assets:**
 ```python
 get_asset_path("configs", "default.yaml")
-get_asset_path("morphospace_modules", "CO_Raup")
+get_asset_path("morphospace_modules", "Shell")
 get_asset_path("scenes", "museum_scene.blend")
 ```
 

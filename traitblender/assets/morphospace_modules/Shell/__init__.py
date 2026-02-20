@@ -1,6 +1,5 @@
 from .helpers import get_raup_apex
-from .morphospace.contreras_morphospace import Contreras_MORPHOSPACE
-from .morphospace import Contreras_MORPHOSPACE_SAMPLE
+from .morphospace import ShellMorphospace, ShellMorphospaceSample
 from .orientations import ORIENTATIONS
 
 # Display name for GUI and config references. Folder name remains the internal identifier.
@@ -19,7 +18,7 @@ def sample(name="Shell", b = 0.2, d = 1.65, z = 0, a = 1, phi = 0, psi = 0,
                          c_depth=0.1, c_n = 70, n_depth = 0, n = 0, t = 100,
                          eps=0.8, h_0=0.1, length=0.15, hyperparameters=None):
     """
-    Generate a shell sample using the Contreras morphospace model.
+    Generate a shell sample using the Shell morphospace model.
     
     Args:
         name (str): Name for the generated shell object
@@ -33,7 +32,7 @@ def sample(name="Shell", b = 0.2, d = 1.65, z = 0, a = 1, phi = 0, psi = 0,
         hyperparameters = {}
     merged_hyperparams = {**HYPERPARAMETERS, **hyperparameters}
     
-    morphospace = Contreras_MORPHOSPACE()
+    morphospace = ShellMorphospace()
     return morphospace.generate_sample(
         name=name, b=b, d=d, z=z, a=a, phi=phi, psi=psi,
         c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, t=t,

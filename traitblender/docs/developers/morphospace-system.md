@@ -222,7 +222,7 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
            c_depth=0, c_n=0, n_depth=0, n=0, t=10, time_step=1/30,
            points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
     """
-    Generate shell using Contreras-Okabe morphospace.
+    Generate shell using Shell morphospace.
     
     Args:
         name: Specimen name
@@ -240,9 +240,9 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
         length: Final shell length in meters
     
     Returns:
-        Contreras_MORPHOSPACE_SAMPLE object
+        ShellMorphospaceSample object
     """
-    morphospace = Contreras_MORPHOSPACE()
+    morphospace = ShellMorphospace()
     return morphospace.generate_sample(
         name=name, b=b, d=d, z=z, a=a, phi=phi, psi=psi,
         c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, 
@@ -343,7 +343,7 @@ class SimpleCylinderSample:
 The Shell (Default) morphospace generates shells with inner/outer surfaces and aperture:
 
 ```python
-class Contreras_MORPHOSPACE_SAMPLE:
+class ShellMorphospaceSample:
     def __init__(self, name, data):
         self.name = name
         self.data = data  # Contains: outer_surface, inner_surface, aperture

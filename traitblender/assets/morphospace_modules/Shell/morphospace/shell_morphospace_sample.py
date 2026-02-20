@@ -4,7 +4,7 @@ import bmesh
 from pathlib import Path
 from mathutils import Vector
 
-class Contreras_MORPHOSPACE_SAMPLE():
+class ShellMorphospaceSample():
 
     def __init__(self, name, data):
         self.name = name

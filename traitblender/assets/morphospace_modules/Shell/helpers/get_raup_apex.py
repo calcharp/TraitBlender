@@ -8,7 +8,7 @@ from mathutils import Vector
 
 def get_raup_apex(shell):
     """
-    World-space centroid of the first ring (apex) for a CO_Raup shell.
+    World-space centroid of the first ring (apex) for a shell.
     The apex is the tip of the spiral; use as rotation pivot. Updates with object transform.
 
     Args:

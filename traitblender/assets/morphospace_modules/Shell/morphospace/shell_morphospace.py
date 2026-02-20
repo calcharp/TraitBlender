@@ -1,8 +1,8 @@
 import numpy as np
-from .contreras_morphospace_sample import Contreras_MORPHOSPACE_SAMPLE
+from .shell_morphospace_sample import ShellMorphospaceSample
 
 
-class Contreras_MORPHOSPACE:
+class ShellMorphospace:
 
     def __init__(self):
         pass
@@ -44,8 +44,7 @@ class Contreras_MORPHOSPACE:
         aperture_shape = np.dot(rotation_matrix, vector_N + vector_B)
         return (axial_ribs * spiral_ribs), aperture_size, aperture_shape
 
-    def _lambda(self, t, theta, sin_t, cos_t, sin_theta, cos_theta, b, d, z, a, phi, psi,
-                c_n, c_depth, n, n_depth, inner, eps, h_0):
+    def _lambda(self, t, theta, sin_t, cos_t, sin_theta, cos_theta, b, d, z, a, phi, psi, c_n, c_depth, n, n_depth, inner, eps, h_0):
         """Single point on shell surface (outer or inner)."""
         surface = self._C(t, theta, sin_t, cos_t, sin_theta, cos_theta, b, a, d, z, phi, psi, c_n, c_depth, n, n_depth)
 
@@ -133,4 +132,4 @@ class Contreras_MORPHOSPACE:
                 shell["inner_surface"] = inner_surface * scale_factor
             shell["aperture"] = shell["aperture"] * scale_factor
 
-        return Contreras_MORPHOSPACE_SAMPLE(name=name, data=shell)
+        return ShellMorphospaceSample(name=name, data=shell)
