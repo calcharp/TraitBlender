@@ -118,4 +118,4 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             traceback.print_exc()
             self.report({'ERROR'}, f"Failed to generate morphospace sample: {str(e)}")
             return {'CANCELLED'}
-        return {'FINISHED'} 
+        return {'FINISHED'}

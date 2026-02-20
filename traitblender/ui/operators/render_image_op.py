@@ -15,4 +15,3 @@ class TRAITBLENDER_OT_render_image(Operator):
         bpy.ops.render.render(write_still=True)
         
         return {'FINISHED'}
-

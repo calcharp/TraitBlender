@@ -46,4 +46,4 @@ class TRAITBLENDER_OT_clear_scene(Operator):
         layout.label(text="This will remove ALL objects, materials, and data from the scene.")
         layout.label(text="This action cannot be undone.")
         layout.separator()
-        layout.label(text="Are you sure you want to clear the scene?", icon='ERROR') 
+        layout.label(text="Are you sure you want to clear the scene?", icon='ERROR')

@@ -72,4 +72,4 @@ class TRAITBLENDER_OT_import_dataset(Operator):
                 self.report({'ERROR'}, f"Failed to import dataset: {str(e)}")
             return {'CANCELLED'}
         
-        return {'FINISHED'} 
+        return {'FINISHED'}

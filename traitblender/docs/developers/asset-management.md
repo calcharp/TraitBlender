@@ -555,7 +555,7 @@ apply_material(obj, "ShellMaterial", textures=textures)
 
 **Material from config:**
 ```python
-# In setup_scene_operator.py
+# In setup_scene_op.py
 config = context.scene.traitblender_config
 mat_config = config.mat
 

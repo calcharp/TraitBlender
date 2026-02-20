@@ -123,4 +123,4 @@ class TRAITBLENDER_OT_setup_scene(Operator):
         layout.label(text="Loading the museum scene will replace your current work.")
         layout.label(text="Make sure to save any important changes first.")
         layout.separator()
-        layout.label(text="Continue?", icon='QUESTION') 
+        layout.label(text="Continue?", icon='QUESTION')

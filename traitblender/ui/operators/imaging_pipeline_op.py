@@ -189,4 +189,4 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
         if self._idx >= self._total:
             total_imgs = self._total * self._imgs_per
             print(f"Complete: rendered {self._total} specimens ({total_imgs} total images)")
-            self.report({'INFO'}, f"Rendered {total_imgs} images") 
+            self.report({'INFO'}, f"Rendered {total_imgs} images")

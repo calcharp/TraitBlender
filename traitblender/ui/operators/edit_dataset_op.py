@@ -43,4 +43,4 @@ class TRAITBLENDER_OT_edit_dataset(Operator):
             self.report({'ERROR'}, f"Failed to edit dataset: {str(e)}")
             return {'CANCELLED'}
         
-        return {'FINISHED'} 
+        return {'FINISHED'}

@@ -269,7 +269,7 @@ This page provides detailed documentation for developers working on TraitBlender
     ## Key Components
     
     - **`core/morphospaces/list_morphospaces.py`**: Discovery function
-    - **`ui/operators/generate_morphospace_sample_operator.py`**: Module loading and execution
+    - **`ui/operators/generate_morphospace_sample_op.py`**: Module loading and execution
     - **`assets/morphospace_modules/`**: Morphospace module storage
     
     ## Creating a New Morphospace Module

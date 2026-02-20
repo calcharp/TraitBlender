@@ -1,27 +1,5 @@
 CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
-UI - OPERATORS
-- ui/operators/configure_traitblender.py
-- ui/operators/edit_dataset_operator.py
-- ui/operators/edit_transforms_operator.py
-- ui/operators/generate_morphospace_sample_operator.py
-- ui/operators/import_dataset_operator.py
-- ui/operators/setup_scene_operator.py
-- ui/operators/transforms_operators.py
-
-UI - PANELS
-- ui/panels/__init__.py
-- ui/panels/main_panel.py
-
-UI - PROPERTIES
-- ui/properties/__init__.py
-- ui/properties/morphospace_hyperparams.py
-- ui/properties/orientation_properties.py
-- ui/properties/setup_properties.py
-- ui/properties/tb_location.py
-- ui/properties/table_rotations.py
-
-
 
 Note that the size parameter in the shell isn't quite working. Or it does, but maybe the size on the x-axis of the shells isnt what we care about. 
 

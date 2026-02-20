@@ -35,7 +35,7 @@ Operators in `ui/operators/` typically follow this pattern:
 
 **Example**:
 ```python
-# ui/operators/transforms_operators.py
+# ui/operators/transforms_ops.py
 class TRAITBLENDER_OT_run_pipeline(Operator):
     def execute(self, context):
         # Access config (which is defined in core/config/)
@@ -116,7 +116,7 @@ class TRAITBLENDER_OT_setup_scene(Operator):
 # Access via: bpy.ops.traitblender.setup_scene()
 
 # The class name is only used in Python code:
-from ui.operators.setup_scene_operator import TRAITBLENDER_OT_setup_scene
+from ui.operators.setup_scene_op import TRAITBLENDER_OT_setup_scene
 bpy.utils.register_class(TRAITBLENDER_OT_setup_scene)
 
 # The bl_idname is used when calling the operator:

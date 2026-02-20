@@ -41,12 +41,3 @@ class TRAITBLENDER_OT_edit_transforms(Operator):
             import traceback
             traceback.print_exc()
             return {'CANCELLED'}
-
-
-def register():
-    bpy.utils.register_class(TRAITBLENDER_OT_edit_transforms)
-
-
-def unregister():
-    bpy.utils.unregister_class(TRAITBLENDER_OT_edit_transforms)
-

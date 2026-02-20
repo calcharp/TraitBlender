@@ -271,7 +271,7 @@ Resolution is configured in the Camera section:
 
 ### Automated Pipeline Operator
 
-The `TRAITBLENDER_OT_imaging_pipeline` operator (currently a stub in `ui/operators/imaging_pipeline_operator.py`) will provide:
+The `TRAITBLENDER_OT_imaging_pipeline` operator (currently a stub in `ui/operators/imaging_pipeline_op.py`) will provide:
 
 **Features:**
 - Start/stop/pause rendering
@@ -381,7 +381,7 @@ blender --background scene.blend --python render_script.py
 
 ## Implementation Status
 
-Current implementation in `ui/operators/imaging_pipeline_operator.py`:
+Current implementation in `ui/operators/imaging_pipeline_op.py`:
 
 ```python
 class TRAITBLENDER_OT_imaging_pipeline(Operator):

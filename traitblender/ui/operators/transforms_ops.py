@@ -76,4 +76,4 @@ class TRAITBLENDER_OT_reset_pipeline(Operator):
             self.report({'ERROR'}, f"Failed to reset pipeline: {str(e)}")
             return {'CANCELLED'}
         
-        return {'FINISHED'} 
+        return {'FINISHED'}

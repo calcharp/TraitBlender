@@ -38,7 +38,7 @@ Morphospace System
 │   ├── __init__.py (contains sample() function)
 │   └── morphospace/ (mathematical model + Blender conversion)
 │
-├── Loading (generate_morphospace_sample_operator)
+├── Loading (generate_morphospace_sample_op)
 │   ├── importlib dynamic loading
 │   ├── Extract sample() function
 │   └── Inspect function signature
@@ -425,7 +425,7 @@ def list_morphospaces():
 
 ### Loading: Dynamic Import
 
-Morphospace modules are loaded on-demand in `ui/operators/generate_morphospace_sample_operator.py`:
+Morphospace modules are loaded on-demand in `ui/operators/generate_morphospace_sample_op.py`:
 
 ```python
 # Get morphospace name from UI

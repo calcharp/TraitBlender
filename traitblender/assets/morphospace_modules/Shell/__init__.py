@@ -13,7 +13,7 @@ HYPERPARAMETERS = {
     'use_inner_surface': False,   # Whether to generate inner surface with thickness
 }
 
-# The sampling function. It is called by the generate_morphospace_sample_operator.
+# The sampling function. It is called by the generate_morphospace_sample_op.
 def sample(name="Shell", b = 0.2, d = 1.65, z = 0, a = 1, phi = 0, psi = 0, 
                          c_depth=0.1, c_n = 70, n_depth = 0, n = 0, t = 100,
                          eps=0.8, h_0=0.1, length=0.15, hyperparameters=None):
