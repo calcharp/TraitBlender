@@ -1,8 +1,8 @@
-CODE AUDIT - Delete each line when reviewed. (Excluding docs and imaging.)
 
 
-Note that the size parameter in the shell isn't quite working. Or it does, but maybe the size on the x-axis of the shells isnt what we care about. 
+Get Blender + TraitBlende into a Docker container that will work for V2. Maybe have a GitHub action that will build it automatically.
 
+Figure out better unit testing. 
 
 DO NOT REMOVE:
 cls; rm -rf traitblender-2.0.0.zip; blender --command extension build --source-dir TraitBlender/
