@@ -6,21 +6,21 @@ class MatConfig(TraitBlenderConfig):
     print_index = 4
 
     # Table coordinates in meters
-    location: bpy.props.FloatVectorProperty(
+    tb_location: bpy.props.FloatVectorProperty(
         name="Mat Location",
         description="Mat location in world coordinates in meters",
         subtype='TRANSLATION',
         size=3,
-            get=get_property("bpy.data.objects['Mat'].location", object_dependencies={"objects": ["Mat"]}),
-    set=set_property("bpy.data.objects['Mat'].location", object_dependencies={"objects": ["Mat"]})
+            get=get_property("bpy.data.objects['Mat'].tb_location", object_dependencies={"objects": ["Mat"]}),
+            set=set_property("bpy.data.objects['Mat'].tb_location", object_dependencies={"objects": ["Mat"]})
     )
-    rotation: bpy.props.FloatVectorProperty(
+    tb_rotation: bpy.props.FloatVectorProperty(
         name="Mat Rotation",
         description="The rotation of the Mat",
         subtype='EULER',
-        get=get_property("bpy.data.objects['Mat'].rotation_euler",
+        get=get_property("bpy.data.objects['Mat'].tb_rotation",
                         object_dependencies={"objects": ["Mat"]}),
-        set=set_property("bpy.data.objects['Mat'].rotation_euler",
+        set=set_property("bpy.data.objects['Mat'].tb_rotation",
                         object_dependencies={"objects": ["Mat"]})
     )
     scale: bpy.props.FloatVectorProperty(

@@ -62,6 +62,9 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                 for obj in data_to.objects:
                     if obj is not None:  # Skip None objects
                         bpy.context.scene.collection.objects.link(obj)
+
+                # Ensure depsgraph/bounding boxes are up to date before table-relative placement (tb_location)
+                bpy.context.view_layer.update()
                 
                 # Re-apply table material using dynamic asset path
                 table_name = "Table"
@@ -90,6 +93,7 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                         config_data = yaml.safe_load(file)
                     if config_data:
                         context.scene.traitblender_config.from_dict(config_data)
+                        bpy.context.view_layer.update()
                     else:
                         self.report({'WARNING'}, "Default configuration file is empty or invalid")
                 else:

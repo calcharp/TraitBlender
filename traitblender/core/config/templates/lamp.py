@@ -12,17 +12,15 @@ class LampConfig(TraitBlenderConfig):
         description="Lamp location in meters",
         default=(0.0, 0.0, 0.0),
         subtype='TRANSLATION',
-            get=get_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]}),
-    set=set_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]})
+        get=get_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]}),
+        set=set_property("bpy.data.objects['Lamp'].location", object_dependencies={"objects": ["Lamp"]}),
     )
 
     rotation: bpy.props.FloatVectorProperty(
         name="Lamp Rotation",
         description="The rotation of the lamp",
-        get=get_property("bpy.data.objects['Lamp'].rotation_euler",
-                        object_dependencies={"objects": ["Lamp"]}),
-        set=set_property("bpy.data.objects['Lamp'].rotation_euler",
-                        object_dependencies={"objects": ["Lamp"]})
+        get=get_property("bpy.data.objects['Lamp'].rotation_euler", object_dependencies={"objects": ["Lamp"]}),
+        set=set_property("bpy.data.objects['Lamp'].rotation_euler", object_dependencies={"objects": ["Lamp"]}),
     )
 
     scale: bpy.props.FloatVectorProperty(
