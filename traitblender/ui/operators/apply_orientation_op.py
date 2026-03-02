@@ -2,12 +2,15 @@
 TraitBlender Apply Orientation Operator
 
 Applies the selected orientation function from the morphospace's ORIENTATIONS dict
-to the current sample object.
+to the current sample object. Resets to rest state (from traitblender_sample) first,
+then applies the orientation and bakes rotation.
 """
 
 import bpy
 from bpy.types import Operator
+from mathutils import Euler, Vector
 from ...core.morphospaces import get_orientations_for_morphospace
+from ...core.helpers import bake_rotation_to_mesh
 
 
 class TRAITBLENDER_OT_apply_orientation(Operator):
@@ -42,9 +45,39 @@ class TRAITBLENDER_OT_apply_orientation(Operator):
             return {'CANCELLED'}
 
         sample_obj = bpy.data.objects[sample_name]
+        scene = context.scene
+        sample_data = scene.traitblender_sample
+
         try:
+            # Reset to rest state (as when sample was created) before applying orientation
+            if bpy.context.mode != 'OBJECT':
+                bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.select_all(action='DESELECT')
+            sample_obj.select_set(True)
+            bpy.context.view_layer.objects.active = sample_obj
+
+            last_baked = sample_data.last_baked_rotation
+            if (last_baked[0], last_baked[1], last_baked[2]) != (0.0, 0.0, 0.0):
+                # Use rotation matrix inverse so Flipped (and any combined rotation) undoes correctly
+                eul = Euler(last_baked)
+                inv_rot = eul.to_matrix().inverted()
+                sample_obj.rotation_euler = inv_rot.to_euler(eul.order)
+                bpy.ops.object.transform_apply(rotation=True)
+                sample_data.last_baked_rotation = (0.0, 0.0, 0.0)
+
+            cursor_prev = tuple(scene.cursor.location)
+            scene.cursor.location = Vector(sample_data.rest_origin)
+            bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+            scene.cursor.location = cursor_prev
+            sample_obj.rotation_euler = Euler(sample_data.rest_rotation)
+            bpy.context.view_layer.update()
+
             orient_func(sample_obj)
             bpy.context.view_layer.update()
+
+            sample_data.last_baked_rotation = tuple(sample_obj.rotation_euler)
+            bake_rotation_to_mesh(sample_name)
+
             self.report({'INFO'}, f"Applied orientation: {orientation_key}")
         except Exception as e:
             self.report({'ERROR'}, f"Failed to apply orientation: {str(e)}")

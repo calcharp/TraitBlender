@@ -35,6 +35,7 @@ from .transform_sampler_helper import (
     format_parameter_value,
 )
 from .clear_scene import clear_scene
+from .orientation_helpers import bake_rotation_to_mesh
 # Import table location functions
 try:
     from ..ui.properties.tb_location import _get_tb_location, _set_tb_location
@@ -84,6 +85,8 @@ __all__ = [
     "VALID_PROPERTY_TYPES",
     # Clear scene
     "clear_scene",
+    # Orientation
+    "bake_rotation_to_mesh",
     # Table location functions
     "z_dist_to_lowest",
     "_get_tb_location",

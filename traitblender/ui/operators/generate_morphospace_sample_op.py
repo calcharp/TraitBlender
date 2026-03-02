@@ -83,6 +83,11 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 if bpy.context.active_object and bpy.context.mode != 'OBJECT':
                     bpy.ops.object.mode_set(mode='OBJECT')
 
+                # Store rest state for this sample (before any orientation); used when resetting before apply.
+                scene = context.scene
+                scene.traitblender_sample.rest_origin = tuple(generated_obj.matrix_world.translation)
+                scene.traitblender_sample.rest_rotation = tuple(generated_obj.rotation_euler)
+                scene.traitblender_sample.last_baked_rotation = (0.0, 0.0, 0.0)
 
                 try:
                     bpy.context.scene.traitblender_orientation.orientation = 'Default'
