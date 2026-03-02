@@ -4,6 +4,7 @@ Orientation functions for shell objects.
 
 import bpy
 import math
+from mathutils import Matrix
 from ..helpers import get_raup_apex, set_origin_at_location
 
 
@@ -61,5 +62,26 @@ def _orient_geometric_center_xflipped(sample_obj):
     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
 
     # Ensure centered on table after rotation
+    sample_obj.tb_location = (0.0, 0.0, 0.0)
+    bpy.context.view_layer.update()
+
+
+def _orient_default_xminus90(sample_obj):
+    """
+    Default orientation plus -90° rotation around world X (aperture-facing view).
+    Uses world X so the tilt is consistent; Euler .x would rotate around local X (diagonal after Default).
+    """
+    _orient_default(sample_obj)
+
+    # Apply -90° around world X by composing in world space (avoids Euler order / local-axis diagonal)
+    R_obj = sample_obj.rotation_euler.to_matrix()
+    R_world_x = Matrix.Rotation(-math.pi / 2, 3, 'X')
+    R_new = R_world_x @ R_obj
+    sample_obj.rotation_euler = R_new.to_euler(sample_obj.rotation_euler.order)
+
+    bpy.context.view_layer.objects.active = sample_obj
+    sample_obj.select_set(True)
+    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+
     sample_obj.tb_location = (0.0, 0.0, 0.0)
     bpy.context.view_layer.update()

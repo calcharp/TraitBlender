@@ -8,7 +8,7 @@ then applies the orientation and bakes rotation.
 
 import bpy
 from bpy.types import Operator
-from mathutils import Euler, Vector
+from mathutils import Euler
 from ...core.morphospaces import get_orientations_for_morphospace
 from ...core.helpers import bake_rotation_to_mesh
 
@@ -65,10 +65,7 @@ class TRAITBLENDER_OT_apply_orientation(Operator):
                 bpy.ops.object.transform_apply(rotation=True)
                 sample_data.last_baked_rotation = (0.0, 0.0, 0.0)
 
-            cursor_prev = tuple(scene.cursor.location)
-            scene.cursor.location = Vector(sample_data.rest_origin)
-            bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
-            scene.cursor.location = cursor_prev
+            # Restore baseline rotation (do NOT change origin or location here)
             sample_obj.rotation_euler = Euler(sample_data.rest_rotation)
             bpy.context.view_layer.update()
 
@@ -77,6 +74,9 @@ class TRAITBLENDER_OT_apply_orientation(Operator):
 
             sample_data.last_baked_rotation = tuple(sample_obj.rotation_euler)
             bake_rotation_to_mesh(sample_name)
+            # Ensure origin is always the geometry bounds center (not world origin)
+            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+            bpy.context.view_layer.update()
 
             self.report({'INFO'}, f"Applied orientation: {orientation_key}")
         except Exception as e:

@@ -85,7 +85,6 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
 
                 # Store rest state for this sample (before any orientation); used when resetting before apply.
                 scene = context.scene
-                scene.traitblender_sample.rest_origin = tuple(generated_obj.matrix_world.translation)
                 scene.traitblender_sample.rest_rotation = tuple(generated_obj.rotation_euler)
                 scene.traitblender_sample.last_baked_rotation = (0.0, 0.0, 0.0)
 

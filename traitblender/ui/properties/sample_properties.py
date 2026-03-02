@@ -31,13 +31,6 @@ class TRAITBLENDER_PG_sample(bpy.types.PropertyGroup):
     props: PointerProperty(type=TRAITBLENDER_PG_sample_props)
 
     # Rest state (updated when a new sample is created); used to reset before applying an orientation.
-    rest_origin: FloatVectorProperty(
-        name="Rest origin",
-        description="World position of the sample origin when the sample was created",
-        size=3,
-        subtype='TRANSLATION',
-        default=(0.0, 0.0, 0.0),
-    )
     rest_rotation: FloatVectorProperty(
         name="Rest rotation",
         description="Rotation of the sample when it was created (Euler)",

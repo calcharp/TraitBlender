@@ -14,7 +14,7 @@ camera:
   aspect_x: 1.0
   aspect_y: 1.0
   camera_type: PERSP
-  focal_length: 60.0
+  focal_length: 50.0
   lens_unit: MILLIMETERS
   resolution_percentage: 100
   resolution_x: 1080
@@ -38,7 +38,7 @@ mat:
   tb_location: [0.0, 0.0, 0.0]
   tb_rotation: [0.0, 0.0, 0.0]
   roughness: 1.0
-  scale: [0.125, 0.125, 1.0]
+  scale: [0.15, 0.15, 1.0]
 render:
   eevee_use_raytracing: false
   engine: BLENDER_EEVEE_NEXT
