@@ -27,7 +27,7 @@ For reference, here are all the parameters available for the shell morphospace, 
 | `n` | ℤ⁺ or ℝ⁺ | Spiral rib frequency around the aperture |
 | `t` | ℝ⁺ (positive reals) | Time parameter defining shell length (upper bound of integration) |
 | `time_step` | ℝ⁺ (small positive reals) | Time step for shell generation (Δt in numerical integration) |
-| `points_in_circle` | ℤ⁺ (positive integers) | Number of points around each shell ring (aperture resolution) |
+| `n_vertices_aperture` | ℤ⁺ (positive integers) | Number of points around each shell ring (aperture resolution) |
 | `eps` | ℝ⁺ (positive reals) | Thickness parameter: thickness = (exp(b·t) - 1/(t+1))^eps · h_0 |
 | `h_0` | ℝ⁺ (positive reals) | Base thickness parameter in the allometric thickness function |
 | `length` | ℝ⁺ (positive reals, meters) | Desired final shell length in meters (applied as scaling factor) |
@@ -37,7 +37,7 @@ For reference, here are all the parameters available for the shell morphospace, 
 - Parameters `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, and `n` come from the Contreras paper and describe the overall shape of the outer surface of the shell.
 - Parameters `eps`, `h_0`, and `length` come from Okabe and describe the thickness of the shell as an allometric function of its radius at any point.
 - Parameter `t` describes the number of half spirals of the shell.
-- Parameters `time_step` and `points_in_circle` are not biologically meaningful parameters, but describe how many vertices will be in the outer and inner surfaces as a function of `t` along the growth curve and as a raw count along the aperture.
+- Parameters `time_step` and `n_vertices_aperture` are not biologically meaningful parameters, but describe how many vertices will be in the outer and inner surfaces as a function of `t` along the growth curve and as a raw count along the aperture.
 
 ## Setup
 
@@ -121,11 +121,11 @@ print(snails)
 
 ## Step 4: Set Constant Parameters
 
-Since shells grow according to their spiral curve, the `t` parameter essentially corresponds to an ontogenic age. We'll keep this constant across species for simplicity. Additionally, we'll make `time_step` and `points_in_circle` constant across species, set high enough that the generated shells have a nice high-poly look:
+Since shells grow according to their spiral curve, the `t` parameter essentially corresponds to an ontogenic age. We'll keep this constant across species for simplicity. Additionally, we'll make `time_step` and `n_vertices_aperture` constant across species, set high enough that the generated shells have a nice high-poly look:
 
 ```r
 snails$t <- 30
-snails$points_in_circle <- 80
+snails$n_vertices_aperture <- 80
 snails$time_step <- 0.1
 snails$d <- 1.5
 ```

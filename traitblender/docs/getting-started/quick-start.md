@@ -90,7 +90,7 @@ Before starting, ensure you have:
     - **First column**: Species/specimen names (automatically detected)
     - **Remaining columns**: Morphological traits that map to morphospace parameters
 
-    For Shell (Default), the parameters include: `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `time_step`, `points_in_circle`, `eps`, `h_0`, `length`
+    For Shell (Default), the parameters include: `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `time_step`, `n_vertices_aperture`, `eps`, `h_0`, `length`
 
     ### Generate a Specimen
 

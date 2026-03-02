@@ -82,12 +82,12 @@ class ShellMorphospace:
         ])
 
     def generate_sample(self, name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
-                        c_depth=0.1, c_n=70, n_depth=0, n=0, t=100,
-                        points_in_circle=40, time_step=1/30, use_inner_surface=True,
+                        c_depth=0, c_n=70, n_depth=0, n=0, t=100,
+                        n_vertices_aperture=40, time_step=1/30, use_inner_surface=True,
                         eps=0.8, h_0=0.1, length=0.15):
 
         t_values = np.arange(0, t, time_step)
-        theta_values = np.linspace(0, 2 * np.pi, points_in_circle, endpoint=False)
+        theta_values = np.linspace(0, 2 * np.pi, n_vertices_aperture, endpoint=False)
 
         sin_t_values = np.sin(t_values)
         cos_t_values = np.cos(t_values)

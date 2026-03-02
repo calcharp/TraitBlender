@@ -220,7 +220,7 @@ def sample(name="Shape", radius=1.0, height=2.0, segments=32):
 ```python
 def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
            c_depth=0, c_n=0, n_depth=0, n=0, t=10, time_step=1/30,
-           points_in_circle=40, eps=0.8, h_0=0.1, length=0.015):
+           n_vertices_aperture=40, eps=0.8, h_0=0.1, length=0.015):
     """
     Generate shell using Shell morphospace.
     
@@ -235,7 +235,7 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
         n_depth, n: Spiral rib parameters
         t: Shell length (time parameter)
         time_step: Time discretization
-        points_in_circle: Aperture resolution
+        n_vertices_aperture: Aperture resolution
         eps, h_0: Thickness parameters
         length: Final shell length in meters
     
@@ -246,7 +246,7 @@ def sample(name="Shell", b=0.1, d=4, z=0, a=1, phi=0, psi=0,
     return morphospace.generate_sample(
         name=name, b=b, d=d, z=z, a=a, phi=phi, psi=psi,
         c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, 
-        t=t, time_step=time_step, points_in_circle=points_in_circle,
+        t=t, time_step=time_step, n_vertices_aperture=n_vertices_aperture,
         eps=eps, h_0=h_0, length=length
     )
 ```
