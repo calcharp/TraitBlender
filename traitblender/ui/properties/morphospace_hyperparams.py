@@ -61,7 +61,7 @@ def create_hyperparams_property_group(morphospace_name, hyperparams_dict):
             )
         elif isinstance(default, float):
             annotations[key] = FloatProperty(
-                name=display_name, default=default, min=0.0001, max=1000.0,
+                name=display_name, default=default, min=1e-13, max=1000.0,
                 step=0.01, precision=4, get=getter, set=setter
             )
         else:

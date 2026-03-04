@@ -53,13 +53,18 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 # Remove hyperparameters from valid_params so they don't get mapped from dataset
                 valid_params = valid_params - set(hyperparameters.keys()) - {'hyperparameters'}
             
-            # Map dataset columns to function parameters (excluding hyperparameters)
+            # Map dataset columns to function parameters (excluding hyperparameters).
+            # Case-insensitive match so e.g. dataset column "S" maps to param "S".
             params = {}
             for column_name, value in row_data.items():
                 param_name = column_name.lower().replace(' ', '_')
                 if param_name in valid_params:
                     params[param_name] = value
-            
+                else:
+                    matched = next((p for p in valid_params if p.lower().replace(' ', '_') == param_name), None)
+                    if matched is not None:
+                        params[matched] = value
+
             # Add hyperparameters as a dict parameter if the function accepts it
             if hyperparameters is not None and 'hyperparameters' in sig.parameters:
                 params['hyperparameters'] = hyperparameters

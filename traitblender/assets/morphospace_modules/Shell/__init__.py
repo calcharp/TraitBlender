@@ -6,37 +6,39 @@ from .orientations import ORIENTATIONS
 NAME = "Shell (Default)"
 
 # Hyperparameters: Non-biological parameters (discretization, surface options). From config, not dataset.
-# Regular traits (eps, h_0, length) are passed as sample() params from the dataset.
+# Regular traits (eps, h_0, etc.) are passed as sample() params from the dataset.
 HYPERPARAMETERS = {
-    'n_vertices_aperture': 20,  #Number of points around each shell ring (discretization)
+    'n_vertices_aperture': 20,  # Number of points around each shell ring (discretization)
     'time_step': 0.05,          # Time step for shell generation (discretization)
-    'use_inner_surface': False,   # Whether to generate inner surface with thickness
+    'use_inner_surface': False, # Whether to generate inner surface with thickness
 }
 
 # The sampling function. It is called by the generate_morphospace_sample_op.
-def sample(name="Shell", b = 0.2, d = 1.65, z = 0, a = 1, phi = 0, psi = 0, 
-                         c_depth=0, c_n = 70, n_depth = 0, n = 0, t = 100,
-                         eps=0.8, h_0=0.1, length=0.15, hyperparameters=None):
+def sample(name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
+           c_depth=0, c_n=70, n_depth=0, n=0, t=100,
+           eps=0.8, h_0=0.1, S=0.05, hyperparameters=None):
     """
-    Generate a shell sample using the Shell morphospace model.
-    
+    Generate a shell sample using the Shell morphospace model (paper parameterization).
+
     Args:
         name (str): Name for the generated shell object
         b, d, z, a, phi, psi, c_depth, c_n, n_depth, n, t (float): Biological traits (from dataset)
+        d (float): Horizontal distance scale (paper Eq. 2): r = d*e^(bt). From images (paper
+            §2.4.3): d = (re+ri)/(re-ri)*a, with re/ri = axis to external/internal aperture border, a = ellipse ratio.
         eps (float): Thickness parameter (allometric exponent) - trait
         h_0 (float): Base thickness parameter - trait
-        length (float): Desired shell length in meters (scaling) - trait
+        S (float, optional): If set, scale so aperture diameter along B at final time = S. None = no scaling.
         hyperparameters (dict, optional): From config. n_vertices_aperture, time_step, use_inner_surface.
     """
     if hyperparameters is None:
         hyperparameters = {}
     merged_hyperparams = {**HYPERPARAMETERS, **hyperparameters}
-    
+
     morphospace = ShellMorphospace()
     return morphospace.generate_sample(
         name=name, b=b, d=d, z=z, a=a, phi=phi, psi=psi,
         c_depth=c_depth, c_n=c_n, n_depth=n_depth, n=n, t=t,
-        eps=eps, h_0=h_0, length=length,
+        eps=eps, h_0=h_0, S=S,
         **merged_hyperparams
     )
 

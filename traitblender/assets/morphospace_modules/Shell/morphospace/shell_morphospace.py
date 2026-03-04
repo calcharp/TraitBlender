@@ -51,7 +51,8 @@ class ShellMorphospace:
         if inner:
             surface = surface[1] * surface[2]
             surface_norm = np.linalg.norm(surface)
-            thickness = ((np.exp(b * t) - (1 / (t + 1))) ** eps) * h_0
+            aperture_size_norm = np.exp(b * t) - (1 / (t + 1))
+            thickness = (aperture_size_norm ** eps) * h_0
 
             # Numerical safeguards for inner surface thickness calculation.
             # Prevents NaN/Inf from division by zero, negative thickness, or extreme ratios.
@@ -84,9 +85,15 @@ class ShellMorphospace:
     def generate_sample(self, name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
                         c_depth=0, c_n=70, n_depth=0, n=0, t=100,
                         n_vertices_aperture=40, time_step=1/30, use_inner_surface=True,
-                        eps=0.8, h_0=0.1, length=0.15):
+                        eps=0.8, h_0=0.1, S=0.05):
+        """Generate a shell sample using the paper parameterization (d, z, b, t, ...).
+        S: if set, scale the shell so the aperture diameter along the B direction at final
+        time t equals S (single global scale, shape unchanged). None = no scaling.
+        """
 
         t_values = np.arange(0, t, time_step)
+        if t_values.size == 0 or t_values[-1] != t:
+            t_values = np.append(t_values, t)
         theta_values = np.linspace(0, 2 * np.pi, n_vertices_aperture, endpoint=False)
 
         sin_t_values = np.sin(t_values)
@@ -94,6 +101,7 @@ class ShellMorphospace:
         sin_theta_values = np.sin(theta_values)
         cos_theta_values = np.cos(theta_values)
 
+        # Generate in the original paper parameterization (use `d` directly)
         outer_surface = self._compute_surface_vertices(
             t_values, theta_values, sin_t_values, cos_t_values,
             sin_theta_values, cos_theta_values, b, d, z, a, phi, psi,
@@ -111,25 +119,23 @@ class ShellMorphospace:
             inner_surface = None
             aperture = outer_surface[-1]
 
+        # Optional size scaling: B-diameter at aperture = S
+        if S is not None and np.isfinite(S):
+            g_tf = np.exp(b * t) - 1 / (t + 1)
+            B_amplitude = np.sqrt((a * np.sin(phi)) ** 2 + (np.cos(phi)) ** 2)
+            D_B = 2.0 * g_tf * B_amplitude
+            if D_B > 0:
+                k = S / D_B
+                outer_surface = outer_surface * k
+                if inner_surface is not None:
+                    inner_surface = inner_surface * k
+                aperture = aperture * k
+
         shell = {
             "outer_surface": outer_surface,
             "inner_surface": inner_surface,
-            "aperture": aperture
+            "aperture": aperture,
         }
 
-        if length is not None:
-            all_x_coords = []
-            all_x_coords.extend(outer_surface[:, :, 0].flatten())
-            if inner_surface is not None:
-                all_x_coords.extend(inner_surface[:, :, 0].flatten())
-            all_x_coords.extend(aperture[:, 0])
-
-            x_length_current = max(all_x_coords) - min(all_x_coords)
-            scale_factor = length / x_length_current if x_length_current != 0 else 1
-
-            shell["outer_surface"] = outer_surface * scale_factor
-            if inner_surface is not None:
-                shell["inner_surface"] = inner_surface * scale_factor
-            shell["aperture"] = shell["aperture"] * scale_factor
-
         return ShellMorphospaceSample(name=name, data=shell)
+

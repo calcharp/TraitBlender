@@ -94,17 +94,15 @@ class ShellMorphospaceSample():
 
             objs.append(obj)
 
-        surface_names = [f"{surface_name}" for surface_name in surfaces]
+        join_objs = list(objs)
         if aperture_obj is not None:
-            surface_names.append(f"{self.name}_aperture")
+            join_objs.append(aperture_obj)
 
         bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.object.select_all(action='DESELECT')
-        for name in surface_names:
-            obj = bpy.data.objects.get(name)
-            if obj:
-                obj.select_set(True)
-        bpy.context.view_layer.objects.active = bpy.data.objects[surface_names[0]]
+        for obj in join_objs:
+            obj.select_set(True)
+        bpy.context.view_layer.objects.active = join_objs[0]
         bpy.ops.object.join()
 
         obj = bpy.context.active_object
