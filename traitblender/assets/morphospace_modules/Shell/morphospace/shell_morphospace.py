@@ -85,10 +85,10 @@ class ShellMorphospace:
     def generate_sample(self, name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
                         c_depth=0, c_n=70, n_depth=0, n=0, t=100,
                         n_vertices_aperture=40, time_step=1/30, use_inner_surface=True,
-                        eps=0.8, h_0=0.1, S=0.05):
+                        eps=0.8, h_0=0.1, S=5.0):
         """Generate a shell sample using the paper parameterization (d, z, b, t, ...).
         S: if set, scale the shell so the aperture diameter along the B direction at final
-        time t equals S (single global scale, shape unchanged). None = no scaling.
+        time t equals S centimeters (single global scale, shape unchanged). None = no scaling.
         """
 
         t_values = np.arange(0, t, time_step)
@@ -119,13 +119,14 @@ class ShellMorphospace:
             inner_surface = None
             aperture = outer_surface[-1]
 
-        # Optional size scaling: B-diameter at aperture = S
+        # Optional size scaling: B-diameter at aperture = S (cm) → target meters = S/100
         if S is not None and np.isfinite(S):
             g_tf = np.exp(b * t) - 1 / (t + 1)
             B_amplitude = np.sqrt((a * np.sin(phi)) ** 2 + (np.cos(phi)) ** 2)
             D_B = 2.0 * g_tf * B_amplitude
             if D_B > 0:
-                k = S / D_B
+                S_m = S / 100.0  # S in cm → meters (Blender units)
+                k = S_m / D_B
                 outer_surface = outer_surface * k
                 if inner_surface is not None:
                     inner_surface = inner_surface * k

@@ -16,7 +16,7 @@ HYPERPARAMETERS = {
 # The sampling function. It is called by the generate_morphospace_sample_op.
 def sample(name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
            c_depth=0, c_n=70, n_depth=0, n=0, t=100,
-           eps=0.8, h_0=0.1, S=0.05, hyperparameters=None):
+           eps=0.8, h_0=0.1, S=5.0, hyperparameters=None):
     """
     Generate a shell sample using the Shell morphospace model (paper parameterization).
 
@@ -27,7 +27,7 @@ def sample(name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
             §2.4.3): d = (re+ri)/(re-ri)*a, with re/ri = axis to external/internal aperture border, a = ellipse ratio.
         eps (float): Thickness parameter (allometric exponent) - trait
         h_0 (float): Base thickness parameter - trait
-        S (float, optional): If set, scale so aperture diameter along B at final time = S. None = no scaling.
+        S (float, optional): Aperture diameter in centimeters. If set, scale so aperture diameter = S cm. None = no scaling.
         hyperparameters (dict, optional): From config. n_vertices_aperture, time_step, use_inner_surface.
     """
     if hyperparameters is None:
