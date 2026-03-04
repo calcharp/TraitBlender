@@ -4,5 +4,7 @@ Get Blender + TraitBlende into a Docker container that will work for V2. Maybe h
 
 Figure out better unit testing. 
 
+Figure out why the chirality seems to be flipped in the shell morphospace.
+
 DO NOT REMOVE:
 cls; rm -rf traitblender-2.0.0.zip; blender --command extension build --source-dir TraitBlender/
