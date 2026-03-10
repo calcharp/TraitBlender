@@ -5,8 +5,8 @@ on:
     branches:
       - v2  # Your current branch (change to 'main' or 'master' if you merge to default branch)
     paths:
-      - 'traitblender/docs/**'
-      - 'traitblender/mkdocs.yml'
+      - 'TraitBlender/docs/**'
+      - 'TraitBlender/mkdocs.yml'
       - '.github/workflows/docs.yml'
   workflow_dispatch:  # Allows manual triggering
 
@@ -37,8 +37,15 @@ jobs:
           pip install mkdocs-material
           pip install pymdown-extensions
 
+      - name: Find addon directory
+        id: addon_dir
+        run: |
+          ADDON_DIR="$(find . -maxdepth 1 -type d -iname 'traitblender' | head -1)"
+          if [ -z "$ADDON_DIR" ]; then echo "Addon directory not found"; exit 1; fi
+          echo "dir=$ADDON_DIR" >> $GITHUB_OUTPUT
+
       - name: Build documentation
-        working-directory: traitblender
+        working-directory: ${{ steps.addon_dir.outputs.dir }}
         run: mkdocs build
 
       - name: Setup Pages
@@ -47,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: traitblender/site
+          path: ${{ steps.addon_dir.outputs.dir }}/site
 
   deploy:
     environment:
