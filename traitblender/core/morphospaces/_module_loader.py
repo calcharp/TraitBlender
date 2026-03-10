@@ -1,30 +1,46 @@
 """Shared loader for morphospace modules."""
 
 import os
+import types
 import importlib.util
 import sys
 
 from ..helpers import get_asset_path
+from ..helpers.constants import ADDON_PACKAGE
+
+# Namespace under which morphospace modules are registered (avoids Blender "top-level module" warning)
+_MORPHOSPACE_NAMESPACE = f"{ADDON_PACKAGE}._morphospace"
+
+
+def _ensure_morphospace_namespace():
+    """Ensure the _morphospace namespace exists in sys.modules so child modules are not top-level."""
+    if _MORPHOSPACE_NAMESPACE not in sys.modules:
+        ns = types.ModuleType(_MORPHOSPACE_NAMESPACE)
+        ns.__path__ = []
+        sys.modules[_MORPHOSPACE_NAMESPACE] = ns
 
 
 def _load_by_folder(folder_name):
-    """Load a morphospace module by folder name (internal)."""
+    """Load a morphospace module by folder name (internal). Registers under addon namespace to avoid top-level module warning."""
     if not folder_name:
         return None
     morphospace_modules_path = get_asset_path("morphospace_modules")
     morphospace_path = os.path.join(morphospace_modules_path, folder_name)
     if not os.path.exists(morphospace_path):
         return None
+    _ensure_morphospace_namespace()
+    # Use a dotted name under the addon so Blender does not treat it as a top-level module
+    module_name = f"{_MORPHOSPACE_NAMESPACE}.{folder_name}"
     try:
         spec = importlib.util.spec_from_file_location(
-            folder_name,
+            module_name,
             os.path.join(morphospace_path, "__init__.py"),
             submodule_search_locations=[morphospace_path]
         )
         if spec is None or spec.loader is None:
             return None
         module = importlib.util.module_from_spec(spec)
-        sys.modules[folder_name] = module
+        sys.modules[module_name] = module
         spec.loader.exec_module(module)
         return module
     except Exception as e:

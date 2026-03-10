@@ -55,7 +55,7 @@ def sample(
     diameter_15=0.0,
 ):
     """
-    Generate a Circle Grid sample: white cube (0.295 m × 0.295 m × 1 cm) with 16 black circles
+    Generate a Circle Grid sample: white cube (0.29 m × 0.29 m × 1 cm) with 16 black circles
     on the top face in a 4×4 grid.
 
     Args:
