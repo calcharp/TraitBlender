@@ -50,9 +50,9 @@ def get_default(property_path: str, prop_type: str):
         'EnumProperty': 0
     }
     
-    # Check if prop_type is None
+    # Check if prop_type is None (avoid returning None for numeric/vector props)
     if prop_type is None:
-        return None
+        return 0.0
     
     # Check if it's a scalar property
     if prop_type in scalar_defaults:
@@ -120,6 +120,8 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
             return val if options is None else 0
         if not _check_object_dependencies(object_dependencies):
             val = default if default is not None else get_default(path, prop_type)
+            if val is None:
+                val = get_default(path, prop_type) if prop_type else 0.0
             if strict_error_reporting:
                 raise RuntimeError(f"[TraitBlender] Missing required Blender objects for property: {path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()")
             warnings.warn(f"[TraitBlender] Missing required Blender objects for property: {path}\n\nYou may need to run bpy.ops.traitblender.setup_scene()", UserWarning)
@@ -134,6 +136,8 @@ def get_property(property_path: str, options: list = None, object_dependencies: 
             return value
         except Exception as e:
             val = default if default is not None else get_default(path, prop_type)
+            if val is None:
+                val = get_default(path, prop_type) if prop_type else 0.0
             if strict_error_reporting:
                 raise RuntimeError(f"[TraitBlender] Error accessing property: {path}\nError: {str(e)}")
             warnings.warn(f"[TraitBlender] Error accessing property: {path}", UserWarning)
