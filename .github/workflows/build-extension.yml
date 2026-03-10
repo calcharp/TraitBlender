@@ -1,5 +1,6 @@
 # Build TraitBlender extension for Windows and Linux (Blender 4.3).
 # Assembles addon + platform wheels and a generated manifest per job.
+# On tag push (v*), creates a GitHub Release with the built zips for README download links.
 name: Build extension
 
 on:
@@ -8,18 +9,26 @@ on:
       - v2
     paths:
       - 'TraitBlender/**'
+      - 'traitblender/**'
       - 'wheels/**'
       - 'packaging/**'
       - '.github/workflows/build-extension.yml'
+  push:
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - v2
     paths:
       - 'TraitBlender/**'
+      - 'traitblender/**'
       - 'wheels/**'
       - 'packaging/**'
       - '.github/workflows/build-extension.yml'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build-windows:
@@ -80,3 +89,33 @@ jobs:
         with:
           name: traitblender-linux-x86_64
           path: "**/traitblender-2.0.0.zip"
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: traitblender-windows-x86_64
+
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: traitblender-linux-x86_64
+
+      - name: Prepare release assets
+        run: |
+          mv traitblender-windows-x86_64/traitblender-2.0.0.zip traitblender-windows-x86_64.zip
+          mv traitblender-linux-x86_64/traitblender-2.0.0.zip traitblender-linux-x86_64.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            traitblender-windows-x86_64.zip
+            traitblender-linux-x86_64.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
