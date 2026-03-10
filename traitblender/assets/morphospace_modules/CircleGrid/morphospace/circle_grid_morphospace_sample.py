@@ -3,12 +3,12 @@
 import bpy
 
 
-# Cube: 0.295 m x 0.295 m x 0.01 m (1 cm deep in z), centered at origin
-_CUBE_HALF_XY = 0.295 / 2.0
+# Cube: 0.29 m x 0.29 m x 0.01 m (1 cm deep in z), centered at origin
+_CUBE_HALF_XY = 0.29 / 2.0
 _CUBE_HALF_Z = 0.005
 
 # 4x4 grid on top face
-_CELL_SIZE = 0.295 / 4.0
+_CELL_SIZE = 0.29 / 4.0
 _TOP_Z = _CUBE_HALF_Z
 _CIRCLE_VERTICES = 64  # vertices for Add Mesh > Circle (smooth look)
 # Default circle diameter in Blender (meters). Diameter trait: 0 = this size, 1 = 2×, 2 = 4× (scale = 2^trait).
