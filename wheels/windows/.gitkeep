@@ -1,0 +1,2 @@
+# Windows wheels go here (e.g. numpy, pandas, dearpygui *.whl).
+# CI copies these into the build dir when building the extension.

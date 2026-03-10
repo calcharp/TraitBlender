@@ -1,0 +1,2 @@
+# Wheels live at repo root: wheels/windows, wheels/mac, wheels/ubuntu.
+# The build assembles addon + wheels + generated manifest; see packaging/generate_manifest.py.

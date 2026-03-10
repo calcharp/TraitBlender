@@ -1,4 +1,5 @@
 # Build TraitBlender extension for Windows (Blender 4.3).
+# Assembles addon + wheels from repo-level wheels/windows and a generated manifest.
 # Other OSs can be added to the matrix later.
 name: Build extension (Windows)
 
@@ -8,12 +9,16 @@ on:
       - v2
     paths:
       - 'TraitBlender/**'
+      - 'wheels/**'
+      - 'packaging/**'
       - '.github/workflows/build-extension.yml'
   pull_request:
     branches:
       - v2
     paths:
       - 'TraitBlender/**'
+      - 'wheels/**'
+      - 'packaging/**'
       - '.github/workflows/build-extension.yml'
   workflow_dispatch:
 
@@ -29,9 +34,18 @@ jobs:
         with:
           version: "4.3"
 
-      - name: Build extension
+      - name: Assemble build directory
         run: |
-          blender --command extension build --source-dir TraitBlender
+          New-Item -ItemType Directory -Path build_traitblender -Force
+          Copy-Item -Path TraitBlender\* -Destination build_traitblender\ -Recurse -Force
+          New-Item -ItemType Directory -Path build_traitblender\wheels -Force
+          Copy-Item -Path wheels\windows\*.whl -Destination build_traitblender\wheels\
+
+      - name: Generate manifest
+        run: python packaging/generate_manifest.py build_traitblender/wheels --output build_traitblender/blender_manifest.toml
+
+      - name: Build extension
+        run: blender --command extension build --source-dir build_traitblender
 
       - name: Upload extension artifact
         uses: actions/upload-artifact@v4
