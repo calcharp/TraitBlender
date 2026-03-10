@@ -7,15 +7,14 @@ on:
   push:
     branches:
       - v2
+    tags:
+      - 'v*'
     paths:
       - 'TraitBlender/**'
       - 'traitblender/**'
       - 'wheels/**'
       - 'packaging/**'
       - '.github/workflows/build-extension.yml'
-  push:
-    tags:
-      - 'v*'
   pull_request:
     branches:
       - v2
