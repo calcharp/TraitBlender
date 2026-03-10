@@ -1,0 +1,40 @@
+# Build TraitBlender extension for Windows (Blender 4.3).
+# Other OSs can be added to the matrix later.
+name: Build extension (Windows)
+
+on:
+  push:
+    branches:
+      - v2
+    paths:
+      - 'TraitBlender/**'
+      - '.github/workflows/build-extension.yml'
+  pull_request:
+    branches:
+      - v2
+    paths:
+      - 'TraitBlender/**'
+      - '.github/workflows/build-extension.yml'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Blender 4.3
+        uses: bradyajohnston/setup-blender@v1
+        with:
+          version: "4.3"
+
+      - name: Build extension
+        run: |
+          blender --command extension build --source-dir TraitBlender
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: traitblender-windows-x86_64
+          path: "**/traitblender-2.0.0.zip"
