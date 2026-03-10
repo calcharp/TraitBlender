@@ -1,7 +1,6 @@
-# Build TraitBlender extension for Windows (Blender 4.3).
-# Assembles addon + wheels from repo-level wheels/windows and a generated manifest.
-# Other OSs can be added to the matrix later.
-name: Build extension (Windows)
+# Build TraitBlender extension for Windows and Linux (Blender 4.3).
+# Assembles addon + platform wheels and a generated manifest per job.
+name: Build extension
 
 on:
   push:
@@ -51,4 +50,33 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: traitblender-windows-x86_64
+          path: "**/traitblender-2.0.0.zip"
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Blender 4.3
+        uses: bradyajohnston/setup-blender@v5
+        with:
+          version: "4.3"
+
+      - name: Assemble build directory
+        run: |
+          mkdir -p build_traitblender/wheels
+          cp -r TraitBlender/* build_traitblender/
+          cp wheels/linux/*.whl build_traitblender/wheels/
+
+      - name: Generate manifest
+        run: python3 packaging/generate_manifest.py build_traitblender/wheels --output build_traitblender/blender_manifest.toml
+
+      - name: Build extension
+        run: blender --command extension build --source-dir build_traitblender
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: traitblender-linux-x86_64
           path: "**/traitblender-2.0.0.zip"
