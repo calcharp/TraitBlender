@@ -33,6 +33,8 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
     _save_meshes = False
     _mesh_root = ""
     _exported_mesh_for_specimen = False
+    _mesh_path = ""
+    _last_applied_orientation = ""
     _log_file = None
     _csv_file = None
     _csv_writer = None
@@ -61,6 +63,8 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                 dataset.sample = name
                 bpy.ops.traitblender.generate_morphospace_sample()
                 self._exported_mesh_for_specimen = False
+                self._mesh_path = ""
+                self._last_applied_orientation = ""
 
                 # Optional mesh export: once per specimen, at Default orientation only
                 if self._save_meshes and not self._exported_mesh_for_specimen:
@@ -69,16 +73,26 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                         bpy.ops.traitblender.apply_orientation()
                         mesh_dir = os.path.join(self._mesh_root, name)
                         os.makedirs(mesh_dir, exist_ok=True)
-                        export_current_sample(filepath=os.path.join(mesh_dir, f"{name}"), context=context)
+                        self._mesh_path = os.path.join(mesh_dir, f"{name}")
+                        export_current_sample(filepath=self._mesh_path, context=context)
                         self._exported_mesh_for_specimen = True
+                        if self._csv_writer:
+                            self._csv_writer.writerow([name, "MESH", 0, os.path.abspath(self._mesh_path), ""])
+                            self._csv_file.flush()
                     except Exception as e:
                         # Don't crash the imaging pipeline if mesh export fails
                         print(f"TraitBlender: Mesh export failed for '{name}': {e}")
 
             # Set and apply this orientation at start of each orientation block
-            if self._img_idx == 0:
+            current_ui_orientation = getattr(context.scene.traitblender_orientation, "orientation", "")
+            if (
+                self._img_idx == 0
+                or current_ui_orientation != orientation_name
+                or self._last_applied_orientation != orientation_name
+            ):
                 context.scene.traitblender_orientation.orientation = orientation_name
                 bpy.ops.traitblender.apply_orientation()
+                self._last_applied_orientation = orientation_name
 
             # Reset and run pipeline for this image
             bpy.ops.traitblender.reset_pipeline()
@@ -122,7 +136,6 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
 
             abs_img_path = os.path.abspath(img_path)
             abs_config_path = os.path.abspath(config_path)
-
             if self._csv_writer:
                 self._csv_writer.writerow([name, orientation_name, self._img_idx, abs_img_path, abs_config_path])
                 self._csv_file.flush()
@@ -214,7 +227,7 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
         try:
             self._csv_file = open(csv_path, 'w', newline='')
             self._csv_writer = csv.writer(self._csv_file)
-            self._csv_writer.writerow(['species', 'orientation', 'index', 'image_path', 'config_path'])
+            self._csv_writer.writerow(['species', 'orientation', 'index', 'path', 'config_path'])
         except Exception as e:
             self.report({'WARNING'}, f"Failed to open CSV file: {e}")
             self._csv_file = None
