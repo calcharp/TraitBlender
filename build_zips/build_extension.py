@@ -69,13 +69,28 @@ def build_one(*, blender_exe: str, addon_src_dir: Path, wheels_dir: Path) -> Pat
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--blender", default="blender", help="Blender executable (default: blender)")
-    ap.add_argument("--addon-src", default="TraitBlender", help="Addon source folder to package (default: TraitBlender)")
+    ap.add_argument(
+        "--addon-src",
+        default="TraitBlender",
+        help="Addon source folder to package (default: TraitBlender)",
+    )
     ap.add_argument("--wheels", required=True, help="Wheels folder for this OS (e.g. wheels, wheels/mac, wheels/linux)")
     args = ap.parse_args()
 
+    # Resolve addon source directory, with cross-platform casing fallbacks.
+    addon_src = Path(args.addon_src)
+    if not addon_src.is_dir():
+        for alt in ("TraitBlender", "traitblender"):
+            cand = Path(alt)
+            if cand.is_dir():
+                addon_src = cand
+                break
+
+    addon_src_resolved = addon_src.resolve()
+
     out = build_one(
         blender_exe=args.blender,
-        addon_src_dir=Path(args.addon_src).resolve(),
+        addon_src_dir=addon_src_resolved,
         wheels_dir=Path(args.wheels).resolve(),
     )
     print(out)
