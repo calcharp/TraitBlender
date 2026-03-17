@@ -147,9 +147,10 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         row = layout.row(align=True)
         row.prop(dataset, "filepath", text="Dataset File")
         
-        # Edit dataset button
+        # Edit + Export dataset buttons
         row = layout.row(align=True)
         row.operator("traitblender.edit_dataset", text="Edit Dataset")
+        row.operator("traitblender.export_dataset", text="Export Dataset")
         
         # Sample selection dropdown
         row = layout.row(align=True)
