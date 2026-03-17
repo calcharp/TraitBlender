@@ -1,0 +1,27 @@
+# Circle Grid
+
+The **Circle Grid** morphospace generates a white cube with a 4×4 grid of black circles on the top face.  
+Each circle has two traits:
+
+- **opacity** (how dark the circle is)
+- **diameter** (relative size)
+
+## Traits (dataset columns)
+
+The traits are `opacity_0`–`opacity_15` and `diameter_0`–`diameter_15`, row-major over the 4×4 grid.
+
+| Trait name pattern | Default | Description | Typical range / notes |
+|--------------------|---------|-------------|------------------------|
+| `opacity_0` … `opacity_15` | `1.0` | Opacity of each circle (0 = invisible, 1 = fully black). | Use values between `0.0` and `1.0`. |
+| `diameter_0` … `diameter_15` | `0.0` | Size trait for each circle. The physical size is scaled as \(2^{\text{diameter}}\). | `0` ≈ default size. `1` = 2×, `2` = 4× default diameter. Values in `(0, 0.01)` are treated as `0`. |
+
+The traits are ordered as:
+
+```text
+opacity_0, opacity_1, ..., opacity_15
+diameter_0, diameter_1, ..., diameter_15
+```
+
+## Hyperparameters
+
+Circle Grid currently has **no extra hyperparameters** (`HYPERPARAMETERS = {}`), so you do not need a `hyperparams` block in the config for this morphospace.
