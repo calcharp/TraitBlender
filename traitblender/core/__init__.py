@@ -42,6 +42,9 @@ from .config import CONFIG, config_subsection_register, configs, config_register
 # Datasets
 from .datasets import launch_dataset_viewer_with_string
 
+# Mesh exports
+from .meshes import export_current_sample
+
 # Config, morphospaces (placeholder for future development)
 # from .morphospaces import *
 
@@ -71,4 +74,7 @@ __all__ = [
     
     # Datasets
     "launch_dataset_viewer_with_string",
+
+    # Meshes
+    "export_current_sample",
 ]

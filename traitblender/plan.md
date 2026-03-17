@@ -624,3 +624,72 @@ TraitBlender v2 will:
 - prioritize **reproducibility**
 
 The repository structure and CI system should support these goals with minimal manual steps.
+
+---
+
+## 3D Mesh Export System (core `meshes` submodule)
+
+Goal: add a core module for exporting the **current sample** to common 3D formats, using the **object name** as the stable reference (not object pointers).
+
+### Module layout
+
+- **`traitblender/core/meshes/__init__.py`**
+  - Expose the public API (at minimum `export_current_sample(...)` / `export_sample_by_name(...)`).
+- **`traitblender/core/meshes/exporters.py`** (or keep in `__init__.py` if small)
+  - Format dispatch table (`EXPORTERS`) and the main entry-point(s).
+- **`traitblender/core/meshes/formats/*.py`** (optional, if you want clean separation)
+  - One file per format (`obj.py`, `fbx.py`, `gltf.py`, `stl.py`, etc.) implementing a uniform exporter signature.
+
+### Core rules / design constraints
+
+- **Reference sample by name**
+  - The “current sample” is resolved via `bpy.context.scene.traitblender_dataset.sample` (string identifier).
+  - Exporters should resolve the object at export time via `bpy.data.objects.get(name)` and validate it exists.
+- **Single entry point + dispatch**
+  - One function calls the correct backend based on an explicit `export_type` (or inferred from file extension).
+  - Backends live in a dictionary, e.g. `EXPORTERS = {"obj": export_obj, "fbx": export_fbx, ...}`.
+- **Uniform return contract**
+  - Every exporter returns a dict like:
+    - `{"export_type": "obj", "sample_name": "<name>", "files": ["..."], "warnings": []}`
+- **Non-destructive export**
+  - Do not permanently modify the scene (selection, active object, transforms, modifiers).
+  - Use a small “selection/active restore” helper (context manager) inside the export layer.
+
+### Specific implementation plan (step-by-step)
+
+- **Add core module skeleton**
+  - Create `traitblender/core/meshes/` with `__init__.py`.
+  - Add `EXPORTERS` dict and stub exporter functions for at least one format.
+
+- **Implement sample name resolution**
+  - Implement `get_current_sample_name(context=None) -> str | None`
+    - Defaults to `bpy.context` if `context` is None.
+    - Returns `None` for missing / "NONE".
+  - Implement `get_object_for_sample_name(name: str) -> bpy.types.Object`
+    - Validate `name` exists in `bpy.data.objects`.
+    - Raise a clear `RuntimeError` if missing (for UI to report).
+
+- **Define the exporter interface**
+  - Each exporter function signature:
+    - `export_<fmt>(*, object_name: str, filepath: str, **options) -> dict`
+  - Main entry point:
+    - `export_current_sample(filepath: str, export_type: str | None = None, **options) -> dict`
+    - `export_sample_by_name(object_name: str, filepath: str, export_type: str | None = None, **options) -> dict`
+
+- **Implement at least one real exporter first**
+  - Start with the easiest/most reliable in Blender (likely `gltf`/`glb` or `stl`), then add `obj`/`fbx`.
+  - In each exporter:
+    - Resolve object from name
+    - Temporarily set selection/active object appropriately
+    - Call the relevant `bpy.ops.export_scene.*` or `bpy.ops.wm.*` operator
+    - Return the list of produced file paths (multi-file formats should enumerate outputs)
+
+- **Add UI operator later (separate from core)**
+  - In `traitblender/ui/operators/`, add an operator that calls `core.meshes.export_current_sample(...)`
+  - Use Blender file picker for destination.
+  - Place button(s) where appropriate in UI.
+
+### Export types (initial)
+
+- **Required**: pick 1 stable baseline format and implement fully first (including options + return payload).
+- **Then add**: `obj`, `fbx` as needed, acknowledging their quirks (multi-file outputs, materials, etc.).

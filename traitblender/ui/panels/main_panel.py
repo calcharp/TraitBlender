@@ -204,8 +204,29 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         row = box.row(align=True)
         row.label(text=f"Transforms in pipeline: {len(transforms_config)}")
 
+class TRAITBLENDER_PT_meshes_panel(Panel):
+    bl_label = "7 Meshes"
+    bl_idname = "TRAITBLENDER_PT_meshes_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        config = context.scene.traitblender_config
+
+        box = layout.box()
+        box.label(text="Export current sample mesh")
+
+        row = box.row(align=True)
+        row.prop(config.meshes, "file_export_type", text="Type")
+
+        row = box.row(align=True)
+        row.operator("traitblender.export_mesh", text="Export Mesh")
+
+
 class TRAITBLENDER_PT_imaging_panel(Panel):
-    bl_label = "7 Imaging"
+    bl_label = "8 Imaging"
     bl_idname = "TRAITBLENDER_PT_imaging_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
