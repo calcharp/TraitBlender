@@ -59,9 +59,10 @@ def build_one(*, blender_exe: str, addon_src_dir: Path, wheels_dir: Path) -> Pat
         if not zips:
             raise RuntimeError("Could not find built traitblender-*.zip")
 
-        # Copy zip out of temp dir so caller can keep it.
+        # Blender writes the zip into cwd; only copy if it was created inside the temp dir.
         out_zip = Path.cwd() / zips[-1].name
-        shutil.copy2(zips[-1], out_zip)
+        if zips[-1].resolve() != out_zip.resolve():
+            shutil.copy2(zips[-1], out_zip)
         return out_zip
 
 
