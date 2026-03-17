@@ -1,1 +1,24 @@
-# TraitBlender2
+# TraitBlender
+
+TraitBlender is a Blender add-on for generating museum-style images and 3D meshes of specimens from theoretical morphospaces. It supports Blender 4.3+ on Windows, macOS, and Linux.
+
+## Features
+
+**Serializable scene configuration** — The entire scene (camera, lamp, world, morphospace hyperparameters, sample placement, render and output settings) is exposed as a single configuration that can be saved to and loaded from YAML files. This makes it easy to reproduce runs, share setups, and version-control pipeline settings.
+
+**Morphospaces** — TraitBlender ships with two morphospaces:
+
+- **Shell (Default)** — A 3D shell morphospace that combines the parametric coiling model of [Contreras-Figueroa & Aragón (2023)](https://doi.org/10.3390/d15030431) with thickness allometry from [Okabe & Yoshimura (2017)](https://doi.org/10.1038/srep42445). Traits control whorl expansion, aperture shape, ribbing, and scaling; hyperparameters tune mesh resolution and options.
+- **Circle Grid** — A simple morphospace (e.g. for testing): a gridded plane of circles with configurable traits.
+
+**Dataset import, editing, and saving** — Specimen trait values are read from CSV, TSV, or Excel. The built-in dataset editor supports filtering, sorting, pagination, and saving changes back to file, so you can curate and tweak trait tables without leaving Blender.
+
+**Built-in orientations** — Each morphospace defines named orientations (e.g. "Default", "Aperture view") that place specimens consistently on the table. The imaging pipeline can render multiple orientations per specimen so images are comparable across specimens and runs.
+
+**Stochastic transform pipeline** — Scene properties (e.g. camera location, focal length, lamp power) can be driven by configurable transforms with normal or other samplers. This adds controlled variation to images (e.g. small camera jitter) for robustness or data augmentation while keeping the setup reproducible via the same config and seed.
+
+**Export** — The pipeline can export meshes (e.g. OBJ) and multi-view images per specimen. Simulated trait values are simply read from your spreadsheet, so you can generate trait tables in R or Python, import them into TraitBlender, run the imaging pipeline, and then analyze the exported meshes in external tools.
+
+**Integration with SlicerMorph** — Exported meshes can be imported and analyzed in [SlicerMorph](https://slicermorph.github.io/), an open platform for 3D morphology and morphometrics in 3D Slicer.
+
+For installation, quick start, and full documentation, see the [docs](https://imageomics.github.io/TraitBlender/).
