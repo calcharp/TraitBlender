@@ -1,0 +1,64 @@
+name: Build extension zips
+
+on:
+  push:
+    branches: [v2]
+    paths:
+      - "TraitBlender/**"
+      - "wheels/**"
+      - "build_zips/**"
+      - ".github/workflows/build-zips.yml"
+  pull_request:
+    branches: [v2]
+    paths:
+      - "TraitBlender/**"
+      - "wheels/**"
+      - "build_zips/**"
+      - ".github/workflows/build-zips.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            wheels: wheels
+            artifact: traitblender-windows
+          - os: macos-latest
+            wheels: wheels/mac
+            artifact: traitblender-mac
+          - os: ubuntu-latest
+            wheels: wheels/linux
+            artifact: traitblender-linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11 (for pip download)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Blender 4.3
+        uses: bradyajohnston/setup-blender@v5
+        with:
+          version: "4.3"
+
+      - name: Download wheels for this OS
+        run: >-
+          python -m pip download --only-binary=:all: -r requirements-wheels.txt -d "${{ matrix.wheels }}"
+
+      - name: Build extension zip
+        run: python build_zips/build_extension.py --wheels "${{ matrix.wheels }}"
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: "traitblender-*.zip"
+

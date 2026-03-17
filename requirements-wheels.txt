@@ -1,0 +1,8 @@
+numpy
+scipy
+pandas
+openpyxl
+pillow
+PyYAML
+dearpygui
+
