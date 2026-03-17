@@ -3,7 +3,7 @@ Mesh export configuration.
 """
 
 import bpy
-from bpy.props import EnumProperty
+from bpy.props import BoolProperty, EnumProperty
 
 from .. import config_subsection_register, TraitBlenderConfig
 from ...meshes import export_type_items
@@ -21,5 +21,11 @@ class MeshesConfig(TraitBlenderConfig):
         description="Mesh export file type for exporting the current sample",
         items=lambda self, context: export_type_items(),
         default=0,
+    )
+
+    save_meshes: BoolProperty(
+        name="Save Meshes",
+        description="If enabled, export a 3D model for each specimen during the imaging pipeline (Default orientation only)",
+        default=False,
     )
 

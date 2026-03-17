@@ -6,6 +6,7 @@ import csv
 from datetime import datetime
 
 from ...core.morphospaces import get_orientation_names
+from ...core.meshes import export_current_sample
 
 
 def _sanitize_orientation_for_path(name):
@@ -27,7 +28,11 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
     _orientations = []
     _total_specimens = 0
     _images_per_orientation = 1
+    _include_images = True
     _render_dir = ""
+    _save_meshes = False
+    _mesh_root = ""
+    _exported_mesh_for_specimen = False
     _log_file = None
     _csv_file = None
     _csv_writer = None
@@ -55,6 +60,20 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
 
                 dataset.sample = name
                 bpy.ops.traitblender.generate_morphospace_sample()
+                self._exported_mesh_for_specimen = False
+
+                # Optional mesh export: once per specimen, at Default orientation only
+                if self._save_meshes and not self._exported_mesh_for_specimen:
+                    try:
+                        context.scene.traitblender_orientation.orientation = "Default"
+                        bpy.ops.traitblender.apply_orientation()
+                        mesh_dir = os.path.join(self._mesh_root, name)
+                        os.makedirs(mesh_dir, exist_ok=True)
+                        export_current_sample(filepath=os.path.join(mesh_dir, f"{name}"), context=context)
+                        self._exported_mesh_for_specimen = True
+                    except Exception as e:
+                        # Don't crash the imaging pipeline if mesh export fails
+                        print(f"TraitBlender: Mesh export failed for '{name}': {e}")
 
             # Set and apply this orientation at start of each orientation block
             if self._img_idx == 0:
@@ -65,10 +84,27 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
             bpy.ops.traitblender.reset_pipeline()
             bpy.ops.traitblender.run_pipeline()
 
-            # Directory structure: render_dir / images|configs / specimen_name / orientation_sanitized /
+            # If images are disabled, skip rendering and just advance counters.
+            if not self._include_images:
+                self._img_idx += 1
+                if self._img_idx >= self._images_per_orientation:
+                    self._img_idx = 0
+                    self._orientation_idx += 1
+                    if self._orientation_idx >= len(self._orientations):
+                        self._orientation_idx = 0
+                        self._specimen_idx += 1
+                return {'PASS_THROUGH'}
+
+            # Directory structure:
+            # - Always: render_dir / images / specimen_name / orientation_sanitized /
+            # - If save_meshes: render_dir / meshes / specimen_name / (one model at Default only)
             orient_subdir = _sanitize_orientation_for_path(orientation_name)
             images_dir = os.path.join(self._render_dir, "images", name, orient_subdir)
-            configs_dir = os.path.join(self._render_dir, "configs", name, orient_subdir)
+            # Keep configs under images when meshes are enabled so the dataset root splits into images/ + meshes/
+            if self._save_meshes:
+                configs_dir = images_dir
+            else:
+                configs_dir = os.path.join(self._render_dir, "configs", name, orient_subdir)
             os.makedirs(images_dir, exist_ok=True)
             os.makedirs(configs_dir, exist_ok=True)
 
@@ -147,11 +183,22 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
 
         self._specimens = dataset.rownames
         self._total_specimens = len(self._specimens)
+        self._include_images = bool(getattr(config.imaging, "include_images", True))
         self._images_per_orientation = config.imaging.images_per_orientation
         self._render_dir = render_dir
+        self._save_meshes = bool(getattr(config.meshes, "save_meshes", False))
+        self._mesh_root = os.path.join(render_dir, "meshes")
         self._specimen_idx = 0
         self._orientation_idx = 0
         self._img_idx = 0
+        self._exported_mesh_for_specimen = False
+
+        if self._save_meshes:
+            try:
+                os.makedirs(self._mesh_root, exist_ok=True)
+            except Exception as e:
+                self.report({'ERROR'}, f"Failed to create meshes directory: {e}")
+                return {'CANCELLED'}
 
         log_path = os.path.join(render_dir, "rendering_log.txt")
         try:

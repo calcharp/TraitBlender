@@ -222,6 +222,9 @@ class TRAITBLENDER_PT_meshes_panel(Panel):
         row.prop(config.meshes, "file_export_type", text="Type")
 
         row = box.row(align=True)
+        row.prop(config.meshes, "save_meshes", text="Save meshes in imaging pipeline")
+
+        row = box.row(align=True)
         row.operator("traitblender.export_mesh", text="Export Mesh")
 
 
@@ -240,6 +243,9 @@ class TRAITBLENDER_PT_imaging_panel(Panel):
         # Rendering directory
         row = layout.row(align=True)
         row.prop(config.output, "rendering_directory", text="Rendering Directory")
+
+        row = layout.row(align=True)
+        row.prop(config.imaging, "include_images", text="Include Images")
         
         # Images per orientation
         row = layout.row(align=True)

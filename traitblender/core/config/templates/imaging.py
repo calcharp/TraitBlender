@@ -25,6 +25,12 @@ class ImagingConfig(TraitBlenderConfig):
 
     print_index = 7
 
+    include_images: BoolProperty(
+        name="Include Images",
+        description="If enabled, render images during the imaging pipeline",
+        default=True,
+    )
+
     orientation_options: CollectionProperty(
         type=ImagingOrientationItem,
         name="Orientations",
@@ -42,13 +48,19 @@ class ImagingConfig(TraitBlenderConfig):
         indent = "  " * (indent_level + 1)
         names = [item.name for item in self.orientation_options if item.enabled]
         safe = [repr(n) for n in names]
-        lines = [f'{indent}orientation_names: [{", ".join(safe)}]', f"{indent}images_per_orientation: {self.images_per_orientation}"]
+        lines = [
+            f"{indent}include_images: {str(self.include_images).lower()}",
+            f'{indent}orientation_names: [{", ".join(safe)}]',
+            f"{indent}images_per_orientation: {self.images_per_orientation}",
+        ]
         return "\n".join(lines)
 
     def from_dict(self, data_dict):
         """Load imaging section; restore orientation_options from orientation_names list."""
         if not isinstance(data_dict, dict):
             raise ValueError("Input must be a dictionary")
+        if "include_images" in data_dict:
+            self.include_images = bool(data_dict["include_images"])
         if "images_per_orientation" in data_dict:
             self.images_per_orientation = data_dict["images_per_orientation"]
         if "orientation_names" in data_dict:
