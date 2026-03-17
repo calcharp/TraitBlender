@@ -9,7 +9,7 @@ import os
 
 
 class TRAITBLENDER_OT_edit_transforms(Operator):
-    """Edit the transform pipeline using DearPyGUI interface"""
+    """Edit the transform pipeline using the DearPyGui interface."""
     bl_idname = "traitblender.edit_transforms"
     bl_label = "Edit Transform Pipeline"
     bl_description = "Open the transform pipeline editor"

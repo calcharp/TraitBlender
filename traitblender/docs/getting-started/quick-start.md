@@ -2,9 +2,6 @@
 
 Get up and running with TraitBlender's graphical interface in just a few minutes! This guide will walk you through creating your first museum-style specimen image using Blender's user interface.
 
-!!! note "Alternative Access Methods"
-    This guide covers the GUI interface. TraitBlender can also be accessed programmatically via Python API. See the [Quick Start (API)](./quick-start-api.md) guide for code-based workflows.
-
 ## Prerequisites
 
 Before starting, ensure you have:
@@ -12,7 +9,7 @@ Before starting, ensure you have:
 - ✅ Blender 4.3.0+ installed
 - ✅ TraitBlender add-on installed ([Installation Guide](./installation.md))
 
-??? note "Step 1: Enable TraitBlender"
+??? note "Step 0: Enable TraitBlender"
     1. Open Blender
     2. Go to **Edit → Preferences → Add-ons**
     3. Search for "TraitBlender" 
@@ -21,7 +18,7 @@ Before starting, ensure you have:
 
     If you want TraitBlender to be activated by default when opening Blender, you must save your preferences after activation with **Edit → ☰ → Save Preferences**.
 
-??? note "Step 2: Open the Museum Scene"
+??? note "Step 1: Open the Museum Scene"
     1. In the TraitBlender panel, find the **"1 Museum Setup"** panel
     2. Click the **"Import Museum"** button
     3. After a moment, the scene will load with a museum table, lighting, and camera setup
@@ -31,7 +28,7 @@ Before starting, ensure you have:
     !!! tip "Emulate Numpad"
         If you don't have a numpad, go to **Edit → Preferences → Input** and check **Emulate Numpad**. This allows you to use the number keys at the top of your keyboard as a numpad.
 
-??? note "Step 3: Configure the Scene"
+??? note "Step 2: Configure the Scene"
     Collapse the **Museum Setup** panel and expand the **"2 Configuration"** panel.
 
     The configuration system stores all scene settings (camera, lighting, world, materials, etc.) as a structured PropertyGroup at `bpy.context.scene.traitblender_config`. The Configuration Panel provides a visual interface for these settings.
@@ -45,6 +42,10 @@ Before starting, ensure you have:
     - **Render** - Render engine settings
     - **Output** - Image output format and directory
     - **Metadata** - Information to include in rendered images
+    - **Morphospace** - Selected morphospace and related settings
+    - **Sample** - Controls for the current specimen in the scene
+    - **Transforms** - The transform pipeline for simulation and augmentation
+    - **Ruler** - Measurements and scale-related settings
 
     Click the arrow next to any section to expand it and adjust settings. Changes are immediately reflected in the scene.
 
@@ -61,7 +62,7 @@ Before starting, ensure you have:
     !!! warning "Scene Requirements"
         Configuration import only works if the museum scene has been loaded (via **Import Museum**). If you encounter issues, click **Clear Scene** and re-import the museum scene.
 
-??? note "Step 4: Select a Morphospace"
+??? note "Step 3: Select a Morphospace"
     Expand the **"3 Morphospaces"** panel.
 
     TraitBlender generates 3D specimens from mathematical models called morphospaces. By default, TraitBlender includes the **Shell (Default)** morphospace, which combines:
@@ -72,7 +73,7 @@ Before starting, ensure you have:
 
     Select **Shell (Default)** from the dropdown (it should be the only option by default).
 
-??? note "Step 5: Import and Manage Datasets"
+??? note "Step 4: Import and Manage Datasets"
     Expand the **"4 Datasets"** panel.
 
     ### Import a Dataset
@@ -107,65 +108,64 @@ Before starting, ensure you have:
     - Edit values
     - Export changes back to TraitBlender
 
-??? note "Step 6: Orientations"
+    ### Export Dataset
+
+    Click **Export Dataset** to save the current dataset to a CSV file.
+
+??? note "Step 5: Orientations"
     Expand the **"5 Orientations"** panel.
 
     Each morphospace can define orientation functions in its `ORIENTATIONS` dictionary. Select an orientation from the dropdown and click **Apply** to orient the specimen. The selected orientation is also applied automatically when running the Imaging Pipeline.
 
-??? note "Step 7: Configure Transforms"
+??? note "Step 6: Transforms"
     Expand the **"6 Transforms"** panel.
 
-    Transforms allow you to add statistical variation to your images for data augmentation. This is useful for training neural networks or simulating real-world imaging conditions.
+    The transform pipeline lets you apply controlled variation to configuration values for simulation and augmentation. This is useful when you want to randomize scene settings between samples without changing the base configuration by hand.
 
-    ### Building a Transform Pipeline
-
-    1. **Select Property**: Choose a configuration section (e.g., "world") and a property (e.g., "color")
-    2. **Select Sampler**: Choose a statistical distribution (uniform, normal, beta, gamma, etc.)
-    3. **Add Transform**: The transform is added to the pipeline (currently requires Python API - GUI coming soon)
-
-    ### Available Samplers
-
-    - **uniform**: Uniform distribution between low and high
-    - **normal**: Normal (Gaussian) distribution
-    - **beta**: Beta distribution
-    - **gamma**: Gamma distribution
-    - **dirichlet**: Dirichlet distribution (for color vectors)
-    - **multivariate_normal**: Multivariate normal distribution
-    - **poisson**: Poisson distribution
-    - **exponential**: Exponential distribution
-    - **cauchy**: Cauchy distribution
-    - **discrete_uniform**: Discrete uniform distribution
-
-    ### Running the Pipeline
-
-    - **Run Pipeline**: Execute all transforms in sequence
-    - **Undo Pipeline**: Revert all changes back to original values
+    1. Use the transform controls to add items to the pipeline.
+    2. Pick the property you want to vary and choose a sampler for it.
+    3. Add more transforms if you want multiple properties randomized together.
+    4. Use **Run Pipeline** to apply the transforms in order.
+    5. Use **Undo** to revert the changes.
 
 
-??? note "Step 8: Render Images"
-    Expand the **"7 Imaging"** panel.
+??? note "Step 7: Meshes"
+    Expand the **"7 Meshes"** panel.
 
-    1. Configure your output settings in the **Configuration** panel (Output section)
-    2. Click **Run Imaging Pipeline** to render images
+    1. Choose the mesh export type.
+    2. Enable **Save Meshes** if you want the simulation pipeline to export meshes.
+    3. You can also use **Export Mesh** to save the current sample manually.
 
-    The imaging pipeline will:
+??? note "Step 8: Imaging"
+    Expand the **"8 Imaging"** panel.
+
+    1. Use **Include Images** to control whether image files are rendered.
+    2. Set the number of images per orientation if needed.
+    3. Choose which orientations are included for the imaging run.
+
+??? note "Step 9: Simulation"
+    Use the separate **Simulation** section below the numbered panels.
+
+    1. Set the **Simulation Directory**.
+    2. Click **Simulate Dataset**.
+
+    The simulation pipeline will:
     - Apply any configured transforms
     - Render from the current camera view
-    - Save images to the specified output directory
+    - Save images when enabled
+    - Export meshes when enabled
     - Include metadata if configured
 
 ## Next Steps
 
 Congratulations! You've completed the basic workflow. Now you can:
 
-- **Explore the API**: ([Quick Start API](./quick-start-api.md))
+- **Explore the API**: ([API Reference](../api/scene-assets.md))
 - **Customize Configurations**: Create and save YAML configs for different imaging setups
-- **Build Transform Pipelines**: Use the Python API to create complex data augmentation pipelines
-- **Work with Multiple Specimens**: Process entire datasets programmatically
 
 For more detailed information, see:
+- [API Reference](../api/scene-assets.md) - Complete API documentation
 - [Configuration Files](../configuration/config-files.md) - Understanding YAML configs
-- [API Reference](../api/) - Complete API documentation
 - [Tutorials](../tutorials/) - Advanced techniques and workflows
 
 

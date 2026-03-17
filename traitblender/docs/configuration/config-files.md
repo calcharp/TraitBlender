@@ -1,398 +1,293 @@
 # Configuration Files
 
-TraitBlender uses YAML configuration files to define scene settings, transforms, and output options. This allows for reproducible, automated generation of museum-style morphological images.
+TraitBlender config files are **YAML** files that store the settings you see in the **Configuration** panel (camera, lighting, world, materials, output, etc.). You can export a YAML to reuse the same setup later.
 
-## Configuration File Structure
+<details>
+<summary>Basic structure</summary>
 
-Configuration files are organized into several main sections that correspond to different aspects of the scene. The structure matches the `traitblender_config` PropertyGroup in Blender.
+<p>Config files are organized into top-level sections. Each section controls one part of the scene or pipeline:</p>
 
-### Basic Structure
+<ul>
+  <li><code>morphospace</code> – which morphospace is active and its hyperparameters</li>
+  <li><code>world</code> – background color and strength</li>
+  <li><code>camera</code> – position, rotation, resolution, lens</li>
+  <li><code>lamp</code> – light position, color, power, shadows</li>
+  <li><code>mat</code> – specimen mat position, scale, color, roughness</li>
+  <li><code>render</code> – render engine and Eevee ray tracing</li>
+  <li><code>output</code> – where simulation results are written and in what format</li>
+  <li><code>metadata</code> – stamp text in the rendered images</li>
+  <li><code>ruler</code> – ruler location / visibility</li>
+  <li><code>transforms</code> – optional random variation on config values</li>
+  <li><code>imaging</code> – which orientations to render and how many images</li>
+  <li><code>meshes</code> – mesh export options during simulation</li>
+</ul>
+
+<p><strong>Allowed values and ranges (quick reference)</strong></p>
+
+<p><strong>world</strong></p>
+<ul>
+  <li><code>color</code>: 4 floats (RGBA), each in 0.0–1.0</li>
+  <li><code>strength</code>: float, ≥ 0.0</li>
+</ul>
+
+<p><strong>camera</strong></p>
+<ul>
+  <li><code>location</code>, <code>rotation</code>: 3 floats each</li>
+  <li><code>camera_type</code>: <code>PERSP</code> | <code>ORTHO</code> | <code>PANO</code></li>
+  <li><code>focal_length</code>: float, ≥ 0.0</li>
+  <li><code>resolution_x</code>, <code>resolution_y</code>: integers</li>
+  <li><code>resolution_percentage</code>: integer in 0–100</li>
+  <li><code>aspect_x</code>, <code>aspect_y</code>: floats</li>
+  <li><code>shift_x</code>, <code>shift_y</code>: floats</li>
+  <li><code>lens_unit</code>: <code>MILLIMETERS</code> | <code>FOV</code></li>
+</ul>
+
+<p><strong>lamp</strong></p>
+<ul>
+  <li><code>location</code>, <code>rotation</code>, <code>scale</code>: 3 floats each</li>
+  <li><code>color</code>: 3 floats (RGB), each in 0.0–1.0</li>
+  <li><code>power</code>: float, ≥ 0.0</li>
+  <li><code>use_soft_falloff</code>, <code>shadow</code>: booleans</li>
+  <li><code>beam_size</code>: float in 0.0–10.0</li>
+  <li><code>beam_blend</code>: float, ≥ 0.0</li>
+  <li><code>diffuse</code>: float, ≥ 0.0</li>
+</ul>
+
+<p><strong>mat</strong></p>
+<ul>
+  <li><code>tb_location</code>, <code>tb_rotation</code>, <code>scale</code>: 3 floats each</li>
+  <li><code>color</code>: 4 floats (RGBA), each in 0.0–1.0</li>
+  <li><code>roughness</code>: float in 0.0–1.0</li>
+</ul>
+
+<p><strong>render</strong></p>
+<ul>
+  <li><code>engine</code>: <code>CYCLES</code> | <code>BLENDER_EEVEE_NEXT</code> | <code>BLENDER_WORKBENCH</code></li>
+  <li><code>eevee_use_raytracing</code>: boolean</li>
+</ul>
+
+<p><strong>output</strong></p>
+<ul>
+  <li><code>rendering_directory</code>, <code>output_directory</code>: directory paths (strings)</li>
+  <li><code>output_type</code>: <code>image</code> | <code>video</code></li>
+  <li><code>image_format</code>: <code>PNG</code> | <code>JPEG</code></li>
+  <li><code>images_per_view</code>: integer, ≥ 1</li>
+</ul>
+
+<p><strong>metadata</strong></p>
+<ul>
+  <li>All <code>use_stamp_*</code>: booleans</li>
+  <li><code>stamp_note_text</code>: string</li>
+</ul>
+
+<p><strong>ruler</strong></p>
+<ul>
+  <li><code>tb_location</code>, <code>tb_rotation</code>: 3 floats each</li>
+  <li><code>hide</code>: boolean</li>
+</ul>
+
+<p><strong>imaging</strong></p>
+<ul>
+  <li><code>include_images</code>: boolean</li>
+  <li><code>orientation_names</code>: list of strings (orientation names from the selected morphospace)</li>
+  <li><code>images_per_orientation</code>: integer, ≥ 1</li>
+</ul>
+
+<p><strong>meshes</strong></p>
+<ul>
+  <li><code>save_meshes</code>: boolean</li>
+  <li><code>file_export_type</code>: currently <code>obj</code></li>
+</ul>
+
+<p><strong>morphospace</strong></p>
+<ul>
+  <li><code>name</code>: morphospace display name (e.g. <code>Shell (Default)</code>)</li>
+  <li><code>hyperparams</code>: mapping of morphospace-specific keys to values (keys differ by morphospace)</li>
+</ul>
+
+<p><strong>transforms</strong></p>
+<ul>
+  <li><code>sampler_name</code>: currently <code>normal</code>
+    <ul>
+      <li><code>params.mu</code>: float</li>
+      <li><code>params.sigma</code>: float (use &gt; 0 for meaningful variation)</li>
+    </ul>
+  </li>
+  <li><code>property_path</code>: supported scalar paths such as:
+    <ul>
+      <li><code>world.strength</code></li>
+      <li><code>camera.location.x|y|z</code></li>
+      <li><code>camera.rotation.x|y|z</code></li>
+      <li><code>lamp.power</code></li>
+      <li><code>lamp.color.r|g|b</code></li>
+      <li><code>mat.roughness</code></li>
+    </ul>
+  </li>
+</ul>
+
+</details>
+
+<details>
+<summary>Example 1: Minimal “museum image” config</summary>
+
+This is a good starting point if you want a stable, repeatable setup with no augmentation.
 
 ```yaml
----
+morphospace:
+  name: Shell (Default)
+  hyperparams: {}
+
 world:
   color: [0.0, 0.0, 0.0, 1.0]
   strength: 1.0
+
 camera:
   location: [0.0, 0.0, 1.0]
   rotation: [0.0, 0.0, 0.0]
+  camera_type: PERSP
   focal_length: 60.0
-  resolution_x: 1080
-  resolution_y: 1080
+  resolution_x: 1920
+  resolution_y: 1920
   resolution_percentage: 100
+  aspect_x: 1.0
+  aspect_y: 1.0
+  shift_x: 0.0
+  shift_y: 0.0
+  lens_unit: MILLIMETERS
+
 lamp:
   location: [0.0, 0.0, 1.0]
-  power: 10.0
+  rotation: [0.0, 0.0, 0.0]
+  scale: [1.0, 1.0, 1.0]
   color: [1.0, 1.0, 1.0]
+  power: 10.0
+  use_soft_falloff: true
+  beam_size: 1.0
+  beam_blend: 0.0
+  shadow: true
+  diffuse: 1.0
+
 mat:
+  tb_location: [0.0, 0.0, 0.59]
+  tb_rotation: [0.0, 0.0, 0.0]
+  scale: [0.125, 0.125, 1.0]
   color: [0.0, 0.0, 0.0, 1.0]
-  location: [0.0, 0.0, 0.59]
+  roughness: 1.0
+
 render:
   engine: BLENDER_EEVEE_NEXT
+  eevee_use_raytracing: false
+
 output:
+  rendering_directory: ""   # The directory where simulation output will be written
+  output_type: image
+  image_format: PNG
   output_directory: ""
-  image_format: PNG
-transforms:
-  []
-```
+  images_per_view: 1
 
-## Configuration Sections
-
-### world
-
-Controls the world/background settings.
-
-```yaml
-world:
-  color: [0.0, 0.0, 0.0, 1.0]  # RGBA background color
-  strength: 1.0                 # Background light strength
-```
-
-**Fields:**
-- `color` (list[float, float, float, float]): RGBA color values (0.0-1.0)
-- `strength` (float): Intensity of background lighting
-
-### camera
-
-Camera position, rotation, and rendering settings.
-
-```yaml
-camera:
-  location: [0.0, 0.0, 1.0]           # Camera position (table coordinates)
-  rotation: [0.0, 0.0, 0.0]          # Camera rotation (Euler angles)
-  focal_length: 60.0                 # Focal length in mm
-  camera_type: PERSP                 # PERSP, ORTHO, or PANO
-  resolution_x: 1920                 # Render width
-  resolution_y: 1080                 # Render height
-  resolution_percentage: 100          # Render resolution percentage
-  aspect_x: 1.0                      # Pixel aspect ratio X
-  aspect_y: 1.0                      # Pixel aspect ratio Y
-  shift_x: 0.0                       # Camera shift X
-  shift_y: 0.0                       # Camera shift Y
-  lens_unit: MILLIMETERS             # MILLIMETERS or FOV
-```
-
-**Fields:**
-- `location` (list[float, float, float]): Position relative to table center (in meters)
-- `rotation` (list[float, float, float]): Euler rotation angles
-- `focal_length` (float): Camera lens focal length
-- `camera_type` (string): `PERSP`, `ORTHO`, or `PANO`
-- `resolution_x/y` (int): Output image dimensions
-- `resolution_percentage` (int): Render resolution percentage (0-100)
-
-### lamp
-
-Lighting configuration.
-
-```yaml
-lamp:
-  location: [0.0, 0.0, 1.0]      # Light position (table coordinates)
-  rotation: [0.0, 0.0, 0.0]      # Light rotation
-  power: 10.0                    # Light power/energy
-  color: [1.0, 1.0, 1.0]         # RGB light color
-  scale: [1.0, 1.0, 1.0]         # Light scale
-  shadow: true                    # Enable shadows
-  beam_size: 1.0                  # Beam size (for area lights)
-  beam_blend: 0.0                 # Beam blend
-  diffuse: 1.0                    # Diffuse light contribution
-  use_soft_falloff: true          # Use soft falloff
-```
-
-### mat
-
-Specimen mat/background surface settings.
-
-```yaml
-mat:
-  color: [0.0, 0.0, 0.0, 1.0]    # Mat color (RGBA)
-  location: [0.0, 0.0, 0.59]      # Mat position
-  rotation: [0.0, 0.0, 0.0]       # Mat rotation
-  scale: [0.125, 0.125, 1.0]      # Mat scale
-  roughness: 0.0                  # Material roughness
-```
-
-### render
-
-Render engine settings.
-
-```yaml
-render:
-  engine: BLENDER_EEVEE_NEXT      # BLENDER_EEVEE_NEXT or CYCLES
-  eevee_use_raytracing: false     # Enable Eevee ray tracing
-```
-
-### output
-
-Output file settings.
-
-```yaml
-output:
-  output_directory: ""            # Output directory path
-  image_format: PNG               # PNG, JPEG, TIFF, etc.
-  output_type: image              # Output type
-  images_per_view: 1              # Images per camera view
-```
-
-### metadata
-
-Information to include in rendered images.
-
-```yaml
 metadata:
-  use_stamp_camera: true          # Include camera info
-  use_stamp_date: true            # Include date
-  use_stamp_filename: true        # Include filename
-  use_stamp_frame: true           # Include frame number
-  use_stamp_render_time: true     # Include render time
-  use_stamp_scene: true           # Include scene name
-  use_stamp_time: true            # Include time
-  stamp_note_text: ""             # Custom note text
-  # Additional stamp options available
+  use_stamp_date: true
+  use_stamp_time: true
+  use_stamp_render_time: true
+  use_stamp_frame: true
+  use_stamp_frame_range: false
+  use_stamp_memory: false
+  use_stamp_hostname: false
+  use_stamp_camera: true
+  use_stamp_lens: false
+  use_stamp_scene: true
+  use_stamp_marker: false
+  use_stamp_filename: true
+  use_stamp_sequencer_strip: false
+  use_stamp_note: false
+  stamp_note_text: ""
+
+ruler:
+  tb_location: [0.0, -0.1, 0.0]
+  tb_rotation: [0.0, 0.0, 0.0]
+  hide: false
+
+transforms: []
+
+imaging:
+  include_images: true
+  orientation_names: []
+  images_per_orientation: 1
+
+meshes:
+  file_export_type: obj
+  save_meshes: false
 ```
 
-### transforms
+ </details>
 
-Transform pipeline for data augmentation. This is a list of transform definitions.
+<details>
+<summary>Example 2: Simulation that saves meshes (and skips images)</summary>
+
+If you only want meshes during simulation (no rendered images), these are the important toggles:
+
+```yaml
+output:
+  rendering_directory: "C:/path/to/simulation-output"
+
+imaging:
+  include_images: false
+
+meshes:
+  file_export_type: obj
+  save_meshes: true
+```
+
+ </details>
+
+<details>
+<summary>Example 3: Morphospace hyperparameters (non-empty)</summary>
+
+Hyperparameters are **morphospace-specific** (they are not part of the dataset). Here is a real example for **Shell (Default)**:
+
+```yaml
+morphospace:
+  name: Shell (Default)
+  hyperparams:
+    n_vertices_aperture: 24
+    time_step: 0.03
+    use_inner_surface: true
+```
+
+ </details>
+
+<details>
+<summary>Example 4: Transforms (non-empty)</summary>
+
+Transforms apply **random variation** during rendering/simulation. Each transform has:
+
+- `property_path`: which setting to change
+- `sampler_name`: how to sample the change
+- `params`: parameters for the sampler
 
 ```yaml
 transforms:
-  - property_path: world.color
-    sampler_name: uniform
-    params:
-      low: 0.0
-      high: 1.0
-  - property_path: camera.location
+  - property_path: lamp.power
     sampler_name: normal
     params:
-      mu: 0
-      sigma: 0.5
-      n: 3
+      mu: 0.0
+      sigma: 2.0
+
+  - property_path: camera.location.z
+    sampler_name: normal
+    params:
+      mu: 0.0
+      sigma: 0.05
+
   - property_path: world.strength
-    sampler_name: beta
-    params:
-      a: 2
-      b: 5
-```
-
-**Transform Structure:**
-- `property_path` (string): Relative path to config property (e.g., "world.color", "camera.location")
-- `sampler_name` (string): Statistical distribution to use
-- `params` (dict): Parameters for the sampler function
-
-**Available Samplers:**
-
-| Sampler | Parameters | Description |
-|---------|-----------|-------------|
-| `uniform` | `low`, `high` | Uniform distribution |
-| `normal` | `mu`, `sigma`, optional `n` | Normal (Gaussian) distribution |
-| `beta` | `a`, `b` | Beta distribution |
-| `gamma` | `alpha`, `beta` | Gamma distribution |
-| `dirichlet` | `alphas` (list) | Dirichlet distribution (for color vectors) |
-| `multivariate_normal` | `mu` (list), `cov` (list of lists) | Multivariate normal distribution |
-| `poisson` | `lam` | Poisson distribution |
-| `exponential` | `lambd` | Exponential distribution |
-| `cauchy` | `x0`, `gamma` | Cauchy distribution |
-| `discrete_uniform` | `low`, `high` (integers) | Discrete uniform distribution |
-
-## Example Configurations
-
-### Basic Museum Documentation
-
-```yaml
----
-world:
-  color: [0.0, 0.0, 0.0, 1.0]
-  strength: 1.0
-camera:
-  location: [0.0, 0.0, 1.0]
-  rotation: [0.0, 0.0, 0.0]
-  focal_length: 60.0
-  resolution_x: 2048
-  resolution_y: 2048
-  resolution_percentage: 100
-lamp:
-  location: [0.0, 0.0, 1.0]
-  power: 10.0
-  color: [1.0, 1.0, 1.0]
-render:
-  engine: BLENDER_EEVEE_NEXT
-output:
-  output_directory: "./output/museum_docs"
-  image_format: PNG
-transforms: []  # No transforms for documentation
-```
-
-### Research Data Augmentation
-
-```yaml
----
-world:
-  color: [0.0, 0.0, 0.0, 1.0]
-  strength: 1.0
-camera:
-  location: [0.0, 0.0, 1.0]
-  rotation: [0.0, 0.0, 0.0]
-  focal_length: 50.0
-  resolution_x: 1024
-  resolution_y: 1024
-  resolution_percentage: 100
-lamp:
-  location: [0.0, 0.0, 1.0]
-  power: 10.0
-  color: [1.0, 1.0, 1.0]
-render:
-  engine: BLENDER_EEVEE_NEXT
-output:
-  output_directory: "./output/research_augmented"
-  image_format: PNG
-transforms:
-  - property_path: world.color
-    sampler_name: dirichlet
-    params:
-      alphas: [1.0, 1.0, 1.0, 1.0]
-  - property_path: camera.location
     sampler_name: normal
     params:
-      mu: 0
+      mu: 0.0
       sigma: 0.2
-      n: 3
-  - property_path: lamp.power
-    sampler_name: gamma
-    params:
-      alpha: 3.0
-      beta: 2.0
 ```
 
-## Using Configuration Files
+ </details>
 
-### In Blender GUI
+## Using config files
 
-1. In the **Museum Setup** panel, enter the path to your YAML file in the **Config File** field
-2. Click **Configure Scene** to load the configuration
-3. The configuration will be applied to the current scene
-
-### Python API
-
-```python
-import bpy
-import yaml
-
-# Load configuration from YAML file
-with open("my_config.yaml", 'r') as f:
-    config_data = yaml.safe_load(f)
-
-# Apply to scene
-bpy.context.scene.traitblender_config.from_dict(config_data)
-
-# Export current configuration
-config_dict = bpy.context.scene.traitblender_config.to_dict()
-with open("exported_config.yaml", 'w') as f:
-    yaml.dump(config_dict, f)
-
-# View configuration as YAML string
-config_yaml = str(bpy.context.scene.traitblender_config)
-print(config_yaml)
-```
-
-### Exporting Configuration
-
-You can export the current configuration from the GUI:
-1. Go to the **Configuration** panel
-2. Click **Export Config as YAML**
-3. Save the file for reuse
-
-## Property Paths
-
-When defining transforms, use relative property paths that match the configuration structure:
-
-- `world.color` - World background color
-- `world.strength` - World background strength
-- `camera.location` - Camera position (3D vector)
-- `camera.rotation` - Camera rotation (3D vector)
-- `camera.focal_length` - Camera focal length
-- `camera.resolution_x` - Render width
-- `camera.resolution_y` - Render height
-- `lamp.location` - Light position
-- `lamp.power` - Light power
-- `lamp.color` - Light color (3D vector)
-- `mat.color` - Mat color
-- `mat.location` - Mat position
-
-## Best Practices
-
-### File Organization
-
-```
-project/
-├── configs/
-│   ├── base.yaml              # Base configuration
-│   ├── museum_docs.yaml       # Museum documentation
-│   ├── research_augment.yaml  # Research with augmentation
-│   └── quick_test.yaml        # Fast testing configuration
-├── data/
-│   └── specimens.csv
-└── output/
-```
-
-### Configuration Tips
-
-1. **Start with Base Config**: Create a base configuration and extend it for specific use cases
-2. **Document Transforms**: Comment your transform parameters for reproducibility
-3. **Version Control**: Keep configuration files in version control
-4. **Validation**: Test configurations with small datasets first
-5. **Performance**: Balance quality (resolution) with rendering time for your use case
-
-### Common Patterns
-
-**High Quality Documentation:**
-- High resolution (2048x2048+)
-- No transforms
-- Standard camera settings
-
-**Research Data Augmentation:**
-- Moderate resolution (1024x1024)
-- Multiple transforms for variation
-- Statistical sampling on multiple properties
-
-**Quick Testing:**
-- Lower resolution (512x512)
-- Minimal transforms
-- Fast render engine (EEVEE)
-
-## Transform Examples
-
-### Color Variation
-
-```yaml
-transforms:
-  - property_path: world.color
-    sampler_name: dirichlet
-    params:
-      alphas: [0.8, 0.8, 0.8, 1.0]  # Slight color variation
-```
-
-### Camera Movement
-
-```yaml
-transforms:
-  - property_path: camera.location
-    sampler_name: multivariate_normal
-    params:
-      mu: [0, 0, 0]
-      cov: [[0.1, 0, 0], [0, 0.1, 0], [0, 0, 0.05]]  # Small position variation
-```
-
-### Lighting Variation
-
-```yaml
-transforms:
-  - property_path: lamp.power
-    sampler_name: gamma
-    params:
-      alpha: 3.0
-      beta: 2.0
-  - property_path: lamp.color
-    sampler_name: dirichlet
-    params:
-      alphas: [1.0, 1.0, 1.0]  # Slight color temperature variation
-```
+Use the GUI to export a YAML (recommended), then reuse it later by loading it back into the Configuration panel workflow.

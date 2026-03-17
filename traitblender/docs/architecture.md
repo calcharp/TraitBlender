@@ -1,6 +1,6 @@
 # TraitBlender Architecture
 
-This document provides a high-level overview of TraitBlender's architecture, showing how the major systems interact and how data flows through the add-on. For detailed information about specific systems, see the [For Developers](./developers.md) documentation.
+This document provides a high-level overview of TraitBlender's architecture, showing how the major systems interact and how data flows through the add-on.
 
 ---
 
@@ -63,19 +63,6 @@ flowchart LR
     col1 --> col2
     col2 --> col3
     
-    click Operators "/TraitBlender/developers/operators/" "Developer Documentation: Operators"
-    click Panels "/TraitBlender/developers/panels/" "Developer Documentation: Panels"
-    click Properties "/TraitBlender/developers/properties/" "Developer Documentation: Properties"
-    click Events "/TraitBlender/developers/events/" "Developer Documentation: Events"
-    click Config "/TraitBlender/developers/configuration-system/" "Developer Documentation: Configuration System"
-    click Transform "/TraitBlender/developers/transform-pipeline/" "Developer Documentation: Transform Pipeline"
-    click Dataset "/TraitBlender/developers/dataset-management/" "Developer Documentation: Dataset Management"
-    click Morphospace "/TraitBlender/developers/morphospace-system/" "Developer Documentation: Morphospace System"
-    click Positioning "/TraitBlender/developers/positioning-system/" "Developer Documentation: Positioning System"
-    click Assets "/TraitBlender/developers/asset-management/" "Developer Documentation: Asset Management"
-    click SceneObjects "/TraitBlender/developers/scene-objects/" "Developer Documentation: Scene Objects"
-    click PropertyGroups "/TraitBlender/developers/property-groups/" "Developer Documentation: Property Groups"
-    click CustomProps "/TraitBlender/developers/custom-properties/" "Developer Documentation: Custom Properties"
     
     style UITitle fill:transparent,stroke:transparent,font-weight:bold
     style CoreTitle fill:transparent,stroke:transparent,font-weight:bold

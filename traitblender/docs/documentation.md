@@ -2,6 +2,5 @@
 
 Choose your documentation path:
 
-- **[GUI Documentation](./gui.md)** - Graphical interface guides and workflows
-- **[API Documentation](./api.md)** - Python API reference and programmatic control
-- **[For Developers](./developers.md)** - Extending TraitBlender and development guides
+- **[Quick Start (GUI)](./getting-started/quick-start.md)** - Main walkthrough for using TraitBlender in Blender
+- **[API Reference](./api/scene-assets.md)** - Operators and properties used in the GUI workflow

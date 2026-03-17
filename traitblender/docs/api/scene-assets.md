@@ -1,195 +1,171 @@
-# Scene Assets API Reference
+# API Reference
 
-The positioning system provides a custom coordinate system relative to the museum table for consistent object placement.
+This reference focuses on the user-facing operators and properties you will use in normal TraitBlender workflows.
 
-## Table Coordinates System
+<details>
+<summary>1. Museum Setup</summary>
 
-TraitBlender uses a custom coordinate system (`tb_location`) that positions objects relative to the table's top surface center. This ensures consistent placement regardless of table orientation or position.
+<p><code>bpy.ops.traitblender.setup_scene()</code></p>
+<p>Load the pre-configured museum scene with the camera, lighting, and table objects needed for morphospace work.</p>
 
-### Table Coordinates Property
+<hr>
 
-All Blender objects have a `tb_location` property that provides table-relative positioning:
+<p><code>bpy.ops.traitblender.clear_scene()</code></p>
+<p>Remove the current scene contents so you can start from a clean state.</p>
 
-```python
-# Get an object
-obj = bpy.data.objects["MyObject"]
+</details>
 
-# Position relative to table center
-obj.tb_location = (0.0, 0.0, 0.0)  # Center of table
-obj.tb_location = (0.5, 0.0, 0.0)  # 0.5 units along table's X axis
-obj.tb_location = (0.0, 0.5, 0.1)  # Offset in X, Y, and Z
+<details>
+<summary>2. Configuration</summary>
 
-# Get current table coordinates
-current_pos = obj.tb_location
-print(f"Table coordinates: {current_pos}")
-```
+<p><code>bpy.context.scene.traitblender_config</code></p>
+<p>The main configuration <code>PropertyGroup</code> containing all scene settings.</p>
 
-### Table Rotation Property
+<hr>
 
-Objects also have a `tb_rotation` property for table-relative rotation:
+<p><code>bpy.ops.traitblender.show_configuration()</code></p>
+<p>Print the current configuration as YAML for inspection or copying.</p>
 
-```python
-# Rotate relative to table orientation
-obj.tb_rotation = (0.0, 0.0, 0.0)  # Aligned with table
-obj.tb_rotation = (0.0, 0.0, 1.57)  # 90 degrees around table's Z axis
-```
+<hr>
 
-## Coordinate Conversion Functions
+<p><code>bpy.ops.traitblender.export_config(filepath="")</code></p>
+<p>Export the current configuration to a YAML file.</p>
 
-### world_to_tb_location
+</details>
 
-Convert a world-space point to table location (tb_location coordinates).
+<details>
+<summary>3. Morphospaces</summary>
 
-```python
-from core.positioning import world_to_tb_location
-from mathutils import Vector
+<p><code>bpy.context.scene.traitblender_setup.available_morphospaces</code></p>
+<p>Select the active morphospace. Changing it can alter the available parameters, orientations, and default dataset.</p>
 
-# Convert world position to table location
-world_point = Vector((1.0, 2.0, 3.0))
-tb_location = world_to_tb_location(world_point)
-print(f"Table location: {tb_location}")
-```
+<hr>
 
-**Parameters:**
-- `world_point` (Vector): World-space position
-- `precision` (int, optional): Decimal places for rounding (default: 4)
+<p><code>bpy.context.scene.traitblender_dataset.sample</code></p>
+<p>Select the current specimen or sample name from the active dataset.</p>
 
-**Returns:**
-- `tuple[float, float, float]`: Table coordinates (x, y, z)
+<hr>
 
-### get_table_top_center
+<p><code>bpy.ops.traitblender.generate_morphospace_sample()</code></p>
+<p>Generate a morphospace sample object using the selected sample and morphospace settings.</p>
 
-Get the world-space center of the table's top face.
+<hr>
 
-```python
-from core.positioning import get_table_top_center
+<p><code>bpy.ops.traitblender.apply_orientation()</code></p>
+<p>Apply the selected morphospace orientation to the current sample.</p>
 
-center = get_table_top_center()
-print(f"Table center: {center}")
-```
+</details>
 
-**Returns:**
-- `Vector`: World-space position of table top center
+<details>
+<summary>4. Datasets</summary>
 
-### z_dist_to_lowest
+<p><code>bpy.context.scene.traitblender_dataset.filepath</code></p>
+<p>Path to the dataset file on disk.</p>
 
-Calculate the distance from an object's origin to its lowest vertex.
+<hr>
 
-```python
-from core.positioning import z_dist_to_lowest
+<p><code>bpy.ops.traitblender.import_dataset()</code></p>
+<p>Import CSV, TSV, or Excel data into the in-memory dataset.</p>
 
-obj = bpy.data.objects["MyObject"]
-distance = z_dist_to_lowest(obj)
-print(f"Distance to lowest point: {distance}")
-```
+<hr>
 
-**Parameters:**
-- `obj` (bpy.types.Object): Blender object
+<p><code>bpy.ops.traitblender.edit_dataset()</code></p>
+<p>Open the dataset editor and modify the current dataset interactively.</p>
 
-**Returns:**
-- `float`: Distance from origin to lowest vertex (0 for non-mesh objects)
+<hr>
 
-## Usage Examples
+<p><code>bpy.ops.traitblender.export_dataset()</code></p>
+<p>Export the current dataset to a CSV file.</p>
 
-### Positioning Specimens on Table
+</details>
 
-```python
-import bpy
+<details>
+<summary>5. Transforms</summary>
 
-# Generate a specimen (from morphospace)
-bpy.ops.traitblender.generate_morphospace_sample()
+<p><code>bpy.context.scene.traitblender_config.transforms</code></p>
+<p>Transform pipeline settings and state.</p>
 
-# Get the generated object
-specimen = bpy.data.objects["species_name"]
+<hr>
 
-# Position at table center
-specimen.tb_location = (0.0, 0.0, 0.0)
+<p><code>bpy.ops.traitblender.run_pipeline()</code></p>
+<p>Run the transform pipeline on the current specimen.</p>
 
-# Move to different position
-specimen.tb_location = (0.3, 0.0, 0.0)  # 0.3 units along table X axis
-```
+<hr>
 
-### Converting Between Coordinate Systems
+<p><code>bpy.ops.traitblender.undo_pipeline()</code></p>
+<p>Undo the last transform step.</p>
 
-```python
-from core.positioning import world_to_tb_location, get_table_top_center
-from mathutils import Vector
+<hr>
 
-# Get table center in world space
-table_center = get_table_top_center()
+<p><code>bpy.ops.traitblender.reset_pipeline()</code></p>
+<p>Reset the pipeline back to its initial state.</p>
 
-# Convert world position to table coordinates
-world_pos = Vector((1.5, 2.0, 0.5))
-table_pos = world_to_tb_location(world_pos)
+</details>
 
-# Use table coordinates to position object
-obj = bpy.data.objects["MyObject"]
-obj.tb_location = table_pos
-```
+<details>
+<summary>6. Meshes</summary>
 
-### Working with Multiple Objects
+<p><code>bpy.context.scene.traitblender_config.meshes.file_export_type</code></p>
+<p>Choose the mesh export format used by the mesh exporter and simulation pipeline.</p>
 
-```python
-# Position multiple specimens on table
-specimens = ["specimen1", "specimen2", "specimen3"]
-positions = [
-    (-0.3, 0.0, 0.0),  # Left
-    (0.0, 0.0, 0.0),   # Center
-    (0.3, 0.0, 0.0),   # Right
-]
+<hr>
 
-for name, pos in zip(specimens, positions):
-    if name in bpy.data.objects:
-        obj = bpy.data.objects[name]
-        obj.tb_location = pos
-```
+<p><code>bpy.context.scene.traitblender_config.meshes.save_meshes</code></p>
+<p>If enabled, save a mesh export during simulation.</p>
 
-## How Table Coordinates Work
+<hr>
 
-The table coordinate system:
+<p><code>bpy.ops.traitblender.export_mesh()</code></p>
+<p>Export the current sample as a mesh file using the selected format.</p>
 
-1. **Origin**: Center of the table's top face
-2. **Axes**: Aligned with the table's local coordinate system
-3. **Z-axis**: Normal to the table surface (upward)
-4. **Automatic lift**: Accounts for object's lowest vertex to place on table surface
+</details>
 
-When you set `obj.tb_location = (x, y, z)`:
-- `x, y`: Position along table surface
-- `z`: Height above/below table surface
-- The object is automatically lifted so its bottom touches the table
+<details>
+<summary>7. Imaging and Simulation</summary>
 
-## Integration with Morphospace Generation
+<p><code>bpy.context.scene.traitblender_config.imaging</code></p>
+<p>Controls for the imaging pipeline, including whether to render images during simulation.</p>
 
-When you generate a morphospace sample, it's automatically positioned using table coordinates:
+<hr>
 
-```python
-# Generate sample
-bpy.ops.traitblender.generate_morphospace_sample()
+<p><code>bpy.context.scene.traitblender_config.output.rendering_directory</code></p>
+<p>Root directory used for simulation output.</p>
 
-# The specimen is automatically set to table center
-specimen = bpy.data.objects[dataset.sample]
-print(f"Initial position: {specimen.tb_location}")  # (0.0, 0.0, 0.0)
+<hr>
 
-# Adjust position
-specimen.tb_location = (0.2, 0.0, 0.0)  # Move along table X axis
-```
+<p><code>bpy.ops.traitblender.imaging_pipeline()</code></p>
+<p>Run the full simulation pipeline for the current dataset.</p>
 
-## Best Practices
+</details>
 
-1. **Always use table coordinates** for positioning specimens - ensures consistency
-2. **Use world coordinates** only when necessary for calculations
-3. **Account for object geometry** - the system automatically handles bottom alignment
-4. **Test positioning** before batch processing to ensure correct placement
+<details>
+<summary>User-facing properties</summary>
 
-## Error Handling
+<p><code>bpy.context.scene.traitblender_config</code></p>
+<p>Main configuration object for all TraitBlender settings.</p>
 
-The table coordinate system requires the "Table" object to exist in the scene:
+<hr>
 
-```python
-try:
-    obj.tb_location = (0.0, 0.0, 0.0)
-except RuntimeError as e:
-    print(f"Error: Table object not found. Run bpy.ops.traitblender.setup_scene() first")
-```
+<p><code>bpy.context.scene.traitblender_setup</code></p>
+<p>Setup state for morphospace selection and scene initialization.</p>
 
-Always ensure the museum scene is loaded before using table coordinates.
+<hr>
+
+<p><code>bpy.context.scene.traitblender_dataset</code></p>
+<p>The current dataset and its editable CSV contents.</p>
+
+<hr>
+
+<p><code>bpy.context.scene.traitblender_orientation</code></p>
+<p>The currently selected orientation.</p>
+
+<hr>
+
+<p><code>bpy.context.scene.traitblender_sample</code></p>
+<p>The current sample object.</p>
+
+</details>
+
+## Notes
+
+- The Python tooltip in Blender is usually enough to discover the matching API call for a given button or property.

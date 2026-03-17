@@ -67,33 +67,16 @@ nav:
     - Blender Settings: getting-started/blender-optimization.md
     - Installation: getting-started/installation.md
     - Quick Start (GUI): getting-started/quick-start.md
-    - Quick Start (API): getting-started/quick-start-api.md
   - User Documentation:
     - Overview: documentation.md
-    - GUI Documentation: gui.md
-    - API Documentation: api.md
+    - API Reference:
+      - Operators and Properties: api/scene-assets.md
     - Configuration:
       - Configuration Files: configuration/config-files.md
-    - API Reference:
-      - Scene Assets: api/scene-assets.md
-  - Developer Documentation:
-    - Architecture: architecture.md
-    - UI Components:
-      - Operators: developers/operators.md
-      - Panels: developers/panels.md
-      - Properties: developers/properties.md
-      - Events: developers/events.md
-    - Core Systems:
-      - 1 Asset Management: developers/asset-management.md
-      - 2 Configuration System: developers/configuration-system.md
-      - 3 Morphospace System: developers/morphospace-system.md
-      - 4 Dataset Management: developers/dataset-management.md
-      - 5 Positioning System: developers/positioning-system.md
-      - 6 Transform Pipeline: developers/transform-pipeline.md
-      - 7 Imaging: developers/imaging.md
-  - Tutorials:
-    - Generating Shell Dataset Data: tutorials/generating-shell-data.md
-    - Basic Specimen Imaging: tutorials/basic-imaging.md
+  - Morphospaces:
+    - Overview: morphospaces/overview.md
+    - Shell (Default): morphospaces/shell.md
+    - Circle Grid: morphospaces/circle-grid.md
 
 extra:
   social:
