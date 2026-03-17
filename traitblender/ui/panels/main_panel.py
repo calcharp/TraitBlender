@@ -239,10 +239,6 @@ class TRAITBLENDER_PT_imaging_panel(Panel):
         layout = self.layout
         config = context.scene.traitblender_config
         setup = context.scene.traitblender_setup
-        
-        # Rendering directory
-        row = layout.row(align=True)
-        row.prop(config.output, "rendering_directory", text="Rendering Directory")
 
         row = layout.row(align=True)
         row.prop(config.imaging, "include_images", text="Include Images")
@@ -271,7 +267,20 @@ class TRAITBLENDER_PT_imaging_panel(Panel):
                     continue  # will appear after timer runs
                 row = box.row()
                 row.prop(item, "enabled", text=name)
-        
-        # Imaging pipeline button
+
+class TRAITBLENDER_PT_simulation_panel(Panel):
+    bl_label = "Simulation"
+    bl_idname = "TRAITBLENDER_PT_simulation_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'TraitBlender'
+
+    def draw(self, context):
+        layout = self.layout
+        config = context.scene.traitblender_config
+
         row = layout.row(align=True)
-        row.operator("traitblender.imaging_pipeline", text="Run Imaging Pipeline", icon='PLAY') 
+        row.prop(config.output, "rendering_directory", text="Simulation Directory")
+
+        row = layout.row(align=True)
+        row.operator("traitblender.imaging_pipeline", text="Simulate Dataset", icon='PLAY')

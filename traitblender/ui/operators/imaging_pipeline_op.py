@@ -17,7 +17,7 @@ def _sanitize_orientation_for_path(name):
 
 class TRAITBLENDER_OT_imaging_pipeline(Operator):
     bl_idname = "traitblender.imaging_pipeline"
-    bl_label = "Run Imaging Pipeline"
+    bl_label = "Simulate Dataset"
     bl_options = {'REGISTER', 'UNDO'}
 
     _timer = None
