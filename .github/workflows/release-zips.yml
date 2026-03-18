@@ -6,7 +6,7 @@ name: Release extension zips
 
 on:
   release:
-    types: [published]
+    types: [published, prereleased]
 
 jobs:
   build:
@@ -18,14 +18,22 @@ jobs:
             wheels: wheels
             artifact: traitblender-windows
             suffix: windows
+            requirements: requirements-wheels.txt
           - os: macos-latest
             wheels: wheels/mac
             artifact: traitblender-mac
             suffix: mac
+            requirements: requirements-wheels.txt
           - os: ubuntu-latest
             wheels: wheels/linux
             artifact: traitblender-linux
             suffix: linux
+            requirements: requirements-wheels.txt
+          - os: ubuntu-latest
+            wheels: wheels/linux-headless
+            artifact: traitblender-linux-headless
+            suffix: linux-headless
+            requirements: requirements-wheels-headless.txt
 
     runs-on: ${{ matrix.os }}
 
@@ -45,7 +53,7 @@ jobs:
 
       - name: Download wheels for this OS
         run: >-
-          python -m pip download --only-binary=:all: -r requirements-wheels.txt -d "${{ matrix.wheels }}"
+          python -m pip download --only-binary=:all: -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
 
       - name: Build extension zip
         run: python build_zips/build_extension.py --wheels "${{ matrix.wheels }}"
@@ -82,5 +90,6 @@ jobs:
             release-zips/traitblender-windows/*.zip
             release-zips/traitblender-mac/*.zip
             release-zips/traitblender-linux/*.zip
+            release-zips/traitblender-linux-headless/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

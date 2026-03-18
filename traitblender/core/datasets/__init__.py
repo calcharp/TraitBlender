@@ -6,7 +6,11 @@ Contains dataset management functionality for TraitBlender.
 
 import bpy
 from . import traitblender_dataset
-from .dpg_dataset_editor import launch_dataset_viewer_with_string
+try:
+    # Only available when DearPyGui is installed (GUI editor).
+    from .dpg_dataset_editor import launch_dataset_viewer_with_string
+except Exception:
+    launch_dataset_viewer_with_string = None
 
 classes = [
     traitblender_dataset.TRAITBLENDER_PG_dataset,
