@@ -6,5 +6,9 @@ Get Blender + TraitBlender into a Docker container that will work for V2. Maybe 
 
 - Make sure the dataset switches when the morphospace switches. 
 
+
+Add information for command line installs.
+
+
 DO NOT REMOVE:
 cls; rm -rf traitblender-2.0.0.zip; blender --command extension build --source-dir TraitBlender/

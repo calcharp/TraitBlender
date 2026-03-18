@@ -1,0 +1,45 @@
+abstract: "TraitBlender is a Blender add-on for generating museum-style images and 3D meshes of specimens from theoretical morphospaces."
+authors:
+  - family-names: Charpentier
+    given-names: Caleb
+    email: calebcharpentier00@gmail.com
+    orcid: "https://orcid.org/0000-0002-9787-7081"
+  - family-names: Linscott
+    given-names: Mason
+    orcid: "https://orcid.org/0000-0002-6146-7961"
+  - family-names: Bradley
+    given-names: John
+    orcid: "https://orcid.org/0000-0003-3858-848X"
+  - family-names: Campolongo
+    given-names: Elizabeth
+    orcid: "https://orcid.org/0000-0003-0846-2413"
+  - family-names: Thompson
+    given-names: Matthew
+    orcid: "https://orcid.org/0000-0003-0583-8585"
+  - family-names: Uyeda
+    given-names: Josef
+    orcid: "https://orcid.org/0000-0003-4624-9680"
+cff-version: 1.2.0
+date-released: "2026-03-18"
+identifiers:
+  - type: url
+    description: "The GitHub release URL for version 2.0.0."
+    value: "https://github.com/Imageomics/TraitBlender/releases/tag/v2.0.0"
+keywords:
+  - Imageomics
+  - Blender
+  - Phenomics
+  - Computer Vision
+  - Simulations
+  - Evolutionary Biology
+license: "MIT"
+message: "If you find this software helpful in your research, please cite this repository."
+repository-code: "https://github.com/Imageomics/TraitBlender"
+title: "TraitBlender"
+version: 2.0.0
+type: software
+contact:
+  - family-names: Charpentier
+    given-names: Caleb
+    email: calebcharpentier00@gmail.com
+

@@ -3,7 +3,12 @@ from bpy.props import StringProperty, EnumProperty
 import pandas as pd
 import os
 from io import StringIO
-from ..morphospaces import get_trait_parameters_with_defaults_for_morphospace
+import warnings
+
+from ..morphospaces import (
+    get_trait_parameters_for_morphospace,
+    get_trait_parameters_with_defaults_for_morphospace,
+)
 
 
 def reset_sample_on_csv_change(self, context):
@@ -31,7 +36,11 @@ def update_filepath(self, context):
     
     # Check if file exists
     if not os.path.exists(self.filepath):
-        print(f"TraitBlender: Dataset file not found: {self.filepath}")
+        warnings.warn(
+            f"TraitBlender: Dataset file not found: {self.filepath}. Regenerating default dataset.",
+            UserWarning,
+        )
+        self.csv = self.get_csv_for_editing()
         return
     
     # Infer file type from extension
@@ -39,7 +48,11 @@ def update_filepath(self, context):
     
     # Check if extension is supported
     if file_ext not in ['.csv', '.tsv', '.xlsx', '.xls']:
-        print(f"TraitBlender: Unsupported file type '{file_ext}'. Only CSV, TSV, and Excel files are supported.")
+        warnings.warn(
+            f"TraitBlender: Unsupported dataset file type '{file_ext}'. Expected CSV/TSV/XLSX.",
+            UserWarning,
+        )
+        self.csv = self.get_csv_for_editing()
         return
     
     try:
@@ -82,6 +95,25 @@ def update_filepath(self, context):
                     print(f"TraitBlender: Moved '{species_col}' column to first position for species identification")
         
         # Convert DataFrame to CSV string
+        morphospace_name = bpy.context.scene.traitblender_setup.available_morphospaces
+
+        def _norm_col(s: str) -> str:
+            return str(s).lower().strip().replace(" ", "_")
+
+        required_traits = get_trait_parameters_for_morphospace(morphospace_name)
+        df_cols_norm = {_norm_col(c): c for c in df.columns}
+        missing = [t for t in required_traits if _norm_col(t) not in df_cols_norm]
+
+        if missing:
+            warnings.warn(
+                "TraitBlender: Dataset columns don't match the selected morphospace.\n"
+                f"  Missing traits (expected columns): {missing}\n"
+                f"  Using morphospace default dataset instead of '{self.filepath}'.",
+                UserWarning,
+            )
+            self.csv = self.get_csv_for_editing()
+            return
+
         csv_buffer = StringIO()
         df.to_csv(csv_buffer, index=False)
         csv_string = csv_buffer.getvalue()
@@ -94,13 +126,12 @@ def update_filepath(self, context):
         print(f"TraitBlender: Dataset imported successfully: {rows} rows, {cols} columns")
         
     except Exception as e:
-        # Print helpful error message based on file type
-        if file_ext in ['.csv', '.tsv']:
-            print(f"TraitBlender: Failed to import {file_ext.upper()} file. The file may not be properly formatted or may contain invalid data: {str(e)}")
-        elif file_ext in ['.xlsx', '.xls']:
-            print(f"TraitBlender: Failed to import Excel file. The file may be corrupted, password-protected, or contain invalid data: {str(e)}")
-        else:
-            print(f"TraitBlender: Failed to import dataset: {str(e)}")
+        warnings.warn(
+            f"TraitBlender: Failed to import dataset from '{self.filepath}'. Regenerating default dataset. Error: {e}",
+            UserWarning,
+        )
+        self.csv = self.get_csv_for_editing()
+        return
 
 # This naming convention is different than the one for the TraitBlenderConfig, because it is a PropertyGroup and follows standard bpy naming convention for that.
 class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
