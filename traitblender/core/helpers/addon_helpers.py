@@ -39,7 +39,7 @@ def get_asset_path(*path_parts):
         str: Full path to the asset
 
     Example:
-        get_asset_path("objects", "table", "table.fbx")
+        get_asset_path("objects", "my_model", "model.fbx")
         get_asset_path("textures", "wood.png")
     """
     addon_dir = get_addon_root()

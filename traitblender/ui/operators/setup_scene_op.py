@@ -66,13 +66,11 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                 # Ensure depsgraph/bounding boxes are up to date before table-relative placement (tb_location)
                 bpy.context.view_layer.update()
                 
-                # Re-apply table material using dynamic asset path
-                table_name = "Table"
-                table_textures_path = get_asset_path("objects", "table", "table_material")
-                if table_name in bpy.data.objects:
-                    apply_material(table_name, textures_path=table_textures_path)
+                # Table: apply solid color (same pattern as Mat)
+                if "Table" in bpy.data.objects:
+                    apply_material("Table", hex_color="#432006", new_material_name="table_material")
                 else:
-                    self.report({'ERROR'}, f"Initialization failed, table object not found in scene: {table_name}")
+                    self.report({'ERROR'}, "Initialization failed, table object not found in scene: Table")
                     return {'CANCELLED'}
 
                 # Re-apply mat material using solid black color and name it 'mat_material'

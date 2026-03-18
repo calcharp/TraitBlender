@@ -12,6 +12,13 @@ from PIL import ImageColor
 from .constants import VALID_TEXTURES
 
 
+def _srgb_to_linear(c: float) -> float:
+    """Convert sRGB (0-1) to linear RGB (0-1) for Blender shader inputs."""
+    if c <= 0.04045:
+        return c / 12.92
+    return ((c + 0.055) / 1.055) ** 2.4
+
+
 def apply_material(object_name: str, textures_path: str = None, hex_color: str = None, existing_material_name: str = None, new_material_name: str = None):
     """
     Apply a material to a given object in Blender.
@@ -72,9 +79,13 @@ def apply_material(object_name: str, textures_path: str = None, hex_color: str =
     
     elif hex_color:
         # Create solid color material (named after hex code or new_material_name if provided)
+        # Hex is sRGB; Blender Principled BSDF Base Color expects linear RGB
         try:
-            rgb = ImageColor.getrgb(hex_color)
-            rgba = (*[c/255.0 for c in rgb], 1.0)
+            hex_6 = hex_color.strip("#")[:6]
+            rgb = ImageColor.getrgb(f"#{hex_6}")
+            srgb = tuple(c / 255.0 for c in rgb)
+            linear = tuple(_srgb_to_linear(c) for c in srgb)
+            rgba = (*linear, 1.0)
             mat_name = new_material_name if new_material_name else hex_color
             if mat_name in bpy.data.materials:
                 print(f"Warning: Material '{mat_name}' already exists. Replacing it.")

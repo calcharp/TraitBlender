@@ -9,7 +9,7 @@ class CameraConfig(TraitBlenderConfig):
     location: bpy.props.FloatVectorProperty(
         name="Location",
         description="Camera location in world coordinates in meters",
-        default=(0.0, 0.0, 0.0),
+        default=(0.0, 0.0, 1.1),
         subtype='TRANSLATION',
         get=get_property("bpy.data.objects['Camera'].location", object_dependencies={"objects": ["Camera"]}),
         set=set_property("bpy.data.objects['Camera'].location", object_dependencies={"objects": ["Camera"]}),
