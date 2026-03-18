@@ -38,23 +38,6 @@ repository-code: "https://github.com/Imageomics/TraitBlender"
 title: "TraitBlender"
 version: 2.0.0
 type: software
-preferred-citation:
-  type: software
-  authors:
-    - family-names: Charpentier
-      given-names: Caleb
-    - family-names: Linscott
-      given-names: Mason
-    - family-names: Bradley
-      given-names: John
-    - family-names: Campolongo
-      given-names: Elizabeth
-    - family-names: Thompson
-      given-names: Matthew
-    - family-names: Uyeda
-      given-names: Josef
-  title: TraitBlender
-  year: 2026
 contact:
   - family-names: Charpentier
     given-names: Caleb
