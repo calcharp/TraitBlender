@@ -45,7 +45,8 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
             dataset = context.scene.traitblender_dataset
             config = context.scene.traitblender_config
 
-            if not dataset.csv or self._specimen_idx >= self._total_specimens:
+            # Treat implicit morphospace defaults as a valid dataset.
+            if len(dataset.rownames) == 0 or self._specimen_idx >= self._total_specimens:
                 self._finish(context)
                 return {'FINISHED'}
 
@@ -170,7 +171,7 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
         config = context.scene.traitblender_config
         setup = context.scene.traitblender_setup
 
-        if not dataset.csv or len(dataset.rownames) == 0:
+        if len(dataset.rownames) == 0:
             self.report({'WARNING'}, "No dataset loaded")
             return {'CANCELLED'}
 
