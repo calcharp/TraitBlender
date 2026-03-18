@@ -3,32 +3,32 @@
     {
       "name": "Charpentier, Caleb",
       "orcid": "https://orcid.org/0000-0002-9787-7081",
-      "affiliation": ""
+      "affiliation": "Imageomics Institute"
     },
     {
       "name": "Linscott, Mason",
       "orcid": "https://orcid.org/0000-0002-6146-7961",
-      "affiliation": ""
+      "affiliation": "Imageomics Institute"
     },
     {
       "name": "Bradley, John",
       "orcid": "https://orcid.org/0000-0003-3858-848X",
-      "affiliation": ""
+      "affiliation": "Imageomics Institute"
     },
     {
       "name": "Campolongo, Elizabeth",
       "orcid": "https://orcid.org/0000-0003-0846-2413",
-      "affiliation": ""
+      "affiliation": "Imageomics Institute"
     },
     {
       "name": "Thompson, Matthew",
       "orcid": "https://orcid.org/0000-0003-0583-8585",
-      "affiliation": ""
+      "affiliation": "Imageomics Institute"
     },
     {
       "name": "Uyeda, Josef",
       "orcid": "https://orcid.org/0000-0003-4624-9680",
-      "affiliation": ""
+      "affiliation": "Imageomics Institute"
     }
   ],
   "description": "TraitBlender is a Blender add-on for generating museum-style images and 3D meshes of specimens from theoretical morphospaces.",
