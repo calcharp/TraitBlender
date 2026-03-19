@@ -7,7 +7,18 @@
 
 ## Installation
 
-<!-- TODO: Add command-line installation instructions for advanced users -->
+### Command-line install (optional)
+
+You can install a downloaded release zip directly from the terminal:
+
+`blender --command extension install-file -r user_default --enable traitblender-v2.0.0-linux.zip`
+
+Use the zip that matches your OS:
+
+- Linux: `traitblender-<tag>-linux.zip`
+- Linux (headless): `traitblender-<tag>-linux-headless.zip`
+- macOS: `traitblender-<tag>-mac.zip`
+- Windows: `traitblender-<tag>-windows.zip`
 
 **Step 1: Download TraitBlender**
 

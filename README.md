@@ -22,3 +22,11 @@ TraitBlender is a Blender add-on for generating museum-style images and 3D meshe
 **Integration with SlicerMorph** — Exported meshes can be imported and analyzed in [SlicerMorph](https://slicermorph.github.io/), an open platform for 3D morphology and morphometrics in 3D Slicer.
 
 For installation, quick start, and full documentation, see the [docs](https://imageomics.github.io/TraitBlender/).
+
+## Command-Line Installation (Optional)
+
+You can also install a release zip from the command line:
+
+`blender --command extension install-file -r user_default --enable traitblender-v2.0.0-linux.zip`
+
+Use the zip that matches your OS (for example: `...-windows.zip`, `...-mac.zip`, or `...-linux.zip`, `...-linux-headless.zip`).
