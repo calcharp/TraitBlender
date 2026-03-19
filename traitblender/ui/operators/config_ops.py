@@ -3,7 +3,7 @@ import yaml
 import os
 from bpy.types import Operator
 from bpy.props import StringProperty
-from ...core.datasets.traitblender_dataset import update_filepath
+from ...core.datasets.traitblender_dataset import update_filepath, _normalize_dataset_path
 
 
 class TRAITBLENDER_OT_configure_scene(Operator):
@@ -52,10 +52,14 @@ class TRAITBLENDER_OT_configure_scene(Operator):
             # the value is unchanged, and users expect Configure Scene to load data.
             dataset = context.scene.traitblender_dataset
             if dataset.filepath:
-                before_csv = dataset.csv
-                update_filepath(dataset, context)
-                if dataset.csv == before_csv:
-                    self.report({'WARNING'}, f"Dataset path was set but import may have failed: {dataset.filepath}")
+                p = _normalize_dataset_path(dataset.filepath)
+                if not os.path.exists(p):
+                    self.report({'WARNING'}, f"Dataset file not found: {p}")
+                else:
+                    update_filepath(dataset, context)
+                    # Re-import can leave csv unchanged; only warn if we still have no data.
+                    if not (dataset.csv or "").strip():
+                        self.report({'WARNING'}, f"Dataset path set but CSV is empty after import: {p}")
             
             self.report({'INFO'}, f"Configuration loaded successfully from {config_file_path}")
             return {'FINISHED'}

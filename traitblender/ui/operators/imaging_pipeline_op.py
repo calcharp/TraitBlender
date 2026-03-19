@@ -40,118 +40,68 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
     _csv_file = None
     _csv_writer = None
 
-    def modal(self, context, event):
-        if event.type == 'TIMER':
-            dataset = context.scene.traitblender_dataset
-            config = context.scene.traitblender_config
+    def _imaging_step(self, context):
+        """Run one imaging iteration. Returns True if the pipeline is finished (_finish called)."""
+        dataset = context.scene.traitblender_dataset
+        config = context.scene.traitblender_config
 
-            # Treat implicit morphospace defaults as a valid dataset.
-            if len(dataset.rownames) == 0 or self._specimen_idx >= self._total_specimens:
-                self._finish(context)
-                return {'FINISHED'}
+        # Treat implicit morphospace defaults as a valid dataset.
+        if len(dataset.rownames) == 0 or self._specimen_idx >= self._total_specimens:
+            self._finish(context)
+            return True
 
-            name = self._specimens[self._specimen_idx]
-            row = dataset.loc(name)
-            orientation_name = self._orientations[self._orientation_idx]
+        name = self._specimens[self._specimen_idx]
+        row = dataset.loc(name)
+        orientation_name = self._orientations[self._orientation_idx]
 
-            # Generate new specimen only at start of each specimen (first orientation, first image)
-            if self._orientation_idx == 0 and self._img_idx == 0:
-                if self._specimen_idx > 0:
-                    prev_name = self._specimens[self._specimen_idx - 1]
-                    prev_obj = bpy.data.objects.get(prev_name)
-                    if prev_obj:
-                        bpy.data.objects.remove(prev_obj, do_unlink=True)
+        # Generate new specimen only at start of each specimen (first orientation, first image)
+        if self._orientation_idx == 0 and self._img_idx == 0:
+            if self._specimen_idx > 0:
+                prev_name = self._specimens[self._specimen_idx - 1]
+                prev_obj = bpy.data.objects.get(prev_name)
+                if prev_obj:
+                    bpy.data.objects.remove(prev_obj, do_unlink=True)
 
-                dataset.sample = name
-                bpy.ops.traitblender.generate_morphospace_sample()
-                self._exported_mesh_for_specimen = False
-                self._mesh_path = ""
-                self._last_applied_orientation = ""
+            dataset.sample = name
+            bpy.ops.traitblender.generate_morphospace_sample()
+            self._exported_mesh_for_specimen = False
+            self._mesh_path = ""
+            self._last_applied_orientation = ""
 
-                # Optional mesh export: once per specimen, at Default orientation only
-                if self._save_meshes and not self._exported_mesh_for_specimen:
-                    try:
-                        context.scene.traitblender_orientation.orientation = "Default"
-                        bpy.ops.traitblender.apply_orientation()
-                        mesh_dir = os.path.join(self._mesh_root, name)
-                        os.makedirs(mesh_dir, exist_ok=True)
-                        self._mesh_path = os.path.join(mesh_dir, f"{name}")
-                        export_current_sample(filepath=self._mesh_path, context=context)
-                        self._exported_mesh_for_specimen = True
-                        if self._csv_writer:
-                            self._csv_writer.writerow([name, "MESH", 0, os.path.abspath(self._mesh_path), ""])
-                            self._csv_file.flush()
-                    except Exception as e:
-                        # Don't crash the imaging pipeline if mesh export fails
-                        print(f"TraitBlender: Mesh export failed for '{name}': {e}")
+            # Optional mesh export: once per specimen, at Default orientation only
+            if self._save_meshes and not self._exported_mesh_for_specimen:
+                try:
+                    context.scene.traitblender_orientation.orientation = "Default"
+                    bpy.ops.traitblender.apply_orientation()
+                    mesh_dir = os.path.join(self._mesh_root, name)
+                    os.makedirs(mesh_dir, exist_ok=True)
+                    self._mesh_path = os.path.join(mesh_dir, f"{name}")
+                    export_current_sample(filepath=self._mesh_path, context=context)
+                    self._exported_mesh_for_specimen = True
+                    if self._csv_writer:
+                        self._csv_writer.writerow([name, "MESH", 0, os.path.abspath(self._mesh_path), ""])
+                        self._csv_file.flush()
+                except Exception as e:
+                    # Don't crash the imaging pipeline if mesh export fails
+                    print(f"TraitBlender: Mesh export failed for '{name}': {e}")
 
-            # Set and apply this orientation at start of each orientation block
-            current_ui_orientation = getattr(context.scene.traitblender_orientation, "orientation", "")
-            if (
-                self._img_idx == 0
-                or current_ui_orientation != orientation_name
-                or self._last_applied_orientation != orientation_name
-            ):
-                context.scene.traitblender_orientation.orientation = orientation_name
-                bpy.ops.traitblender.apply_orientation()
-                self._last_applied_orientation = orientation_name
+        # Set and apply this orientation at start of each orientation block
+        current_ui_orientation = getattr(context.scene.traitblender_orientation, "orientation", "")
+        if (
+            self._img_idx == 0
+            or current_ui_orientation != orientation_name
+            or self._last_applied_orientation != orientation_name
+        ):
+            context.scene.traitblender_orientation.orientation = orientation_name
+            bpy.ops.traitblender.apply_orientation()
+            self._last_applied_orientation = orientation_name
 
-            # Reset and run pipeline for this image
-            bpy.ops.traitblender.reset_pipeline()
-            bpy.ops.traitblender.run_pipeline()
+        # Reset and run pipeline for this image
+        bpy.ops.traitblender.reset_pipeline()
+        bpy.ops.traitblender.run_pipeline()
 
-            # If images are disabled, skip rendering and just advance counters.
-            if not self._include_images:
-                self._img_idx += 1
-                if self._img_idx >= self._images_per_orientation:
-                    self._img_idx = 0
-                    self._orientation_idx += 1
-                    if self._orientation_idx >= len(self._orientations):
-                        self._orientation_idx = 0
-                        self._specimen_idx += 1
-                return {'PASS_THROUGH'}
-
-            # Directory structure:
-            # - Always: render_dir / images / specimen_name / orientation_sanitized /
-            # - If save_meshes: render_dir / meshes / specimen_name / (one model at Default only)
-            orient_subdir = _sanitize_orientation_for_path(orientation_name)
-            images_dir = os.path.join(self._render_dir, "images", name, orient_subdir)
-            # Keep configs under images when meshes are enabled so the dataset root splits into images/ + meshes/
-            if self._save_meshes:
-                configs_dir = images_dir
-            else:
-                configs_dir = os.path.join(self._render_dir, "configs", name, orient_subdir)
-            os.makedirs(images_dir, exist_ok=True)
-            os.makedirs(configs_dir, exist_ok=True)
-
-            img_format = config.output.image_format.lower()
-            config_filename = f"{name}_{self._img_idx}.yaml"
-            config_path = os.path.join(configs_dir, config_filename)
-
-            bpy.ops.traitblender.export_config(filepath=config_path)
-
-            img_filename = f"{name}_{self._img_idx}.{img_format}"
-            img_path = os.path.join(images_dir, img_filename)
-            context.scene.render.filepath = img_path
-
-            bpy.ops.traitblender.render_image()
-
-            abs_img_path = os.path.abspath(img_path)
-            abs_config_path = os.path.abspath(config_path)
-            if self._csv_writer:
-                self._csv_writer.writerow([name, orientation_name, self._img_idx, abs_img_path, abs_config_path])
-                self._csv_file.flush()
-
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            log_msg = (
-                f"[{timestamp}] [{self._specimen_idx + 1}/{self._total_specimens}] {name} "
-                f"| {orientation_name} | image {self._img_idx + 1}/{self._images_per_orientation}: {dict(row)}\n"
-            )
-            print(log_msg.strip())
-            if self._log_file:
-                self._log_file.write(log_msg)
-                self._log_file.flush()
-
+        # If images are disabled, skip rendering and just advance counters.
+        if not self._include_images:
             self._img_idx += 1
             if self._img_idx >= self._images_per_orientation:
                 self._img_idx = 0
@@ -159,6 +109,63 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
                 if self._orientation_idx >= len(self._orientations):
                     self._orientation_idx = 0
                     self._specimen_idx += 1
+            return False
+
+        # Directory structure:
+        # - Always: render_dir / images / specimen_name / orientation_sanitized /
+        # - If save_meshes: render_dir / meshes / specimen_name / (one model at Default only)
+        orient_subdir = _sanitize_orientation_for_path(orientation_name)
+        images_dir = os.path.join(self._render_dir, "images", name, orient_subdir)
+        # Keep configs under images when meshes are enabled so the dataset root splits into images/ + meshes/
+        if self._save_meshes:
+            configs_dir = images_dir
+        else:
+            configs_dir = os.path.join(self._render_dir, "configs", name, orient_subdir)
+        os.makedirs(images_dir, exist_ok=True)
+        os.makedirs(configs_dir, exist_ok=True)
+
+        img_format = config.output.image_format.lower()
+        config_filename = f"{name}_{self._img_idx}.yaml"
+        config_path = os.path.join(configs_dir, config_filename)
+
+        bpy.ops.traitblender.export_config(filepath=config_path)
+
+        img_filename = f"{name}_{self._img_idx}.{img_format}"
+        img_path = os.path.join(images_dir, img_filename)
+        context.scene.render.filepath = img_path
+
+        bpy.ops.traitblender.render_image()
+
+        abs_img_path = os.path.abspath(img_path)
+        abs_config_path = os.path.abspath(config_path)
+        if self._csv_writer:
+            self._csv_writer.writerow([name, orientation_name, self._img_idx, abs_img_path, abs_config_path])
+            self._csv_file.flush()
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_msg = (
+            f"[{timestamp}] [{self._specimen_idx + 1}/{self._total_specimens}] {name} "
+            f"| {orientation_name} | image {self._img_idx + 1}/{self._images_per_orientation}: {dict(row)}\n"
+        )
+        print(log_msg.strip())
+        if self._log_file:
+            self._log_file.write(log_msg)
+            self._log_file.flush()
+
+        self._img_idx += 1
+        if self._img_idx >= self._images_per_orientation:
+            self._img_idx = 0
+            self._orientation_idx += 1
+            if self._orientation_idx >= len(self._orientations):
+                self._orientation_idx = 0
+                self._specimen_idx += 1
+
+        return False
+
+    def modal(self, context, event):
+        if event.type == 'TIMER':
+            if self._imaging_step(context):
+                return {'FINISHED'}
 
         elif event.type == 'ESC':
             self._finish(context)
@@ -237,6 +244,16 @@ class TRAITBLENDER_OT_imaging_pipeline(Operator):
 
         total_imgs = self._total_specimens * len(self._orientations) * self._images_per_orientation
         print(f"Rendering {self._total_specimens} specimens × {len(self._orientations)} orientations × {self._images_per_orientation} images = {total_imgs} total to {render_dir}")
+
+        # Modal + timer does not reliably run before Blender exits in --background mode.
+        if getattr(bpy.app, "background", False):
+            try:
+                while not self._imaging_step(context):
+                    pass
+            except Exception:
+                self._finish(context)
+                raise
+            return {'FINISHED'}
 
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.1, window=context.window)
