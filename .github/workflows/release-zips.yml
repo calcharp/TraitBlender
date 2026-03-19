@@ -44,6 +44,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Always build release artifacts from the latest main branch code,
+          # instead of the release tag commit.
+          ref: main
 
       - name: Set up Python 3.11 (for pip download)
         uses: actions/setup-python@v5
