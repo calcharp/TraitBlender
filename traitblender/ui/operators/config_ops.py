@@ -3,6 +3,7 @@ import yaml
 import os
 from bpy.types import Operator
 from bpy.props import StringProperty
+from ...core.datasets.traitblender_dataset import update_filepath
 
 
 class TRAITBLENDER_OT_configure_scene(Operator):
@@ -45,6 +46,13 @@ class TRAITBLENDER_OT_configure_scene(Operator):
             
             # Apply the configuration using the from_dict method
             context.scene.traitblender_config.from_dict(config_data)
+
+            # Force a dataset re-import after config load.
+            # Setting filepath via config may not fire the update callback if the
+            # value is unchanged, and dataset validation depends on current scene state.
+            dataset = context.scene.traitblender_dataset
+            if dataset.filepath:
+                update_filepath(dataset, context)
             
             self.report({'INFO'}, f"Configuration loaded successfully from {config_file_path}")
             return {'FINISHED'}

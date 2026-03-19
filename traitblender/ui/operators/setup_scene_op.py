@@ -8,6 +8,7 @@ import bpy
 from bpy.types import Operator
 import os
 from ...core.helpers import get_asset_path, apply_material
+from ...core.datasets.traitblender_dataset import update_filepath
 from bpy.app.handlers import persistent
 import yaml
 
@@ -92,10 +93,14 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                     if config_data:
                         context.scene.traitblender_config.from_dict(config_data)
                         bpy.context.view_layer.update()
-                        # Ensure dataset defaults are materialized so imaging has rows
-                        # even when no external dataset has been imported yet.
                         dataset = context.scene.traitblender_dataset
-                        dataset.csv = dataset.get_csv_for_editing()
+                        if dataset.filepath:
+                            # Re-import from configured file after scene/config setup.
+                            update_filepath(dataset, context)
+                        else:
+                            # Ensure dataset defaults are materialized so imaging has rows
+                            # even when no external dataset has been imported yet.
+                            dataset.csv = dataset.get_csv_for_editing()
                     else:
                         self.report({'WARNING'}, "Default configuration file is empty or invalid")
                 else:
