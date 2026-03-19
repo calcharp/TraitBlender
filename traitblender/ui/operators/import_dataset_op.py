@@ -9,6 +9,7 @@ from bpy.types import Operator
 import pandas as pd
 import os
 from io import StringIO
+from ...core.datasets.traitblender_dataset import _normalize_dataset_path
 
 
 class TRAITBLENDER_OT_import_dataset(Operator):
@@ -22,19 +23,20 @@ class TRAITBLENDER_OT_import_dataset(Operator):
     def execute(self, context):
         """Execute the import dataset operation"""
         dataset = context.scene.traitblender_dataset
+        dataset_path = _normalize_dataset_path(dataset.filepath)
         
         # Check if filepath is provided
-        if not dataset.filepath:
+        if not dataset_path:
             self.report({'ERROR'}, "No dataset file specified")
             return {'CANCELLED'}
         
         # Check if file exists
-        if not os.path.exists(dataset.filepath):
-            self.report({'ERROR'}, f"Dataset file not found: {dataset.filepath}")
+        if not os.path.exists(dataset_path):
+            self.report({'ERROR'}, f"Dataset file not found: {dataset_path}")
             return {'CANCELLED'}
         
         # Infer file type from extension
-        file_ext = os.path.splitext(dataset.filepath)[1].lower()
+        file_ext = os.path.splitext(dataset_path)[1].lower()
         
         # Check if extension is supported
         if file_ext not in ['.csv', '.tsv', '.xlsx', '.xls']:
@@ -44,11 +46,11 @@ class TRAITBLENDER_OT_import_dataset(Operator):
         try:
             # Load the dataset based on the file extension
             if file_ext == '.csv':
-                df = pd.read_csv(dataset.filepath)
+                df = pd.read_csv(dataset_path)
             elif file_ext == '.tsv':
-                df = pd.read_csv(dataset.filepath, sep='\t')
+                df = pd.read_csv(dataset_path, sep='\t')
             elif file_ext in ['.xlsx', '.xls']:
-                df = pd.read_excel(dataset.filepath)
+                df = pd.read_excel(dataset_path)
             
             # Convert DataFrame to CSV string
             csv_buffer = StringIO()

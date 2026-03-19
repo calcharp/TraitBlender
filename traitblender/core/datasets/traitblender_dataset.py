@@ -10,6 +10,12 @@ from ..morphospaces import (
     get_trait_parameters_with_defaults_for_morphospace,
 )
 
+def _normalize_dataset_path(path: str) -> str:
+    """Normalize dataset paths so local Windows paths are read as files, not URLs."""
+    if not path:
+        return path
+    return os.path.normpath(path)
+
 
 def reset_sample_on_csv_change(self, context):
     """Reset sample selection when CSV data changes."""
@@ -34,17 +40,19 @@ def update_filepath(self, context):
         self.csv = ""
         return
     
+    dataset_path = _normalize_dataset_path(self.filepath)
+
     # Check if file exists
-    if not os.path.exists(self.filepath):
+    if not os.path.exists(dataset_path):
         warnings.warn(
-            f"TraitBlender: Dataset file not found: {self.filepath}. Regenerating default dataset.",
+            f"TraitBlender: Dataset file not found: {dataset_path}. Regenerating default dataset.",
             UserWarning,
         )
         self.csv = self.get_csv_for_editing()
         return
     
     # Infer file type from extension
-    file_ext = os.path.splitext(self.filepath)[1].lower()
+    file_ext = os.path.splitext(dataset_path)[1].lower()
     
     # Check if extension is supported
     if file_ext not in ['.csv', '.tsv', '.xlsx', '.xls']:
@@ -58,11 +66,11 @@ def update_filepath(self, context):
     try:
         # Load the dataset based on the file extension
         if file_ext == '.csv':
-            df = pd.read_csv(self.filepath)
+            df = pd.read_csv(dataset_path)
         elif file_ext == '.tsv':
-            df = pd.read_csv(self.filepath, sep='\t')
+            df = pd.read_csv(dataset_path, sep='\t')
         elif file_ext in ['.xlsx', '.xls']:
-            df = pd.read_excel(self.filepath)
+            df = pd.read_excel(dataset_path)
         
         # Apply column reordering (same logic as _get_dataframe)
         if not df.empty and len(df.columns) > 0:
@@ -127,7 +135,7 @@ def update_filepath(self, context):
         
     except Exception as e:
         warnings.warn(
-            f"TraitBlender: Failed to import dataset from '{self.filepath}'. Regenerating default dataset. Error: {e}",
+            f"TraitBlender: Failed to import dataset from '{dataset_path}'. Regenerating default dataset. Error: {e}",
             UserWarning,
         )
         self.csv = self.get_csv_for_editing()

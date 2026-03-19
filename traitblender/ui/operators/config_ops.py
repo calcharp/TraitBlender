@@ -47,12 +47,15 @@ class TRAITBLENDER_OT_configure_scene(Operator):
             # Apply the configuration using the from_dict method
             context.scene.traitblender_config.from_dict(config_data)
 
-            # Force a dataset re-import after config load.
-            # Setting filepath via config may not fire the update callback if the
-            # value is unchanged, and dataset validation depends on current scene state.
+            # Force an explicit dataset import after config load.
+            # Do not rely on property update callbacks here; they may not run when
+            # the value is unchanged, and users expect Configure Scene to load data.
             dataset = context.scene.traitblender_dataset
             if dataset.filepath:
+                before_csv = dataset.csv
                 update_filepath(dataset, context)
+                if dataset.csv == before_csv:
+                    self.report({'WARNING'}, f"Dataset path was set but import may have failed: {dataset.filepath}")
             
             self.report({'INFO'}, f"Configuration loaded successfully from {config_file_path}")
             return {'FINISHED'}
