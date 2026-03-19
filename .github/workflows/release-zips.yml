@@ -49,6 +49,13 @@ jobs:
           # instead of the release tag commit.
           ref: main
 
+      # Run header often shows the *tag* SHA (e.g. f9d9880), not this checkout.
+      - name: Show commit actually built
+        run: |
+          echo "HEAD after checkout:"
+          git rev-parse HEAD
+          git log -1 --oneline
+
       - name: Set up Python 3.11 (for pip download)
         uses: actions/setup-python@v5
         with:
