@@ -6,7 +6,6 @@ from io import StringIO
 import warnings
 
 from ..morphospaces import (
-    get_trait_parameters_for_morphospace,
     get_trait_parameters_with_defaults_for_morphospace,
 )
 
@@ -102,20 +101,47 @@ def update_filepath(self, context):
                     
                     print(f"TraitBlender: Moved '{species_col}' column to first position for species identification")
         
-        # Convert DataFrame to CSV string
+        # Validate columns against active morphospace:
+        # - Missing trait columns are allowed (sample() will use defaults).
+        # - Unknown columns are not allowed.
+        # - Provided trait columns that are entirely empty are not allowed.
         morphospace_name = bpy.context.scene.traitblender_setup.available_morphospaces
 
         def _norm_col(s: str) -> str:
             return str(s).lower().strip().replace(" ", "_")
 
-        required_traits = get_trait_parameters_for_morphospace(morphospace_name)
-        df_cols_norm = {_norm_col(c): c for c in df.columns}
-        missing = [t for t in required_traits if _norm_col(t) not in df_cols_norm]
+        species_column_names = {'species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids'}
+        trait_defaults = get_trait_parameters_with_defaults_for_morphospace(morphospace_name)
+        allowed_traits = {_norm_col(t) for t in trait_defaults.keys()}
 
-        if missing:
+        unknown_columns = []
+        empty_trait_columns = []
+        for col in df.columns:
+            norm = _norm_col(col)
+            if norm in species_column_names:
+                continue
+            if norm not in allowed_traits:
+                unknown_columns.append(col)
+                continue
+            # Treat blank strings as empty values too.
+            cleaned = df[col].replace(r'^\s*$', pd.NA, regex=True)
+            if cleaned.isna().all():
+                empty_trait_columns.append(col)
+
+        if unknown_columns:
             warnings.warn(
-                "TraitBlender: Dataset columns don't match the selected morphospace.\n"
-                f"  Missing traits (expected columns): {missing}\n"
+                "TraitBlender: Dataset contains columns not recognized by the selected morphospace.\n"
+                f"  Unknown columns: {unknown_columns}\n"
+                f"  Using morphospace default dataset instead of '{self.filepath}'.",
+                UserWarning,
+            )
+            self.csv = self.get_csv_for_editing()
+            return
+
+        if empty_trait_columns:
+            warnings.warn(
+                "TraitBlender: Dataset contains trait columns with no values.\n"
+                f"  Empty columns: {empty_trait_columns}\n"
                 f"  Using morphospace default dataset instead of '{self.filepath}'.",
                 UserWarning,
             )
