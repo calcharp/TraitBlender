@@ -15,25 +15,29 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            wheels: wheels
+            wheels: TraitBlender/wheels
             artifact: traitblender-windows
             suffix: windows
             requirements: requirements-wheels.txt
+            download_wheels: false
           - os: macos-latest
             wheels: wheels/mac
             artifact: traitblender-mac
             suffix: mac
             requirements: requirements-wheels.txt
+            download_wheels: true
           - os: ubuntu-latest
             wheels: wheels/linux
             artifact: traitblender-linux
             suffix: linux
             requirements: requirements-wheels.txt
+            download_wheels: true
           - os: ubuntu-latest
             wheels: wheels/linux-headless
             artifact: traitblender-linux-headless
             suffix: linux-headless
             requirements: requirements-wheels-headless.txt
+            download_wheels: true
 
     runs-on: ${{ matrix.os }}
 
@@ -52,6 +56,7 @@ jobs:
           version: "4.3"
 
       - name: Download wheels for this OS
+        if: ${{ matrix.download_wheels }}
         run: >-
           python -m pip download --only-binary=:all: -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
 
