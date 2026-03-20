@@ -57,6 +57,12 @@ class TraitBlenderSetupProperties(bpy.types.PropertyGroup):
         if new_value == self.prev_morphospace:
             return
 
+        # Headless / batch: no windows for popup_menu; apply switch without confirmation.
+        if getattr(bpy.app, "background", False):
+            self.prev_morphospace = new_value
+            self.pending_morphospace = ""
+            return
+
         # Stash the user's requested morphospace, revert selection immediately, then show popup.
         self.pending_morphospace = new_value
         self.suppress_morphospace_update = True

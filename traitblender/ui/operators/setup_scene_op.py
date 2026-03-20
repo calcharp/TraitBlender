@@ -119,7 +119,8 @@ class TRAITBLENDER_OT_setup_scene(Operator):
     
     def invoke(self, context, event):
         """Called when the operator is invoked"""
-        if bpy.data.is_dirty:
+        # Background / no WM: cannot show confirm dialog; run without prompting.
+        if bpy.data.is_dirty and not getattr(bpy.app, "background", False) and context.window_manager.windows:
             window = context.window_manager.windows[0]
             center_x = window.width // 2
             center_y = window.height // 2

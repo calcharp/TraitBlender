@@ -75,6 +75,12 @@ class TRAITBLENDER_OT_configure_scene(Operator):
         """Invoke file browser if no filepath is provided and no stored config file"""
         # If no filepath provided and no stored config file, open file browser
         if not self.filepath and not context.scene.traitblender_setup.config_file:
+            if getattr(bpy.app, "background", False):
+                self.report(
+                    {'ERROR'},
+                    "No configuration file specified (file browser unavailable in background mode)",
+                )
+                return {'CANCELLED'}
             context.window_manager.fileselect_add(self)
             return {'RUNNING_MODAL'}
         else:
@@ -95,6 +101,13 @@ class TRAITBLENDER_OT_show_configuration(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
+        if getattr(bpy.app, "background", False):
+            # No dialogs in headless; dump YAML to stdout for logs / debugging.
+            print(str(context.scene.traitblender_config))
+            return {'FINISHED'}
+        if not context.window_manager.windows:
+            self.report({'WARNING'}, "No window available to show configuration dialog")
+            return {'CANCELLED'}
         window = context.window_manager.windows[0]
         self._old_mouse_pos = (event.mouse_x, event.mouse_y)
         center_x = window.width // 2
@@ -142,5 +155,13 @@ class TRAITBLENDER_OT_export_config(Operator):
             return {'CANCELLED'}
     
     def invoke(self, context, event):
+        if self.filepath:
+            return self.execute(context)
+        if getattr(bpy.app, "background", False):
+            self.report(
+                {'ERROR'},
+                "No export path specified (file browser unavailable in background mode)",
+            )
+            return {'CANCELLED'}
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
