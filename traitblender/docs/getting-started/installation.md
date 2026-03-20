@@ -20,6 +20,18 @@ Use the zip that matches your OS:
 - macOS: `traitblender-<tag>-mac.zip`
 - Windows: `traitblender-<tag>-windows.zip`
 
+## Command-line Uninstall (Optional)
+
+To remove TraitBlender from the Blender extension directory:
+
+```bash
+blender --command extension remove [-h] [--no-prefs] PACKAGES
+```
+
+Replace `PACKAGES` with the installed extension package name(s) you want to remove (the exact identifier can vary by OS/tag).
+
+After removing the extension, restart Blender. TraitBlender will no longer be available (the UI panel and `bpy.ops.traitblender.*` operators will not be registered).
+
 **Step 1: Download TraitBlender**
 
 - Download the latest release from [GitHub Releases](https://github.com/Imageomics/TraitBlender/releases)
