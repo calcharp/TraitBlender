@@ -28,10 +28,8 @@ def register_table_rotations():
         get=_get_tb_rotation,
         set=_set_tb_rotation
     )
-    print("TraitBlender: Table rotation property 'Object.tb_rotation' registered.")
 
 def unregister_table_rotations():
     """Unregister the tb_rotation property."""
     if hasattr(bpy.types.Object, 'tb_rotation'):
         del bpy.types.Object.tb_rotation
-        print("TraitBlender: Table rotation property 'Object.tb_rotation' unregistered.") 

@@ -11,6 +11,8 @@ _CUBE_HALF_Z = 0.005
 _CELL_SIZE = 0.29 / 4.0
 _TOP_Z = _CUBE_HALF_Z
 _CIRCLE_VERTICES = 64  # vertices for Add Mesh > Circle (smooth look)
+# Avoid coplanar z-fighting artifacts with transparency/Cycles by nudging circles up a bit.
+_CIRCLE_Z_EPS = 1e-4
 # Default circle diameter in Blender (meters). Diameter trait: 0 = this size, 1 = 2×, 2 = 4× (scale = 2^trait).
 # Values in (0, 0.01) are treated as 0 so old CSVs with 0.03 in the column still get default size.
 _DEFAULT_DIAMETER_M = 0.03
@@ -113,16 +115,22 @@ class CircleGridMorphospaceSample:
             mat.use_nodes = True
             bsdf = mat.node_tree.nodes.get("Principled BSDF")
             if bsdf:
-                bsdf.inputs["Base Color"].default_value = (0, 0, 0, 1)
-                bsdf.inputs["Alpha"].default_value = max(0, min(1, float(opacities[i])))
+                # User-facing meaning: opacity controls perceived darkness on a white cube,
+                # but we intentionally avoid transparency so Cycles doesn't produce
+                # stochastic alpha artifacts.
+                opacity = max(0.0, min(1.0, float(opacities[i])))
+                intensity = 1.0 - opacity  # opacity=0 -> white (invisible); opacity=1 -> black
+                bsdf.inputs["Base Color"].default_value = (intensity, intensity, intensity, 1.0)
+                bsdf.inputs["Alpha"].default_value = 1.0
                 bsdf.inputs["Roughness"].default_value = 1.0
                 if "Specular IOR Level" in bsdf.inputs:
                     bsdf.inputs["Specular IOR Level"].default_value = 0.0
                 elif "Specular" in bsdf.inputs:
                     bsdf.inputs["Specular"].default_value = 0.0
-            mat.blend_method = "BLEND"
+            mat.blend_method = "OPAQUE"
 
             cx, cy, cz = centers[i]
+            cz = cz + _CIRCLE_Z_EPS
             radius_i = diameters_blender[i] / 2.0
             if radius_i <= 0:
                 radius_i = 1e-9

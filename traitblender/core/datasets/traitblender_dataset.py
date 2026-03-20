@@ -6,9 +6,14 @@ from io import StringIO
 import warnings
 
 from ..morphospaces import (
-    get_trait_parameters_for_morphospace,
     get_trait_parameters_with_defaults_for_morphospace,
 )
+
+def _normalize_dataset_path(path: str) -> str:
+    """Normalize dataset paths so local Windows paths are read as files, not URLs."""
+    if not path:
+        return path
+    return os.path.normpath(path)
 
 
 def reset_sample_on_csv_change(self, context):
@@ -34,17 +39,19 @@ def update_filepath(self, context):
         self.csv = ""
         return
     
+    dataset_path = _normalize_dataset_path(self.filepath)
+
     # Check if file exists
-    if not os.path.exists(self.filepath):
+    if not os.path.exists(dataset_path):
         warnings.warn(
-            f"TraitBlender: Dataset file not found: {self.filepath}. Regenerating default dataset.",
+            f"TraitBlender: Dataset file not found: {dataset_path}. Regenerating default dataset.",
             UserWarning,
         )
         self.csv = self.get_csv_for_editing()
         return
     
     # Infer file type from extension
-    file_ext = os.path.splitext(self.filepath)[1].lower()
+    file_ext = os.path.splitext(dataset_path)[1].lower()
     
     # Check if extension is supported
     if file_ext not in ['.csv', '.tsv', '.xlsx', '.xls']:
@@ -58,11 +65,11 @@ def update_filepath(self, context):
     try:
         # Load the dataset based on the file extension
         if file_ext == '.csv':
-            df = pd.read_csv(self.filepath)
+            df = pd.read_csv(dataset_path)
         elif file_ext == '.tsv':
-            df = pd.read_csv(self.filepath, sep='\t')
+            df = pd.read_csv(dataset_path, sep='\t')
         elif file_ext in ['.xlsx', '.xls']:
-            df = pd.read_excel(self.filepath)
+            df = pd.read_excel(dataset_path)
         
         # Apply column reordering (same logic as _get_dataframe)
         if not df.empty and len(df.columns) > 0:
@@ -94,20 +101,47 @@ def update_filepath(self, context):
                     
                     print(f"TraitBlender: Moved '{species_col}' column to first position for species identification")
         
-        # Convert DataFrame to CSV string
+        # Validate columns against active morphospace:
+        # - Missing trait columns are allowed (sample() will use defaults).
+        # - Unknown columns are not allowed.
+        # - Provided trait columns that are entirely empty are not allowed.
         morphospace_name = bpy.context.scene.traitblender_setup.available_morphospaces
 
         def _norm_col(s: str) -> str:
             return str(s).lower().strip().replace(" ", "_")
 
-        required_traits = get_trait_parameters_for_morphospace(morphospace_name)
-        df_cols_norm = {_norm_col(c): c for c in df.columns}
-        missing = [t for t in required_traits if _norm_col(t) not in df_cols_norm]
+        species_column_names = {'species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids'}
+        trait_defaults = get_trait_parameters_with_defaults_for_morphospace(morphospace_name)
+        allowed_traits = {_norm_col(t) for t in trait_defaults.keys()}
 
-        if missing:
+        unknown_columns = []
+        empty_trait_columns = []
+        for col in df.columns:
+            norm = _norm_col(col)
+            if norm in species_column_names:
+                continue
+            if norm not in allowed_traits:
+                unknown_columns.append(col)
+                continue
+            # Treat blank strings as empty values too.
+            cleaned = df[col].replace(r'^\s*$', pd.NA, regex=True)
+            if cleaned.isna().all():
+                empty_trait_columns.append(col)
+
+        if unknown_columns:
             warnings.warn(
-                "TraitBlender: Dataset columns don't match the selected morphospace.\n"
-                f"  Missing traits (expected columns): {missing}\n"
+                "TraitBlender: Dataset contains columns not recognized by the selected morphospace.\n"
+                f"  Unknown columns: {unknown_columns}\n"
+                f"  Using morphospace default dataset instead of '{self.filepath}'.",
+                UserWarning,
+            )
+            self.csv = self.get_csv_for_editing()
+            return
+
+        if empty_trait_columns:
+            warnings.warn(
+                "TraitBlender: Dataset contains trait columns with no values.\n"
+                f"  Empty columns: {empty_trait_columns}\n"
                 f"  Using morphospace default dataset instead of '{self.filepath}'.",
                 UserWarning,
             )
@@ -127,7 +161,7 @@ def update_filepath(self, context):
         
     except Exception as e:
         warnings.warn(
-            f"TraitBlender: Failed to import dataset from '{self.filepath}'. Regenerating default dataset. Error: {e}",
+            f"TraitBlender: Failed to import dataset from '{dataset_path}'. Regenerating default dataset. Error: {e}",
             UserWarning,
         )
         self.csv = self.get_csv_for_editing()

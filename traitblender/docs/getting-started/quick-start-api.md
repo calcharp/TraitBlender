@@ -188,6 +188,47 @@ for species_name in dataset.rownames:
 print("Batch processing complete!")
 ```
 
+## Run the Full Imaging Pipeline (Headless / Cluster)
+
+If you want to run TraitBlender on a cluster, you typically:
+
+1. Load the museum scene (`setup_scene`)
+2. Load a YAML config (`configure_scene`)
+3. Optionally override Cycles parameters directly in Python (not everything is part of the YAML)
+4. Run the imaging pipeline (`imaging_pipeline`)
+
+Create a script file like `testrun.py`:
+
+```python
+import bpy
+
+# 1) Load the museum scene
+bpy.ops.traitblender.setup_scene()
+
+# 2) Load the config backbone (also imports dataset if `dataset.filepath` is set)
+bpy.ops.traitblender.configure_scene(
+    filepath="/home/calebc22/projects/tbd/configs/default.yaml"
+)
+
+print("Engine:", bpy.context.scene.render.engine)
+
+# 3) Override Cycles parameters (these are intentionally outside the YAML config)
+s = bpy.context.scene
+s.cycles.samples = 128  # try 64–256 for speed; raise if too noisy
+s.cycles.use_denoising = True
+
+# 4) Run the batch imaging pipeline
+bpy.ops.traitblender.imaging_pipeline()
+```
+
+Run it headless from the command line:
+
+```bash
+blender --background --python "testrun.py"
+```
+
+On your cluster, you’ll likely need to `module load` your cluster’s Blender version. `CYCLES` is typically more cooperative in headless environments than `BLENDER_EEVEE_NEXT` (because it tends to require fewer extra graphics/GUI dependencies).
+
 ## Working with Transform Pipelines
 
 ### Building Complex Pipelines

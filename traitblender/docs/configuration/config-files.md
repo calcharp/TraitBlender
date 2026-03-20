@@ -9,6 +9,7 @@ TraitBlender config files are **YAML** files that store the settings you see in 
 
 <ul>
   <li><code>morphospace</code> – which morphospace is active and its hyperparameters</li>
+  <li><code>dataset</code> – the external dataset file path (CSV/TSV/XLSX)</li>
   <li><code>world</code> – background color and strength</li>
   <li><code>camera</code> – position, rotation, resolution, lens</li>
   <li><code>lamp</code> – light position, color, power, shadows</li>
@@ -28,6 +29,11 @@ TraitBlender config files are **YAML** files that store the settings you see in 
 <ul>
   <li><code>color</code>: 4 floats (RGBA), each in 0.0–1.0</li>
   <li><code>strength</code>: float, ≥ 0.0</li>
+</ul>
+
+<p><strong>dataset</strong></p>
+<ul>
+  <li><code>filepath</code>: string path to a CSV/TSV/XLSX dataset file</li>
 </ul>
 
 <p><strong>camera</strong></p>
@@ -115,12 +121,14 @@ TraitBlender config files are **YAML** files that store the settings you see in 
   </li>
   <li><code>property_path</code>: supported scalar paths such as:
     <ul>
-      <li><code>world.strength</code></li>
-      <li><code>camera.location.x|y|z</code></li>
-      <li><code>camera.rotation.x|y|z</code></li>
-      <li><code>lamp.power</code></li>
-      <li><code>lamp.color.r|g|b</code></li>
-      <li><code>mat.roughness</code></li>
+      <li><code>world.color.r|g|b|a</code>, <code>world.strength</code></li>
+      <li><code>camera.location.x|y|z</code>, <code>camera.rotation.x|y|z</code></li>
+      <li><code>camera.focal_length</code>, <code>camera.shift_x</code>, <code>camera.shift_y</code></li>
+      <li><code>lamp.location.x|y|z</code>, <code>lamp.rotation.x|y|z</code></li>
+      <li><code>lamp.color.r|g|b</code>, <code>lamp.power</code></li>
+      <li><code>mat.tb_location.x|y|z</code>, <code>mat.tb_rotation.x|y|z</code></li>
+      <li><code>mat.color.r|g|b|a</code>, <code>mat.roughness</code></li>
+      <li><code>sample.tb_location.x|y|z</code>, <code>sample.tb_rotation.x|y|z</code></li>
     </ul>
   </li>
 </ul>
@@ -287,6 +295,99 @@ transforms:
 ```
 
  </details>
+
+<details>
+<summary>Example 5: Modern “Circle Grid + CYCLES” config</summary>
+
+This example shows a modern YAML config structure you can load via `Configure Scene`. Sections omitted from the YAML fall back to the current Blender default values for those settings. It renders the `Circle Grid` morphospace using `CYCLES`, with transforms empty.
+
+```yaml
+morphospace:
+  name: Circle Grid
+  hyperparams:
+    {}
+
+dataset:
+  filepath: "/home/calebc22/projects/tbd/datasets/circle_grid_50sp_32tr_mu5sd1.csv"
+
+world:
+  color: [1.0, 1.0, 1.0, 1.0]
+  strength: 1.0
+
+camera:
+  location: [0.0, 0.0, 1.1]
+  aspect_x: 1.0
+  aspect_y: 1.0
+  camera_type: PERSP
+  focal_length: 60.0
+  lens_unit: MILLIMETERS
+  resolution_percentage: 100
+  resolution_x: 220
+  resolution_y: 220
+  rotation: [0.0, 0.0, 0.0]
+  shift_x: 0.0
+  shift_y: 0.0
+
+lamp:
+  location: [0.0, 0.0, 1.0]
+  beam_blend: 0.0
+  beam_size: 1.0
+  color: [1.0, 1.0, 1.0]
+  diffuse: 1.0
+  power: 0.0
+  rotation: [0.0, 0.0, 0.0]
+  scale: [1.0, 1.0, 1.0]
+  shadow: true
+  use_soft_falloff: true
+
+ruler:
+  tb_location: [0.0, -0.1, 0.0]
+  tb_rotation: [0.0, 0.0, 0.0]
+  hide: true
+
+mat:
+  color: [0.0, 0.0, 0.0, 1.0]
+  tb_location: [0.0, 0.0, 0.0]
+  tb_rotation: [0.0, 0.0, 0.0]
+  roughness: 1.0
+  scale: [0.15, 0.15, 1.0]
+
+render:
+  eevee_use_raytracing: false
+  engine: CYCLES
+
+output:
+  image_format: PNG
+  images_per_view: 1
+  rendering_directory: "/home/calebc22/projects/tbd/simulations/shell_test_1"
+  output_type: image
+
+imaging:
+  include_images: true
+  orientation_names: ['Default']
+  images_per_orientation: 1
+
+metadata:
+  stamp_note_text: ""
+  use_stamp_camera: true
+  use_stamp_date: true
+  use_stamp_filename: true
+  use_stamp_frame: true
+  use_stamp_frame_range: false
+  use_stamp_hostname: false
+  use_stamp_lens: false
+  use_stamp_marker: false
+  use_stamp_memory: false
+  use_stamp_note: false
+  use_stamp_render_time: true
+  use_stamp_scene: true
+  use_stamp_sequencer_strip: false
+  use_stamp_time: true
+
+transforms: []
+```
+
+</details>
 
 ## Using config files
 

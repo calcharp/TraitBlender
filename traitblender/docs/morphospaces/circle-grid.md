@@ -12,7 +12,7 @@ The traits are `opacity_0`–`opacity_15` and `diameter_0`–`diameter_15`, row-
 
 | Trait name pattern | Default | Description | Typical range / notes |
 |--------------------|---------|-------------|------------------------|
-| `opacity_0` … `opacity_15` | `1.0` | Opacity of each circle (0 = invisible, 1 = fully black). | Use values between `0.0` and `1.0`. |
+| `opacity_0` … `opacity_15` | `1.0` | Per-circle darkness control. In the current implementation, circles are **opaque** (no BSDF transparency); `opacity=0` makes the circle white and `opacity=1` makes it black. | Use values between `0.0` and `1.0`. |
 | `diameter_0` … `diameter_15` | `0.0` | Size trait for each circle. The physical size is scaled as \(2^{\text{diameter}}\). | `0` ≈ default size. `1` = 2×, `2` = 4× default diameter. Values in `(0, 0.01)` are treated as `0`. |
 
 The traits are ordered as:

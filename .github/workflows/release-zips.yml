@@ -15,31 +15,46 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            wheels: wheels
+            wheels: TraitBlender/wheels
             artifact: traitblender-windows
             suffix: windows
             requirements: requirements-wheels.txt
+            download_wheels: false
           - os: macos-latest
             wheels: wheels/mac
             artifact: traitblender-mac
             suffix: mac
             requirements: requirements-wheels.txt
+            download_wheels: true
           - os: ubuntu-latest
             wheels: wheels/linux
             artifact: traitblender-linux
             suffix: linux
             requirements: requirements-wheels.txt
+            download_wheels: true
           - os: ubuntu-latest
             wheels: wheels/linux-headless
             artifact: traitblender-linux-headless
             suffix: linux-headless
             requirements: requirements-wheels-headless.txt
+            download_wheels: true
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Always build release artifacts from the latest main branch code,
+          # instead of the release tag commit.
+          ref: main
+
+      # Run header often shows the *tag* SHA (e.g. f9d9880), not this checkout.
+      - name: Show commit actually built
+        run: |
+          echo "HEAD after checkout:"
+          git rev-parse HEAD
+          git log -1 --oneline
 
       - name: Set up Python 3.11 (for pip download)
         uses: actions/setup-python@v5
@@ -52,6 +67,7 @@ jobs:
           version: "4.3"
 
       - name: Download wheels for this OS
+        if: ${{ matrix.download_wheels }}
         run: >-
           python -m pip download --only-binary=:all: -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
 
