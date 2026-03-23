@@ -58,14 +58,21 @@ If you use TraitBlender in your research, please cite my work:
 !!! quote "BibTeX Citation"
 
     ```bibtex
-    @software{charpentier_traitblender_2025,
-      title = {TraitBlender: A Blender Add-on for Museum-Style Morphological Imaging},
-      author = {Charpentier, Caleb},
-      year = {2025},
-      url = {https://github.com/Imageomics/TraitBlender},
-      organization = {Caleb Charpentier},
-      license = {MIT}
-    }
+        @software{charpentier_2026_19140353,
+          author       = {Charpentier, Caleb and
+                          Linscott, T. Mason and
+                          Bradley, John and
+                          Campolongo, Elizabeth and
+                          Thompson, Matthew and
+                          Uyeda, Josef C},
+          title        = {TraitBlender},
+          month        = mar,
+          year         = 2026,
+          publisher    = {Zenodo},
+          version      = {v2.0.0},
+          doi          = {10.5281/zenodo.19140353},
+          url          = {https://doi.org/10.5281/zenodo.19140353},
+        }
     ```
 
 ---
@@ -75,5 +82,5 @@ If you use TraitBlender in your research, please cite my work:
 TraitBlender is released under the [MIT License](https://github.com/Imageomics/TraitBlender/blob/main/LICENSE).
 
 <div align="center">
-<small>© 2025 Caleb Charpentier. All rights reserved.</small>
+<small>© 2026 Caleb Charpentier. All rights reserved.</small>
 </div> 
