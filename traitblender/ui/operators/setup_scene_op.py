@@ -8,6 +8,7 @@ import bpy
 from bpy.types import Operator
 import os
 from ...core.helpers import get_asset_path, apply_material
+from ...core.datasets.traitblender_dataset import update_filepath
 from bpy.app.handlers import persistent
 import yaml
 
@@ -66,13 +67,11 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                 # Ensure depsgraph/bounding boxes are up to date before table-relative placement (tb_location)
                 bpy.context.view_layer.update()
                 
-                # Re-apply table material using dynamic asset path
-                table_name = "Table"
-                table_textures_path = get_asset_path("objects", "table", "table_material")
-                if table_name in bpy.data.objects:
-                    apply_material(table_name, textures_path=table_textures_path)
+                # Table: apply solid color (same pattern as Mat)
+                if "Table" in bpy.data.objects:
+                    apply_material("Table", hex_color="#432006", new_material_name="table_material")
                 else:
-                    self.report({'ERROR'}, f"Initialization failed, table object not found in scene: {table_name}")
+                    self.report({'ERROR'}, "Initialization failed, table object not found in scene: Table")
                     return {'CANCELLED'}
 
                 # Re-apply mat material using solid black color and name it 'mat_material'
@@ -94,6 +93,14 @@ class TRAITBLENDER_OT_setup_scene(Operator):
                     if config_data:
                         context.scene.traitblender_config.from_dict(config_data)
                         bpy.context.view_layer.update()
+                        dataset = context.scene.traitblender_dataset
+                        if dataset.filepath:
+                            # Re-import from configured file after scene/config setup.
+                            update_filepath(dataset, context)
+                        else:
+                            # Ensure dataset defaults are materialized so imaging has rows
+                            # even when no external dataset has been imported yet.
+                            dataset.csv = dataset.get_csv_for_editing()
                     else:
                         self.report({'WARNING'}, "Default configuration file is empty or invalid")
                 else:
@@ -112,7 +119,8 @@ class TRAITBLENDER_OT_setup_scene(Operator):
     
     def invoke(self, context, event):
         """Called when the operator is invoked"""
-        if bpy.data.is_dirty:
+        # Background / no WM: cannot show confirm dialog; run without prompting.
+        if bpy.data.is_dirty and not getattr(bpy.app, "background", False) and context.window_manager.windows:
             window = context.window_manager.windows[0]
             center_x = window.width // 2
             center_y = window.height // 2

@@ -38,6 +38,8 @@ class TRAITBLENDER_OT_clear_scene(Operator):
     
     def invoke(self, context, event):
         """Called when the operator is invoked - shows confirmation dialog"""
+        if getattr(bpy.app, "background", False) or not context.window_manager.windows:
+            return self.execute(context)
         return context.window_manager.invoke_confirm(self, event)
     
     def draw(self, context):

@@ -65,6 +65,8 @@ class TRAITBLENDER_OT_morphospace_switch_yes(Operator):
         dataset = context.scene.traitblender_dataset
         dataset.filepath = ""
         dataset.csv = ""
+        # Regenerate defaults for the newly selected morphospace.
+        dataset.csv = dataset.get_csv_for_editing()
 
         return {'FINISHED'}
 

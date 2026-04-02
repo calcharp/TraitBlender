@@ -33,6 +33,8 @@ class TRAITBLENDER_OT_export_dataset(Operator):
         # Provide a sensible default filename
         if not self.filepath:
             self.filepath = "dataset.csv"
+        if getattr(bpy.app, "background", False):
+            return self.execute(context)
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 

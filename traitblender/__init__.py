@@ -9,11 +9,10 @@ def register():
     import os
     import bpy
     from .core.helpers import init_user_dirs
-    from .core import configs, config_register
+    from .core import config_register
     from .core.datasets import register as datasets_register
     from .ui import register as ui_register
 
-    print(f"configs: {configs}")
     config_register()
 
     # Register datasets

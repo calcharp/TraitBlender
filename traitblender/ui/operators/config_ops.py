@@ -3,6 +3,7 @@ import yaml
 import os
 from bpy.types import Operator
 from bpy.props import StringProperty
+from ...core.datasets.traitblender_dataset import update_filepath, _normalize_dataset_path
 
 
 class TRAITBLENDER_OT_configure_scene(Operator):
@@ -45,6 +46,20 @@ class TRAITBLENDER_OT_configure_scene(Operator):
             
             # Apply the configuration using the from_dict method
             context.scene.traitblender_config.from_dict(config_data)
+
+            # Force an explicit dataset import after config load.
+            # Do not rely on property update callbacks here; they may not run when
+            # the value is unchanged, and users expect Configure Scene to load data.
+            dataset = context.scene.traitblender_dataset
+            if dataset.filepath:
+                p = _normalize_dataset_path(dataset.filepath)
+                if not os.path.exists(p):
+                    self.report({'WARNING'}, f"Dataset file not found: {p}")
+                else:
+                    update_filepath(dataset, context)
+                    # Re-import can leave csv unchanged; only warn if we still have no data.
+                    if not (dataset.csv or "").strip():
+                        self.report({'WARNING'}, f"Dataset path set but CSV is empty after import: {p}")
             
             self.report({'INFO'}, f"Configuration loaded successfully from {config_file_path}")
             return {'FINISHED'}
@@ -60,6 +75,12 @@ class TRAITBLENDER_OT_configure_scene(Operator):
         """Invoke file browser if no filepath is provided and no stored config file"""
         # If no filepath provided and no stored config file, open file browser
         if not self.filepath and not context.scene.traitblender_setup.config_file:
+            if getattr(bpy.app, "background", False):
+                self.report(
+                    {'ERROR'},
+                    "No configuration file specified (file browser unavailable in background mode)",
+                )
+                return {'CANCELLED'}
             context.window_manager.fileselect_add(self)
             return {'RUNNING_MODAL'}
         else:
@@ -80,6 +101,13 @@ class TRAITBLENDER_OT_show_configuration(Operator):
         return {'FINISHED'}
     
     def invoke(self, context, event):
+        if getattr(bpy.app, "background", False):
+            # No dialogs in headless; dump YAML to stdout for logs / debugging.
+            print(str(context.scene.traitblender_config))
+            return {'FINISHED'}
+        if not context.window_manager.windows:
+            self.report({'WARNING'}, "No window available to show configuration dialog")
+            return {'CANCELLED'}
         window = context.window_manager.windows[0]
         self._old_mouse_pos = (event.mouse_x, event.mouse_y)
         center_x = window.width // 2
@@ -127,5 +155,13 @@ class TRAITBLENDER_OT_export_config(Operator):
             return {'CANCELLED'}
     
     def invoke(self, context, event):
+        if self.filepath:
+            return self.execute(context)
+        if getattr(bpy.app, "background", False):
+            self.report(
+                {'ERROR'},
+                "No export path specified (file browser unavailable in background mode)",
+            )
+            return {'CANCELLED'}
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}

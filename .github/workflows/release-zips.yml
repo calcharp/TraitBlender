@@ -1,0 +1,111 @@
+# Build extension zips and attach them to a GitHub release when you publish one.
+# How to use: Create a release (draft or direct publish) with a tag (e.g. v2.0.0). When the release
+# is published, this workflow runs, builds Windows/Mac/Linux zips, and uploads them as release assets.
+
+name: Release extension zips
+
+on:
+  release:
+    types: [published, prereleased]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            wheels: TraitBlender/wheels
+            artifact: traitblender-windows
+            suffix: windows
+            requirements: requirements-wheels.txt
+            download_wheels: false
+          - os: macos-latest
+            wheels: wheels/mac
+            artifact: traitblender-mac
+            suffix: mac
+            requirements: requirements-wheels.txt
+            download_wheels: true
+          - os: ubuntu-latest
+            wheels: wheels/linux
+            artifact: traitblender-linux
+            suffix: linux
+            requirements: requirements-wheels.txt
+            download_wheels: true
+          - os: ubuntu-latest
+            wheels: wheels/linux-headless
+            artifact: traitblender-linux-headless
+            suffix: linux-headless
+            requirements: requirements-wheels-headless.txt
+            download_wheels: true
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Always build release artifacts from the latest main branch code,
+          # instead of the release tag commit.
+          ref: main
+
+      # Run header often shows the *tag* SHA (e.g. f9d9880), not this checkout.
+      - name: Show commit actually built
+        run: |
+          echo "HEAD after checkout:"
+          git rev-parse HEAD
+          git log -1 --oneline
+
+      - name: Set up Python 3.11 (for pip download)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Blender 4.3
+        uses: bradyajohnston/setup-blender@v5
+        with:
+          version: "4.3"
+
+      - name: Download wheels for this OS
+        if: ${{ matrix.download_wheels }}
+        run: >-
+          python -m pip download --only-binary=:all: -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
+
+      - name: Build extension zip
+        run: python build_zips/build_extension.py --wheels "${{ matrix.wheels }}"
+
+      - name: Rename zip for release asset
+        shell: bash
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          ZIP=$(ls traitblender-*.zip 2>/dev/null | head -1)
+          [ -n "$ZIP" ] && mv "$ZIP" "traitblender-${TAG}-${{ matrix.suffix }}.zip" || true
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: "traitblender-${{ github.event.release.tag_name }}-${{ matrix.suffix }}.zip"
+
+  upload-release-assets:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all zip artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-zips
+
+      - name: Upload assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release-zips/traitblender-windows/*.zip
+            release-zips/traitblender-mac/*.zip
+            release-zips/traitblender-linux/*.zip
+            release-zips/traitblender-linux-headless/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

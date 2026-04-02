@@ -6,15 +6,17 @@ morphospace:
     n_vertices_aperture: 10
     time_step: 0.15
     use_inner_surface: false
+dataset:
+  filepath: ""
 world:
   color: [0.0, 0.0, 0.0, 1.0]
   strength: 1.0
 camera:
-  location: [0.0, 0.0, 1.08]
+  location: [0.0, 0.0, 1.1]
   aspect_x: 1.0
   aspect_y: 1.0
   camera_type: PERSP
-  focal_length: 50.0
+  focal_length: 60.0
   lens_unit: MILLIMETERS
   resolution_percentage: 100
   resolution_x: 1080

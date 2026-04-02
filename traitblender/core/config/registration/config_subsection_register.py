@@ -2,6 +2,8 @@
 Decorator to register a config subsection class.
 """
 
+import warnings
+
 import bpy
 from ..traitblender_config import TraitBlenderConfig
 
@@ -39,15 +41,20 @@ def config_subsection_register(name: str):
                         new_dict
                     )
                     cls = new_cls
-                    print(f"Class {cls.__name__} converted to {new_cls}")
                 except Exception as e:
-                    print(f"Error creating new class: {e}")
+                    warnings.warn(
+                        f"TraitBlender: could not convert {cls.__name__} to TraitBlenderConfig: {e}",
+                        UserWarning,
+                        stacklevel=2,
+                    )
 
             bpy.utils.register_class(cls)
-            print(f"Registered {name} as {cls.__name__}")
             CONFIG[name] = bpy.props.PointerProperty(type=cls)
-            print(f"CONFIG[{name}] = {CONFIG[name]}")
         except Exception as e:
-            print(f"(decorator exception) Error registering {name}: {e}")
+            warnings.warn(
+                f"TraitBlender: error registering config subsection '{name}': {e}",
+                UserWarning,
+                stacklevel=2,
+            )
         return cls
     return decorator

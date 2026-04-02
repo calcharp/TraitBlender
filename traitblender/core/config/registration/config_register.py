@@ -16,4 +16,3 @@ def config_register():
     )
     bpy.utils.register_class(dyn_class)
     bpy.types.Scene.traitblender_config = bpy.props.PointerProperty(type=dyn_class)
-    print("TraitBlenderConfig registered")

@@ -89,10 +89,8 @@ def register_tb_location():
         get=_get_tb_location,
         set=_set_tb_location
     )
-    print("TraitBlender: Table location property 'Object.tb_location' registered.")
 
 def unregister_tb_location():
     """Unregister the tb_location property."""
     if hasattr(bpy.types.Object, 'tb_location'):
         del bpy.types.Object.tb_location
-        print("TraitBlender: Table location property 'Object.tb_location' unregistered.")

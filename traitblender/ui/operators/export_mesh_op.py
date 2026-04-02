@@ -38,6 +38,8 @@ class TRAITBLENDER_OT_export_mesh(Operator):
         etype = getattr(context.scene.traitblender_config.meshes, "file_export_type", "obj") or "obj"
         self.filter_glob = f"*.{etype}"
         self.filepath = f"{sample_name}.{etype}"
+        if getattr(bpy.app, "background", False):
+            return self.execute(context)
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 

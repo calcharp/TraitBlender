@@ -1,6 +1,7 @@
 import bpy
 from bpy.types import Panel
 from ..properties import morphospace_hyperparams
+from ...core.helpers.dependency_helpers import is_dearpygui_available
 
 # Deferred sync of imaging orientation_options (cannot modify ID in draw context)
 _pending_orientation_sync = None  # (scene_name, [orientation_names]) or None
@@ -149,7 +150,8 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         
         # Edit + Export dataset buttons
         row = layout.row(align=True)
-        row.operator("traitblender.edit_dataset", text="Edit Dataset")
+        if is_dearpygui_available():
+            row.operator("traitblender.edit_dataset", text="Edit Dataset")
         row.operator("traitblender.export_dataset", text="Export Dataset")
         
         # Sample selection dropdown
@@ -190,9 +192,14 @@ class TRAITBLENDER_PT_transforms_panel(Panel):
         box = layout.box()
         transforms_config = config.transforms
 
-        # Edit transforms button
+        # Edit transforms button (DearPyGui GUI only)
         row = box.row(align=True)
-        row.operator("traitblender.edit_transforms", text="Edit Transform Pipeline", icon='PREFERENCES')
+        if is_dearpygui_available():
+            row.operator(
+                "traitblender.edit_transforms",
+                text="Edit Transform Pipeline",
+                icon='PREFERENCES',
+            )
         
         # Pipeline control buttons
         row = box.row(align=True)

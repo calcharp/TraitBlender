@@ -3,7 +3,7 @@ name: Deploy Documentation
 on:
   push:
     branches:
-      - v2  # Your current branch (change to 'main' or 'master' if you merge to default branch)
+      - main
     paths:
       - 'traitblender/docs/**'
       - 'traitblender/mkdocs.yml'

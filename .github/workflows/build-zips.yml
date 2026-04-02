@@ -2,14 +2,14 @@ name: Build extension zips
 
 on:
   push:
-    branches: [v2]
+    branches: [main, v2]
     paths:
       - "TraitBlender/**"
       - "wheels/**"
       - "build_zips/**"
       - ".github/workflows/build-zips.yml"
   pull_request:
-    branches: [v2]
+    branches: [main, v2]
     paths:
       - "TraitBlender/**"
       - "wheels/**"
@@ -24,14 +24,17 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            wheels: wheels
+            wheels: TraitBlender/wheels
             artifact: traitblender-windows
+            download_wheels: false
           - os: macos-latest
             wheels: wheels/mac
             artifact: traitblender-mac
+            download_wheels: true
           - os: ubuntu-latest
             wheels: wheels/linux
             artifact: traitblender-linux
+            download_wheels: true
 
     runs-on: ${{ matrix.os }}
 
@@ -50,6 +53,7 @@ jobs:
           version: "4.3"
 
       - name: Download wheels for this OS
+        if: ${{ matrix.download_wheels }}
         run: >-
           python -m pip download --only-binary=:all: -r requirements-wheels.txt -d "${{ matrix.wheels }}"
 

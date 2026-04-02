@@ -38,6 +38,11 @@ def build_one(*, blender_exe: str, addon_src_dir: Path, wheels_dir: Path) -> Pat
 
         build_wheels = build_dir / "wheels"
         build_wheels.mkdir(parents=True, exist_ok=True)
+        # Ensure the package only ships wheels from the selected wheels_dir.
+        # The addon source may already contain prebundled wheels (e.g. windows),
+        # which should not be mixed with downloaded platform wheels.
+        for existing_whl in build_wheels.glob("*.whl"):
+            existing_whl.unlink()
         whls = sorted(wheels_dir.glob("*.whl"))
         if not whls:
             raise RuntimeError(f"No wheels found in {wheels_dir}")
