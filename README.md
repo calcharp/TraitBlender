@@ -1,6 +1,6 @@
 # TraitBlender
 
-TraitBlender is a Blender add-on for generating museum-style images and 3D meshes of specimens from theoretical morphospaces. It supports Blender 4.3+ on Windows, macOS, and Linux.
+TraitBlender is a Blender add-on for generating museum-style images and 3D meshes of specimens from theoretical morphospaces. **v2.0.1** targets **Blender 5.1+** (Python 3.13 wheels) on Windows, macOS, and Linux.
 
 ## Features
 
@@ -27,6 +27,6 @@ For installation, quick start, and full documentation, see the [docs](https://im
 
 You can also install a release zip from the command line:
 
-`blender --command extension install-file -r user_default --enable traitblender-v2.0.0-linux.zip`
+`blender --command extension install-file -r user_default --enable traitblender-v2.0.1-linux.zip`
 
 Use the zip that matches your OS (for example: `...-windows.zip`, `...-mac.zip`, or `...-linux.zip`, `...-linux-headless.zip`).

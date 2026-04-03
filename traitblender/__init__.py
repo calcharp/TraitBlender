@@ -24,7 +24,7 @@ def register():
     # Initialize user directories and copy assets if needed
     init_user_dirs(copy_assets=True)
 
-    # Note: Asset library registration is handled automatically by the extension system in Blender 4.3+
+    # Note: Asset library registration is handled automatically by the extension system in Blender 5.1+
     # The assets directory will be accessible through the addon's package structure
     addon_dir = os.path.dirname(os.path.abspath(__file__))
     assets_path = os.path.join(addon_dir, "assets")

@@ -1,1 +1,2 @@
-
+# macOS extension wheels (cp313) are downloaded in CI with Python 3.13:
+#   python3.13 -m pip download --only-binary=:all: -r requirements-wheels.txt -d .
