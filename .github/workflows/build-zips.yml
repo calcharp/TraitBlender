@@ -7,6 +7,8 @@ on:
       - "traitblender/**"
       - "wheels/**"
       - "build_zips/**"
+      - "requirements-wheels.txt"
+      - "requirements-wheels-headless.txt"
       - ".github/workflows/build-zips.yml"
   pull_request:
     branches: [main, dev]
@@ -14,6 +16,8 @@ on:
       - "traitblender/**"
       - "wheels/**"
       - "build_zips/**"
+      - "requirements-wheels.txt"
+      - "requirements-wheels-headless.txt"
       - ".github/workflows/build-zips.yml"
   workflow_dispatch:
 
@@ -31,10 +35,17 @@ jobs:
             wheels: wheels/mac
             artifact: traitblender-mac
             download_wheels: true
+            requirements: requirements-wheels.txt
           - os: ubuntu-latest
             wheels: wheels/linux
             artifact: traitblender-linux
             download_wheels: true
+            requirements: requirements-wheels.txt
+          - os: ubuntu-latest
+            wheels: wheels/linux-headless
+            artifact: traitblender-linux-headless
+            download_wheels: true
+            requirements: requirements-wheels-headless.txt
 
     runs-on: ${{ matrix.os }}
 
@@ -55,7 +66,7 @@ jobs:
       - name: Download wheels for this OS
         if: ${{ matrix.download_wheels }}
         run: >-
-          python -m pip download --only-binary=:all: -r requirements-wheels.txt -d "${{ matrix.wheels }}"
+          python -m pip download --only-binary=:all: -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
 
       - name: Build extension zip
         run: python build_zips/build_extension.py --wheels "${{ matrix.wheels }}"
