@@ -2,14 +2,14 @@ name: Build extension zips
 
 on:
   push:
-    branches: [main, v2]
+    branches: [main, dev]
     paths:
       - "traitblender/**"
       - "wheels/**"
       - "build_zips/**"
       - ".github/workflows/build-zips.yml"
   pull_request:
-    branches: [main, v2]
+    branches: [main, dev]
     paths:
       - "traitblender/**"
       - "wheels/**"
