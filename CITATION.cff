@@ -22,13 +22,6 @@ authors:
 cff-version: 1.2.0
 date-released: "2026-03-20"
 doi: 10.5281/zenodo.14804133
-identifiers:
-  - type: doi
-    description: "The Zenodo DOI for version 2.0.0."
-    value: "10.5281/zenodo.19140353"
-  - type: url
-    description: "The GitHub release URL for version 2.0.0."
-    value: "https://github.com/Imageomics/TraitBlender/releases/tag/v2.0.0"
 keywords:
   - Imageomics
   - Blender
@@ -40,7 +33,6 @@ license: "MIT"
 message: "If you find this software helpful in your research, please cite this software release."
 repository-code: "https://github.com/Imageomics/TraitBlender"
 title: "TraitBlender"
-version: 2.0.0
 type: software
 contact:
   - family-names: Charpentier
