@@ -37,6 +37,7 @@ license: "MIT"
 message: "If you find this software helpful in your research, please cite this software release."
 repository-code: "https://github.com/Imageomics/TraitBlender"
 title: "TraitBlender"
+version: 2.1.0
 type: software
 contact:
   - family-names: Charpentier
