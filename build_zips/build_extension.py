@@ -76,8 +76,8 @@ def main() -> None:
     ap.add_argument("--blender", default="blender", help="Blender executable (default: blender)")
     ap.add_argument(
         "--addon-src",
-        default="TraitBlender",
-        help="Addon source folder to package (default: TraitBlender)",
+        default="traitblender",
+        help="Addon source folder to package (default: traitblender)",
     )
     ap.add_argument("--wheels", required=True, help="Wheels folder for this OS (e.g. wheels, wheels/mac, wheels/linux)")
     args = ap.parse_args()

@@ -1,0 +1,2 @@
+# Optional mirror; bundled Windows wheels normally live under traitblender/wheels/ in-repo.
+# To refresh (cp313): py -3.13 -m pip download --only-binary=:all: -r requirements-wheels.txt -d ../traitblender/wheels

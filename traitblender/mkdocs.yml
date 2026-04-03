@@ -1,5 +1,5 @@
 site_name: TraitBlender Documentation
-site_description: Generate museum-style images for morphological datasets
+site_description: TraitBlender v2.0.1 — museum-style images for morphological datasets (Blender 5.1+)
 site_url: https://imageomics.github.io/TraitBlender/
 
 repo_name: Imageomics/TraitBlender

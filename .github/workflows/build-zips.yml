@@ -4,14 +4,14 @@ on:
   push:
     branches: [main, v2]
     paths:
-      - "TraitBlender/**"
+      - "traitblender/**"
       - "wheels/**"
       - "build_zips/**"
       - ".github/workflows/build-zips.yml"
   pull_request:
     branches: [main, v2]
     paths:
-      - "TraitBlender/**"
+      - "traitblender/**"
       - "wheels/**"
       - "build_zips/**"
       - ".github/workflows/build-zips.yml"
@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            wheels: TraitBlender/wheels
+            wheels: traitblender/wheels
             artifact: traitblender-windows
             download_wheels: false
           - os: macos-latest
@@ -42,15 +42,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11 (for pip download)
+      - name: Set up Python 3.13 (must match Blender's embedded Python for wheels)
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
-      - name: Set up Blender 4.3
+      - name: Set up Blender 5.1
         uses: bradyajohnston/setup-blender@v5
         with:
-          version: "4.3"
+          version: "5.1"
 
       - name: Download wheels for this OS
         if: ${{ matrix.download_wheels }}

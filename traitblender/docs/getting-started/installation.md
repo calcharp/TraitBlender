@@ -27,7 +27,7 @@ If you upgrade Blender outside the range supported by your installed TraitBlende
 
 You can install a downloaded release zip directly from the terminal:
 
-`blender --command extension install-file -r user_default --enable traitblender-v2.0.0-linux.zip`
+`blender --command extension install-file -r user_default --enable traitblender-v2.0.1-linux.zip`
 
 Use the zip that matches your OS:
 
