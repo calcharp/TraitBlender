@@ -60,7 +60,7 @@ If you use TraitBlender in your research, please cite my work:
 !!! quote "BibTeX Citation"
 
     ```bibtex
-        @software{charpentier_2026_14804133,
+        @software{charpentier_2026_19140353,
           author       = {Charpentier, Caleb and
                           Linscott, T. Mason and
                           Bradley, John and
@@ -68,11 +68,12 @@ If you use TraitBlender in your research, please cite my work:
                           Thompson, Matthew and
                           Uyeda, Josef C},
           title        = {TraitBlender},
-          month        = apr,
+          month        = mar,
           year         = 2026,
           publisher    = {Zenodo},
+          version      = {v2.0.0},
           doi          = {10.5281/zenodo.14804133},
-          url          = {https://doi.org/10.5281/zenodo.14804133},
+          url          = {https://github.com/Imageomics/TraitBlender},
         }
     ```
 
