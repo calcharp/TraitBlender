@@ -25,7 +25,7 @@
 
 TraitBlender is a powerful Blender add-on designed for researchers and institutions working with morphological datasets. It enables the generation of high-quality, standardized images for scientific analysis and museum documentation.
 
-**Current release: v2.0.1** (Blender **5.1+**). **v2.0.0** remains available for Blender **4.3–5.0**. See the [installation guide](getting-started/installation.md#blender-version-compatibility) for details.
+**Current release: v2.1.0** (Blender **5.1+**). **v2.0.0** remains available for Blender **4.3–5.0**. See the [installation guide](getting-started/installation.md#blender-version-compatibility) for details.
 
 ---
 
