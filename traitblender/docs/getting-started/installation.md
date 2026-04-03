@@ -1,9 +1,25 @@
 # Installation Guide
 
+## Blender version compatibility
+
+TraitBlender releases are paired with specific Blender version ranges. Install the add-on release that matches your Blender version:
+
+| TraitBlender | Supported Blender versions |
+|--------------|---------------------------|
+| **v2.0.0** | **4.3** through **5.0** (inclusive) |
+| **v2.0.1** | **5.1** and later |
+
+If you upgrade Blender outside the range supported by your installed TraitBlender build, upgrade TraitBlender as well (or stay on a Blender version within the supported range).
+
 ??? note "System Requirements"
     ### Minimum Requirements
-    - **Blender**: Version 4.3.0 or higher
+    - **Blender**: Must fall within the range for your TraitBlender version ([see table above](#blender-version-compatibility)): v2.0.0 supports Blender 4.3–5.0; v2.0.1 supports Blender 5.1+.
     - **Operating System**: Windows 10/11, macOS 10.15+, or Linux (Ubuntu 20.04+)
+
+    ### Recommended Requirements
+    - **Blender**: The newest Blender release that is still supported by your TraitBlender version (e.g. 5.0 with TraitBlender v2.0.0, or 5.1+ with v2.0.1)
+    - **RAM**: 32GB for large datasets
+    - **CPU**: Multi-core processor (8+ cores recommended)
 
 ## Installation
 
@@ -61,7 +77,12 @@ To verify that TraitBlender is properly installed:
 - In the 3D Viewport, press `N` to open the sidebar
 - Look for the "TraitBlender" tab
 
+**If something is wrong**
+
+- Ensure your Blender version matches your TraitBlender release ([compatibility table](#blender-version-compatibility))
+- Check that the add-on is enabled in Preferences
+- Restart Blender completely
 
 ## Next Steps
 
-After successful installation, proceed to the [Quick Start Tutorial](./quick-start.md) to begin using TraitBlender. 
+After successful installation, proceed to the [Quick Start Tutorial](./quick-start.md) to begin using TraitBlender.
