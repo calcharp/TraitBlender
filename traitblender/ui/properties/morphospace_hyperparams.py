@@ -6,7 +6,7 @@ Values read/write the morphospace config. Used in the morphospaces panel.
 """
 
 import bpy
-from bpy.props import IntProperty, FloatProperty, BoolProperty
+from bpy.props import IntProperty, FloatProperty, BoolProperty, StringProperty
 
 # Registry of dynamically generated classes: morphospace_name -> (class, scene_attr_name)
 _hyperparam_editor_registry = {}
@@ -55,14 +55,33 @@ def create_hyperparams_property_group(morphospace_name, hyperparams_dict):
                 name=display_name, default=default, get=getter, set=setter
             )
         elif isinstance(default, int):
+            int_min = 0 if key == "num_pcs" else 1
+            if key == "num_pcs":
+                int_max, soft = 256, 128
+            else:
+                int_max, soft = 65535, 1000
             annotations[key] = IntProperty(
-                name=display_name, default=default, min=1, soft_max=1000,
-                get=getter, set=setter
+                name=display_name,
+                default=default,
+                min=int_min,
+                max=int_max,
+                soft_max=soft,
+                get=getter,
+                set=setter,
             )
         elif isinstance(default, float):
             annotations[key] = FloatProperty(
                 name=display_name, default=default, min=1e-13, max=1000.0,
                 step=0.01, precision=4, get=getter, set=setter
+            )
+        elif isinstance(default, str):
+            annotations[key] = StringProperty(
+                name=display_name,
+                default=default,
+                maxlen=4096,
+                subtype="DIR_PATH",
+                get=getter,
+                set=setter,
             )
         else:
             annotations[key] = FloatProperty(

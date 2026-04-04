@@ -227,7 +227,7 @@ Run it headless from the command line:
 blender --background --python "testrun.py"
 ```
 
-On your cluster, you’ll likely need to `module load` your cluster’s Blender version. `CYCLES` is typically more cooperative in headless environments than `BLENDER_EEVEE_NEXT` (because it tends to require fewer extra graphics/GUI dependencies).
+On your cluster, you’ll likely need to `module load` your cluster’s Blender version. `CYCLES` is typically more cooperative in headless environments than Eevee (`BLENDER_EEVEE_NEXT` / `BLENDER_EEVEE`, depending on Blender version), because Eevee tends to require more graphics/GUI dependencies.
 
 ## Working with Transform Pipelines
 
