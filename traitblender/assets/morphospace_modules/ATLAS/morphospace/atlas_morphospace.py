@@ -2,21 +2,22 @@
 ATLAS DATABASE-style deformation: dense markup targets from SSM PCs + Local RBF (Gaussian KNN)
 matching agporto/ATLAS DATABASE.py (default method).
 
-Template mesh is loaded with Blender's PLY importer (wm.ply_import).
+Template vertices are read from the PLY file as stored on disk (``atlas_ply_io``) so they
+stay in the same frame as Slicer markups; Blender's ``wm.ply_import`` applies forward/up axis
+remapping and can desync mesh from landmarks (bad Local RBF → lateral / asymmetric artifacts).
 """
 
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 import bpy
 import numpy as np
-from mathutils import Vector
-from mathutils.kdtree import KDTree
+from scipy.spatial import cKDTree
 
 from .atlas_morphospace_sample import AtlasMorphospaceSample
+from .atlas_ply_io import read_ply_vertices_and_faces
 
 
 def _norm_cs(cs: str) -> str:
@@ -53,6 +54,11 @@ def _markups_points_ras(path: Path) -> np.ndarray:
         m = (data.get("markups") or [{}])[0]
         cs = _norm_cs(m.get("coordinateSystem", "RAS"))
         cps = m.get("controlPoints") or []
+        if cps and all("id" in cp for cp in cps):
+            try:
+                cps = sorted(cps, key=lambda cp: int(cp["id"]))
+            except (TypeError, ValueError):
+                pass
         pts = np.asarray([cp["position"] for cp in cps], dtype=np.float64)
     if cs == "LPS":
         a = pts.copy()
@@ -85,88 +91,26 @@ def _resolve_db_paths(db_root: Path) -> tuple[Path, Path, Path]:
     return models[0], lm, ssm
 
 
-def _import_ply_geometry(filepath: str) -> tuple[np.ndarray, list[tuple[int, ...]]]:
-    """Import PLY via Blender; return vertex positions and polygon vertex index tuples."""
-    path = bpy.path.abspath(filepath)
-    if not os.path.isfile(path):
-        raise FileNotFoundError(f"PLY not found: {path}")
-
-    bpy.ops.object.select_all(action="DESELECT")
-    before = {o.name for o in bpy.data.objects}
-
-    import_ok = False
-    try:
-        bpy.ops.wm.ply_import(filepath=path)
-        import_ok = True
-    except Exception:
-        pass
-    if not import_ok:
-        try:
-            if hasattr(bpy.ops, "import_mesh") and hasattr(bpy.ops.import_mesh, "ply"):
-                bpy.ops.import_mesh.ply(filepath=path)
-                import_ok = True
-        except Exception:
-            pass
-    if not import_ok:
-        raise RuntimeError(
-            "ATLAS: PLY import failed. Ensure Blender can import PLY (e.g. wm.ply_import)."
-        )
-
-    new_objs = [bpy.data.objects[n] for n in bpy.data.objects.keys() if n not in before]
-    obj = None
-    for o in new_objs:
-        if o.type == "MESH":
-            obj = o
-            break
-    if obj is None:
-        obj = bpy.context.view_layer.objects.active
-    if obj is None or obj.type != "MESH":
-        raise RuntimeError("PLY import did not produce a mesh object")
-
-    mesh = obj.data
-    verts = np.empty((len(mesh.vertices), 3), dtype=np.float64)
-    for i, v in enumerate(mesh.vertices):
-        verts[i, 0] = v.co.x
-        verts[i, 1] = v.co.y
-        verts[i, 2] = v.co.z
-    faces = [tuple(p.vertices) for p in mesh.polygons]
-
-    mesh_name = mesh.name
-    bpy.data.objects.remove(obj, do_unlink=True)
-    orphan = bpy.data.meshes.get(mesh_name)
-    if orphan is not None and orphan.users == 0:
-        bpy.data.meshes.remove(orphan, do_unlink=True)
-
-    return verts, faces
-
-
 def _precompute_local_rbf(
     template_vertices: np.ndarray, landmark_ras: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
-    """DATABASE Local RBF: k=min(32,nL), h=75th percentile of k-th neighbor distance."""
-    v = np.asarray(template_vertices, dtype=np.float64, copy=False)
+    """Same as DATABASE.py precomputeDeformer Local RBF branch (cKDTree + Gaussian weights)."""
+    V = np.asarray(template_vertices, dtype=np.float64, copy=False)
     lm = np.asarray(landmark_ras, dtype=np.float64, copy=False)
     n_l = int(lm.shape[0])
     k = int(min(32, n_l))
-    kd = KDTree(n_l)
-    for i in range(n_l):
-        kd.insert(Vector(lm[i]), i)
-    kd.balance()
-
-    n_v = int(v.shape[0])
-    idx = np.zeros((n_v, k), dtype=np.int64)
-    dist = np.zeros((n_v, k), dtype=np.float64)
-    for i in range(n_v):
-        found = kd.find_n(v[i], k)
-        for j, item in enumerate(found):
-            _co, ix, d = item
-            idx[i, j] = int(ix)
-            dist[i, j] = float(d)
-
-    h = float(np.percentile(dist[:, -1], 75)) + 1e-9
-    w = np.exp(-(dist * dist) / (h * h))
+    tree = cKDTree(lm)
+    try:
+        d, idx = tree.query(V, k=k, workers=-1)
+    except TypeError:
+        d, idx = tree.query(V, k=k)
+    if k == 1:
+        d = np.reshape(d, (-1, 1))
+        idx = np.reshape(idx, (-1, 1))
+    h = float(np.percentile(d[:, -1], 75)) + 1e-9
+    w = np.exp(-(d * d) / (h * h))
     w /= w.sum(axis=1, keepdims=True)
-    return idx, w
+    return idx.astype(np.int64, copy=False), w.astype(np.float64, copy=False)
 
 
 def _apply_local_rbf(
@@ -218,6 +162,17 @@ def generate_atlas_sample(
             f"Dense landmark count {landmarks_ras.shape[0]} != SSM rows {mean_shape.shape[0]}"
         )
 
+    lm_dev = np.linalg.norm(landmarks_ras - mean_shape, axis=1)
+    mx_dev = float(np.max(lm_dev)) if lm_dev.size else 0.0
+    ref = float(np.percentile(np.linalg.norm(mean_shape, axis=1), 90) or 1.0)
+    if mx_dev > 1e-3 * max(ref, 1.0):
+        print(
+            f"ATLAS: dense landmarks differ from SSM mean_shape by up to {mx_dev:.6g} "
+            f"({mx_dev / ref * 100:.1f}% of ~90th-%ile |p| on mean). "
+            "DATABASE warps as template_landmarks + (modes@σ); when template ≠ mean, "
+            "PCs can look sheared or asymmetric vs a mean-centered reconstruction."
+        )
+
     n_use = min(num_pcs_cfg, n_modes, len(pc_values))
     coeff = np.zeros(n_modes, dtype=np.float64)
     for i in range(n_use):
@@ -225,7 +180,14 @@ def generate_atlas_sample(
     agg = np.tensordot(modes, coeff, axes=(2, 0))
     target_lm = landmarks_ras + agg
 
-    v0, faces = _import_ply_geometry(str(model_path))
+    if not model_path.is_file():
+        raise FileNotFoundError(f"Template model not found: {model_path}")
+    if model_path.suffix.lower() != ".ply":
+        raise ValueError(
+            f"ATLAS TraitBlender expects template_model.ply (raw RAS coordinates). "
+            f"Found {model_path.suffix!r}; re-export the template as PLY from Slicer."
+        )
+    v0, faces = read_ply_vertices_and_faces(model_path)
     idx, w_b = _precompute_local_rbf(v0, landmarks_ras)
     v_new = _apply_local_rbf(v0, landmarks_ras, target_lm, idx, w_b)
 
