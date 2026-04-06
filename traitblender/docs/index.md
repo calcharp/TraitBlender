@@ -71,7 +71,7 @@ If you use TraitBlender in your research, please cite my work:
           month        = mar,
           year         = 2026,
           publisher    = {Zenodo},
-          version      = {v2.0.0},
+          version      = {v2.1.0},
           doi          = {10.5281/zenodo.14804133},
           url          = {https://github.com/Imageomics/TraitBlender},
         }
