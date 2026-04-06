@@ -1,4 +1,4 @@
-# TraitBlender
+# TraitBlender  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19140353.svg)](https://doi.org/10.5281/zenodo.14804133)
 
 TraitBlender is a Blender add-on for generating museum-style images and 3D meshes of specimens from theoretical morphospaces. **v2.1.0** targets **Blender 5.1+** (Python 3.13 wheels) on Windows, macOS, and Linux.
 
