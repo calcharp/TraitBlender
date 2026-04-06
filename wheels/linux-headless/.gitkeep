@@ -1,0 +1,2 @@
+# Headless Linux wheels (cp313, no dearpygui). CI uses Python 3.13:
+#   python3.13 -m pip download --only-binary=:all: -r requirements-wheels-headless.txt -d .

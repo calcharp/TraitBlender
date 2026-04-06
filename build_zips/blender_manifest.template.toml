@@ -3,13 +3,14 @@
 schema_version = "1.0.0"
 
 id = "traitblender"
-version = "2.0.0"
+version = "2.1.0"
 name = "TraitBlender"
 tagline = "Generate museum-style images for morphological datasets"
 maintainer = "Caleb Charpentier <calebcharpentier00@gmail.com>"
 type = "add-on"
 
-blender_version_min = "4.2.0"
+# Blender 5.1+ ships Python 3.13; bundled wheels must be cp313 (see requirements-wheels*.txt).
+blender_version_min = "5.1.0"
 
 license = [
   "SPDX:MIT",

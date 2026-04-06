@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 def package_name_from_wheel(filename: str) -> str:
-    """Derive package name from wheel filename (e.g. numpy-2.2.6-cp311-... -> numpy)."""
+    """Derive package name from wheel filename (e.g. numpy-2.2.6-cp313-... -> numpy)."""
     stem = Path(filename).stem
     m = re.match(r"^(.+?)-\d", stem)
     return m.group(1) if m else stem.split("-")[0]

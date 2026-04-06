@@ -1,5 +1,5 @@
 # Build extension zips and attach them to a GitHub release when you publish one.
-# How to use: Create a release (draft or direct publish) with a tag (e.g. v2.0.0). When the release
+# How to use: Create a release (draft or direct publish) with a tag (e.g. v2.1.0). When the release
 # is published, this workflow runs, builds Windows/Mac/Linux zips, and uploads them as release assets.
 
 name: Release extension zips
@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            wheels: TraitBlender/wheels
+            wheels: traitblender/wheels
             artifact: traitblender-windows
             suffix: windows
             requirements: requirements-wheels.txt
@@ -56,15 +56,15 @@ jobs:
           git rev-parse HEAD
           git log -1 --oneline
 
-      - name: Set up Python 3.11 (for pip download)
+      - name: Set up Python 3.13 (must match Blender's embedded Python for wheels)
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.13"
 
-      - name: Set up Blender 4.3
+      - name: Set up Blender 5.1
         uses: bradyajohnston/setup-blender@v5
         with:
-          version: "4.3"
+          version: "5.1"
 
       - name: Download wheels for this OS
         if: ${{ matrix.download_wheels }}
