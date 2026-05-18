@@ -1,9 +1,8 @@
 """
 ATLAS specimen orientations.
 
-Default: table placement only (tb_location). Other views: same baseline, rotate one axis by n·π/4
-(n = 1..7, i.e. 45° steps through 315°), origin to bounds, tb_location reset — then apply_orientation
-bakes rotation into the mesh (same pipeline as Shell).
+Default: table placement only (tb_location). Other views: rotate one axis by n·π/4
+(n = 1..7), origin to bounds, tb_location reset — then apply_orientation bakes rotation.
 """
 
 from __future__ import annotations
@@ -19,7 +18,6 @@ def _orient_atlas_default(sample_obj):
 
 
 def _pi_multiplier_label(n_quarters: int) -> str:
-    """n_quarters in 1..7  =>  angle n·π/4  as a simplified rational multiplier of π."""
     num = n_quarters
     den = 4
     g = gcd(num, den)

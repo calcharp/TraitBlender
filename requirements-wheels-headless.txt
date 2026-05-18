@@ -1,5 +1,7 @@
 # Same as requirements-wheels.txt but without dearpygui (headless / no GUI CSV editor).
 # CPython 3.13 wheels — use with: py -3.13 -m pip download --only-binary=:all: -r requirements-wheels-headless.txt -d <dir>
+# vtk: see requirements-wheels.txt (9.4+ for cp313).
+vtk==9.4.2
 numpy==2.2.6
 scipy==1.16.0
 pandas==2.2.3

@@ -1,5 +1,7 @@
 # Pin versions with CPython 3.13 wheels (Blender 5.1+). Regenerate platform wheels with:
 #   py -3.13 -m pip download --only-binary=:all: -r requirements-wheels.txt -d <wheels_dir>
+# vtk 9.4+ has cp313 wheels (9.2.x does not); needed for Blender 5.1+ bundles.
+vtk==9.4.2
 numpy==2.2.6
 scipy==1.16.0
 pandas==2.2.3
