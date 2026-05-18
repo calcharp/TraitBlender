@@ -1,5 +1,5 @@
 # Build extension zips and attach them to a GitHub release when you publish one.
-# How to use: Create a release (draft or direct publish) with a tag (e.g. v2.1.0). When the release
+# How to use: Create a release (draft or direct publish) with a tag (e.g. v2.2.0). When the release
 # is published, this workflow runs, builds Windows/Mac/Linux zips, and uploads them as release assets.
 
 name: Release extension zips
@@ -69,7 +69,7 @@ jobs:
       - name: Download wheels for this OS
         if: ${{ matrix.download_wheels }}
         run: >-
-          python -m pip download --only-binary=:all: -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
+          python -m pip download --only-binary=:all: --no-deps -r "${{ matrix.requirements }}" -d "${{ matrix.wheels }}"
 
       - name: Build extension zip
         run: python build_zips/build_extension.py --wheels "${{ matrix.wheels }}"

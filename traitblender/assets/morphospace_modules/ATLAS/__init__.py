@@ -15,10 +15,6 @@ NAME = "ATLAS"
 HYPERPARAMETERS = {
     "database_dir": "",
     "n_components": 10,
-    # traits are σ-multiples (same as ATLAS DATABASE / ATLASViewer sliders)
-    "pc_parameterization": "zscore",
-    # template PLY is typically LPS; convert for RBF then back (ShapeCommons exports)
-    "mesh_from_lps": True,
     # uniform scale applied to deformed vertices after warp
     "scale": 1.0,
 }

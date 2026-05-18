@@ -1,7 +1,12 @@
 # Shell (Default)
 
 The **Shell (Default)** morphospace generates 3D shells from a parametric model of coiling geometry [Contreras-Figueroa & Aragón (2023)](https://doi.org/10.3390/d15030431), with thickness allometry following [Okabe & Yoshimura (2017)](https://doi.org/10.1038/srep42445).  
-Traits come from your dataset; hyperparameters come from the configuration.
+
+<div style="display: flex; justify-content: center; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin: 1rem 0;">
+  <img src="../../images/Morphospace%20Samples/shell-1.png" alt="Shell morphospace sample 1" width="216" />
+  <img src="../../images/Morphospace%20Samples/shell-2.png" alt="Shell morphospace sample 2" width="216" />
+  <img src="../../images/Morphospace%20Samples/shell-3.png" alt="Shell morphospace sample 3" width="216" />
+</div>
 
 ## Traits (dataset columns)
 

@@ -7,17 +7,17 @@ TraitBlender releases are paired with specific Blender version ranges. Install t
 | TraitBlender | Supported Blender versions |
 |--------------|---------------------------|
 | **v2.0.0** | **4.3** through **5.0** (inclusive) |
-| **v2.1.0** | **5.1** and later |
+| **v2.1.0**, **v2.2.0** | **5.1** and later |
 
 If you upgrade Blender outside the range supported by your installed TraitBlender build, upgrade TraitBlender as well (or stay on a Blender version within the supported range).
 
 ??? note "System Requirements"
     ### Minimum Requirements
-    - **Blender**: Must fall within the range for your TraitBlender version ([see table above](#blender-version-compatibility)): v2.0.0 supports Blender 4.3–5.0; v2.1.0 supports Blender 5.1+.
+    - **Blender**: Must fall within the range for your TraitBlender version ([see table above](#blender-version-compatibility)): v2.0.0 supports Blender 4.3–5.0; v2.1.0+ supports Blender 5.1+.
     - **Operating System**: Windows 10/11, macOS 10.15+, or Linux (Ubuntu 20.04+)
 
     ### Recommended Requirements
-    - **Blender**: The newest Blender release that is still supported by your TraitBlender version (e.g. 5.0 with TraitBlender v2.0.0, or 5.1+ with v2.1.0)
+    - **Blender**: The newest Blender release that is still supported by your TraitBlender version (e.g. 5.0 with TraitBlender v2.0.0, or 5.1+ with v2.2.0)
     - **RAM**: 32GB for large datasets
     - **CPU**: Multi-core processor (8+ cores recommended)
 
@@ -27,7 +27,7 @@ If you upgrade Blender outside the range supported by your installed TraitBlende
 
 You can install a downloaded release zip directly from the terminal:
 
-`blender --command extension install-file -r user_default --enable traitblender-v2.1.0-linux.zip`
+`blender --command extension install-file -r user_default --enable traitblender-v2.2.0-linux.zip`
 
 Use the zip that matches your OS:
 

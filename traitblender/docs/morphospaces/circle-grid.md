@@ -6,6 +6,12 @@ Each circle has two traits:
 - **opacity** (how dark the circle is)
 - **diameter** (relative size)
 
+<div style="display: flex; justify-content: center; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin: 1rem 0;">
+  <img src="../../images/Morphospace%20Samples/circle_grid-1.png" alt="Circle Grid morphospace sample 1" width="216" />
+  <img src="../../images/Morphospace%20Samples/circle_grid-2.png" alt="Circle Grid morphospace sample 2" width="216" />
+  <img src="../../images/Morphospace%20Samples/circle_grid-3.png" alt="Circle Grid morphospace sample 3" width="216" />
+</div>
+
 ## Traits (dataset columns)
 
 The traits are `opacity_0`–`opacity_15` and `diameter_0`–`diameter_15`, row-major over the 4×4 grid.

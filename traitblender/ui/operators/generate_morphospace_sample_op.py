@@ -47,11 +47,12 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             
             # Get hyperparameters from config (merged with module defaults)
             hyperparameters = None
-            if hasattr(morphospace_module, 'HYPERPARAMETERS'):
+            module_hp_keys = set(getattr(morphospace_module, 'HYPERPARAMETERS', {}).keys())
+            if module_hp_keys:
                 morphospace_config = context.scene.traitblender_config.morphospace
                 hyperparameters = morphospace_config.get_hyperparams_for(morphospace_identifier)
                 # Remove hyperparameters from valid_params so they don't get mapped from dataset
-                valid_params = valid_params - set(hyperparameters.keys()) - {'hyperparameters'}
+                valid_params = valid_params - module_hp_keys - {'hyperparameters'}
             
             # Map dataset columns to function parameters (excluding hyperparameters).
             # Case-insensitive match so e.g. dataset column "S" maps to param "S".
@@ -66,7 +67,7 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                         params[matched] = value
 
             # Add hyperparameters as a dict parameter if the function accepts it
-            if hyperparameters is not None and 'hyperparameters' in sig.parameters:
+            if hyperparameters is not None and module_hp_keys and 'hyperparameters' in sig.parameters:
                 params['hyperparameters'] = hyperparameters
             
             # Debug: show what will be passed

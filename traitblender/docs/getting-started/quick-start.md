@@ -6,7 +6,7 @@ Get up and running with TraitBlender's graphical interface in just a few minutes
 
 Before starting, ensure you have:
 
-- ✅ A [compatible Blender version](./installation.md#blender-version-compatibility) for your TraitBlender release (**v2.1.0**: Blender 5.1+; **v2.0.0**: Blender 4.3–5.0)
+- ✅ A [compatible Blender version](./installation.md#blender-version-compatibility) for your TraitBlender release (**v2.2.0**: Blender 5.1+; **v2.0.0**: Blender 4.3–5.0)
 - ✅ TraitBlender add-on installed ([Installation Guide](./installation.md))
 
 ??? note "Step 0: Enable TraitBlender"
@@ -65,13 +65,15 @@ Before starting, ensure you have:
 ??? note "Step 3: Select a Morphospace"
     Expand the **"3 Morphospaces"** panel.
 
-    TraitBlender generates 3D specimens from mathematical models called morphospaces. By default, TraitBlender includes the **Shell (Default)** morphospace, which combines:
-    - The morphospace developed by [Contreras-Figueroa and Aragón](https://www.mdpi.com/1424-2818/15/3/431) (a generalization of Raup's classic shell space)
-    - [Okabe and Yoshimura's](https://doi.org/10.1038/srep42445) allometric shell thickness function
+    TraitBlender generates 3D specimens from mathematical models called **morphospaces**. The dropdown lists three built-in options (in order):
 
-    This creates fully 3D models of molluscan shells with realistic geometry.
+    - **Shell (Default)** — parametric mollusc shells ([Contreras-Figueroa & Aragón](https://www.mdpi.com/1424-2818/15/3/431); thickness from [Okabe & Yoshimura](https://doi.org/10.1038/srep42445))
+    - **Circle Grid** — simple test morphospace (cube with a 4×4 grid of circles)
+    - **ATLAS** — deform a template mesh from an [ATLAS DATABASE](https://github.com/agporto/ATLAS) export using PCA + local RBF ([details](../morphospaces/atlas.md))
 
-    Select **Shell (Default)** from the dropdown (it should be the only option by default).
+    Select the morphospace that matches your dataset.
+
+    For **ATLAS**, set **`database_dir`** under Configuration → morphospace hyperparameters before generating samples.
 
 ??? note "Step 4: Import and Manage Datasets"
     Expand the **"4 Datasets"** panel.

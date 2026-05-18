@@ -7,6 +7,12 @@ The **ATLAS** morphospace deforms a template surface mesh using a statistical sh
 
 Traits are **multiples of the per-mode standard deviation** (σ), the same units as the PC sliders in ATLAS DATABASE and 3D Slicer.
 
+<div style="display: flex; justify-content: center; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin: 1rem 0;">
+  <img src="../../images/Morphospace%20Samples/atlas-1.png" alt="ATLAS morphospace sample 1" width="216" />
+  <img src="../../images/Morphospace%20Samples/atlas-2.png" alt="ATLAS morphospace sample 2" width="216" />
+  <img src="../../images/Morphospace%20Samples/atlas-3.png" alt="ATLAS morphospace sample 3" width="216" />
+</div>
+
 ??? note "Prerequisites"
 
     You need a complete ATLAS DATABASE export directory on disk. TraitBlender resolves these files automatically (via `manifest.json` when present, or by filename patterns):

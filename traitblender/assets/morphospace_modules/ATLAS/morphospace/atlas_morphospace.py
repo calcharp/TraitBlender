@@ -34,22 +34,13 @@ def generate_atlas_sample(
         raise ValueError(f"ATLAS database_dir is not a directory: {db_root}")
 
     n_comp_cfg = max(0, int(hp.get("n_components", 10)))
-    mesh_from_lps = bool(hp.get("mesh_from_lps", True))
     scale = float(hp.get("scale", 1.0))
-    pc_param = str(hp.get("pc_parameterization", "zscore")).strip().lower()
-    if pc_param not in ("zscore", "sigma", ""):
-        raise ValueError(
-            f"ATLAS pc_parameterization must be 'zscore' (σ-multiples); got {pc_param!r}"
-        )
 
     if scale <= 0.0:
         raise ValueError("ATLAS hyperparameter 'scale' must be positive")
 
     _log(f"sample {name!r}: database_dir={db_root}")
-    _log(
-        f"  n_components={n_comp_cfg}, scale={scale}, "
-        f"mesh_from_lps={mesh_from_lps}, pc_parameterization=zscore"
-    )
+    _log(f"  n_components={n_comp_cfg}, scale={scale}")
 
     paths = resolve_database_paths(db_root)
     _log(
@@ -77,7 +68,7 @@ def generate_atlas_sample(
     vertices, faces = build_deformed_mesh_arrays(
         paths,
         sigma,
-        mesh_from_lps=mesh_from_lps,
+        mesh_from_lps=True,
     )
 
     if scale != 1.0:

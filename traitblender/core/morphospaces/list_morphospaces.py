@@ -5,6 +5,9 @@ import os
 from ..helpers import get_asset_path
 from .get_orientations import get_orientations_for_morphospace
 
+# GUI dropdown order (folder names under morphospace_modules/)
+_MORPHOSPACE_ORDER = ("Shell", "CircleGrid", "ATLAS")
+
 
 def list_morphospaces():
     """
@@ -35,4 +38,8 @@ def list_morphospaces():
         print(f"Error listing morphospaces: {e}")
         return []
     
-    return sorted(morphospaces)
+    order_rank = {name: i for i, name in enumerate(_MORPHOSPACE_ORDER)}
+    return sorted(
+        morphospaces,
+        key=lambda folder: (order_rank.get(folder, len(order_rank)), folder),
+    )
