@@ -22,7 +22,7 @@ authors:
 cff-version: 1.2.0
 date-released: "2026-05-22"
 doi: 10.5281/zenodo.14804133
-dentifiers:
+identifiers:
   - type: url
     description: "The GitHub release URL for version 2.2.0."
     value: "https://github.com/Imageomics/TraitBlender/releases/tag/v2.2.0"
