@@ -39,7 +39,8 @@ def get_trait_parameters_with_defaults_for_morphospace(morphospace_name, context
     Get trait parameters and their default values for a morphospace.
 
     If the module defines ``get_trait_parameters_with_defaults(merged_hyperparameters)``, that
-    return value is used (e.g. ATLAS: PC1..PCn from hyperparameter ``num_pcs``). Otherwise
+    return value is used (e.g. ATLAS: PC1..PCn from ``n_components``, capped by SSM mode count).
+    Otherwise
     parameters are inferred from ``sample()``'s signature.
 
     Args:

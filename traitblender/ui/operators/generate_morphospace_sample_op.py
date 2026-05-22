@@ -43,6 +43,9 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             row_data = dataset.loc(selected_sample_name)
             # Get the argument names for the sample function (excluding 'name')
             sig = inspect.signature(sample_func)
+            accepts_var_keyword = any(
+                p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+            )
             valid_params = set(sig.parameters.keys()) - {'name'}
             
             # Get hyperparameters from config (merged with module defaults)
@@ -54,11 +57,24 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                 # Remove hyperparameters from valid_params so they don't get mapped from dataset
                 valid_params = valid_params - module_hp_keys - {'hyperparameters'}
             
+            species_column_names = {
+                'species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids',
+            }
+
+            def _norm_col(s: str) -> str:
+                return str(s).lower().strip().replace(' ', '_')
+
             # Map dataset columns to function parameters (excluding hyperparameters).
             # Case-insensitive match so e.g. dataset column "S" maps to param "S".
+            # Morphospaces with **traits (e.g. ATLAS pc1..pcN) pass all non-species trait columns.
             params = {}
             for column_name, value in row_data.items():
                 param_name = column_name.lower().replace(' ', '_')
+                if _norm_col(column_name) in species_column_names:
+                    continue
+                if accepts_var_keyword:
+                    params[param_name] = value
+                    continue
                 if param_name in valid_params:
                     params[param_name] = value
                 else:

@@ -7,7 +7,11 @@ Traits ``pc1`` … ``pcK`` are σ-multiples (ATLAS DATABASE sliders). Reconstruc
 
 from __future__ import annotations
 
-from .morphospace import MAX_ATLAS_PCS, generate_atlas_sample
+from .morphospace import (
+    generate_atlas_sample,
+    pc_values_from_trait_kwargs,
+    resolve_n_modes_for_hyperparams,
+)
 from .orientations import ORIENTATIONS
 
 NAME = "ATLAS"
@@ -21,27 +25,29 @@ HYPERPARAMETERS = {
 
 
 def get_trait_parameters_with_defaults(merged_hyperparameters):
-    """``pc1`` … ``pc{n_components}`` for dataset columns (capped at ``MAX_ATLAS_PCS``)."""
-    n = int(merged_hyperparameters.get("n_components", HYPERPARAMETERS["n_components"]))
-    n = max(0, min(n, MAX_ATLAS_PCS))
+    """``pc1`` … ``pc{n}`` for dataset columns; ``n`` is limited by SSM mode count when known."""
+    n = max(0, int(merged_hyperparameters.get("n_components", HYPERPARAMETERS["n_components"])))
+    n_modes = resolve_n_modes_for_hyperparams(merged_hyperparameters)
+    if n_modes is not None:
+        n = min(n, n_modes)
     return {f"pc{i}": 0.0 for i in range(1, n + 1)}
 
 
-_pc_sig = ", ".join(f"pc{i}=0.0" for i in range(1, MAX_ATLAS_PCS + 1))
-_pc_expr = "[" + ", ".join(f"pc{i}" for i in range(1, MAX_ATLAS_PCS + 1)) + "]"
-_exec_src = (
-    f"def sample(name='ATLAS', {_pc_sig}, hyperparameters=None):\n"
-    f"    return generate_atlas_sample(name, hyperparameters or {{}}, {_pc_expr})\n"
-)
-_ns: dict = {"generate_atlas_sample": generate_atlas_sample}
-exec(_exec_src, _ns)
-sample = _ns["sample"]
+def sample(name="ATLAS", hyperparameters=None, **traits):
+    """Generate a specimen; PC coefficients are passed as pc1, pc2, … keyword traits."""
+    return generate_atlas_sample(
+        name,
+        hyperparameters or {},
+        pc_values_from_trait_kwargs(traits),
+    )
+
 
 __all__ = [
     "NAME",
     "sample",
     "HYPERPARAMETERS",
     "ORIENTATIONS",
-    "MAX_ATLAS_PCS",
     "get_trait_parameters_with_defaults",
+    "generate_atlas_sample",
+    "resolve_n_modes_for_hyperparams",
 ]

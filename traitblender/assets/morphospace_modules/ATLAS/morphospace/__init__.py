@@ -1,6 +1,13 @@
-from .atlas_morphospace import generate_atlas_sample
+from .atlas_morphospace import (
+    generate_atlas_sample,
+    pc_values_from_trait_kwargs,
+    resolve_n_modes_for_hyperparams,
+)
 from .atlas_morphospace_sample import AtlasMorphospaceSample
 
-MAX_ATLAS_PCS = 64
-
-__all__ = ["generate_atlas_sample", "AtlasMorphospaceSample", "MAX_ATLAS_PCS"]
+__all__ = [
+    "generate_atlas_sample",
+    "AtlasMorphospaceSample",
+    "pc_values_from_trait_kwargs",
+    "resolve_n_modes_for_hyperparams",
+]

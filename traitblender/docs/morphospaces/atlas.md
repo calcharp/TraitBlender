@@ -38,7 +38,7 @@ Traits are **multiples of the per-mode standard deviation** (σ), the same units
 
 ## Traits (dataset columns)
 
-Traits are `pc1`, `pc2`, … up to the number set by the **`n_components`** hyperparameter (default **10**, maximum **64**). Each value is a **σ-multiple** for that principal component:
+Traits are `pc1`, `pc2`, … up to the number set by the **`n_components`** hyperparameter (default **10**), but never more than the number of modes in your `ssm_model.npz`. Each value is a **σ-multiple** for that principal component:
 
 | Trait | Default | Description | Typical range |
 |-------|---------|-------------|----------------|
@@ -59,7 +59,7 @@ specimen_b,-2.0,1.0,0.0
 | Hyperparameter | Default | Description | Typical range / notes |
 |----------------|---------|-------------|------------------------|
 | `database_dir` | *(empty)* | Absolute or Blender-relative path to the ATLAS DATABASE folder. **Required** before generating samples. | Folder containing `manifest.json` (recommended) or the standard file set. |
-| `n_components` | `10` | How many PCs appear as dataset traits (`pc1` … `pcN`). | `1`–`64`; should not exceed the number of modes in `ssm_model.npz`. |
+| `n_components` | `10` | How many PCs appear as dataset traits (`pc1` … `pcN`). | At least `1`; cannot exceed the number of modes in `ssm_model.npz`. |
 | `scale` | `1.0` | Uniform scale applied to deformed vertex positions **after** the RBF warp. | Positive; `1.0` = no extra scaling. |
 
 ## Orientations

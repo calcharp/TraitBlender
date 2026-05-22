@@ -13,6 +13,41 @@ from .atlas_core import build_deformed_mesh_arrays, load_ssm, resolve_database_p
 from .atlas_morphospace_sample import AtlasMorphospaceSample
 
 
+def resolve_n_modes_for_hyperparams(hyperparameters: dict | None) -> int | None:
+    """Return mode count from the configured DATABASE SSM, or None if not yet resolvable."""
+    hp = dict(hyperparameters or {})
+    db_raw = (hp.get("database_dir") or hp.get("database_path") or "").strip()
+    if not db_raw:
+        return None
+    try:
+        db_root = Path(bpy.path.abspath(db_raw))
+    except Exception:
+        db_root = Path(db_raw).expanduser().resolve()
+    if not db_root.is_dir():
+        return None
+    try:
+        paths = resolve_database_paths(db_root)
+        ssm = load_ssm(paths)
+        n_modes = int(ssm["n_modes"])
+        return n_modes if n_modes > 0 else None
+    except Exception:
+        return None
+
+
+def pc_values_from_trait_kwargs(traits: dict) -> list[float]:
+    """Collect pc1, pc2, … from keyword traits in numeric order."""
+    indexed: list[tuple[int, float]] = []
+    for key, value in traits.items():
+        if not key.startswith("pc") or len(key) <= 2:
+            continue
+        suffix = key[2:]
+        if not suffix.isdigit():
+            continue
+        indexed.append((int(suffix), float(value)))
+    indexed.sort(key=lambda item: item[0])
+    return [v for _, v in indexed]
+
+
 def _log(msg: str) -> None:
     print(f"[ATLAS] {msg}")
 
@@ -39,19 +74,24 @@ def generate_atlas_sample(
     if scale <= 0.0:
         raise ValueError("ATLAS hyperparameter 'scale' must be positive")
 
-    _log(f"sample {name!r}: database_dir={db_root}")
-    _log(f"  n_components={n_comp_cfg}, scale={scale}")
-
     paths = resolve_database_paths(db_root)
-    _log(
-        "  files — "
-        f"model={paths['model'].name}, dense={paths['dense'].name}, ssm={paths['ssm'].name}"
-    )
-
     ssm = load_ssm(paths)
     n_modes = int(ssm["n_modes"])
     if n_modes < 1:
         raise ValueError("SSM has no modes in ssm_model.npz")
+
+    if n_comp_cfg > n_modes:
+        _log(
+            f"  n_components={n_comp_cfg} exceeds SSM modes ({n_modes}); using {n_modes} modes"
+        )
+        n_comp_cfg = n_modes
+
+    _log(f"sample {name!r}: database_dir={db_root}")
+    _log(f"  n_components={n_comp_cfg}, n_modes={n_modes}, scale={scale}")
+    _log(
+        "  files — "
+        f"model={paths['model'].name}, dense={paths['dense'].name}, ssm={paths['ssm'].name}"
+    )
 
     sigma = np.zeros(n_modes, dtype=np.float64)
     n_use = min(n_comp_cfg, n_modes, len(pc_values))
