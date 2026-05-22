@@ -53,13 +53,15 @@ class MorphospaceConfig(TraitBlenderConfig):
         except Exception as e:
             print(f"TraitBlender: Error serializing morphospace hyperparams: {e}")
 
+    def _scoped_hyperparam_overrides(self, morphospace_name):
+        """Overrides in hyperparams_state that apply to this morphospace only."""
+        module_keys = get_hyperparameters_for_morphospace(morphospace_name).keys()
+        return {k: v for k, v in self._get_hyperparams_dict().items() if k in module_keys}
+
     def get_hyperparams_for(self, morphospace_name):
         """Get merged hyperparameters. Module defaults + config overrides for this morphospace only."""
         module_defaults = get_hyperparameters_for_morphospace(morphospace_name)
-        overrides = self._get_hyperparams_dict()
-        # hyperparams_state is one flat dict; ignore keys from other morphospaces
-        scoped = {k: v for k, v in overrides.items() if k in module_defaults}
-        return {**module_defaults, **scoped}
+        return {**module_defaults, **self._scoped_hyperparam_overrides(morphospace_name)}
 
     def set_hyperparam(self, morphospace_name, key, value):
         """Set one hyperparameter."""
@@ -77,7 +79,7 @@ class MorphospaceConfig(TraitBlenderConfig):
         indent = "  " * indent_level
         result = []
         result.append(f"{indent}name: {self.name}")
-        data = self._get_hyperparams_dict()
+        data = self._scoped_hyperparam_overrides(self.name)
         result.append(f"{indent}hyperparams:")
         if not data:
             result.append(f"{indent}  {{}}")
@@ -91,7 +93,7 @@ class MorphospaceConfig(TraitBlenderConfig):
 
     def to_dict(self):
         """Return morphospace config for config export."""
-        data = self._get_hyperparams_dict()
+        data = self._scoped_hyperparam_overrides(self.name)
         return {"name": self.name, "hyperparams": data if data else {}}
 
     def from_dict(self, data_dict):
@@ -102,4 +104,6 @@ class MorphospaceConfig(TraitBlenderConfig):
             self.name = data_dict["name"]
         hyperparams = data_dict.get("hyperparams")
         if isinstance(hyperparams, dict):
-            self._set_hyperparams_dict(hyperparams)
+            module_keys = get_hyperparameters_for_morphospace(self.name).keys()
+            scoped = {k: v for k, v in hyperparams.items() if k in module_keys}
+            self._set_hyperparams_dict(scoped)
