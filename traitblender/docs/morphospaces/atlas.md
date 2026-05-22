@@ -73,5 +73,5 @@ Select an orientation in the **Orientations** panel and click **Apply**, or incl
 
 ## References
 
-- Porto, A. G. et al. ATLAS: Automatic Template Landmarks And Segmentation. [https://github.com/agporto/ATLAS](https://github.com/agporto/ATLAS)
+- Porto, A. (2025). ATLAS: Automated Template-based Landmark Alignment System. GitHub repository. https://github.com/agporto/ATLAS
 - TraitBlender’s implementation follows the ATLAS DATABASE explorer (template-centered PCA + local RBF deformer).
