@@ -55,11 +55,8 @@ def create_hyperparams_property_group(morphospace_name, hyperparams_dict):
                 name=display_name, default=default, get=getter, set=setter
             )
         elif isinstance(default, int):
-            int_min = 0 if key == "num_pcs" else 1
-            if key == "num_pcs":
-                int_max, soft = 256, 128
-            else:
-                int_max, soft = 65535, 1000
+            int_min = 1
+            int_max, soft = 65535, 1000
             annotations[key] = IntProperty(
                 name=display_name,
                 default=default,
