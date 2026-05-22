@@ -41,10 +41,9 @@ def resolve_database_paths(database_dir: str | Path) -> dict[str, Path]:
     else:
         files = _discover_files_fallback(root)
 
-    resolved: dict[str, Path] = {
-        "database_dir": root,
-        "manifest": manifest_path if manifest_path.is_file() else root / "manifest.json",
-    }
+    resolved: dict[str, Path] = {"database_dir": root}
+    if manifest_path.is_file():
+        resolved["manifest"] = manifest_path
 
     key_map = {
         "model": ("model", _MODEL_SUFFIXES),
@@ -64,7 +63,7 @@ def resolve_database_paths(database_dir: str | Path) -> dict[str, Path]:
     if missing:
         raise FileNotFoundError(
             f"Database folder missing required file(s) {missing}: {root}\n"
-            f"Found: {', '.join(p.name for p in resolved.values() if p != root)}"
+            f"Found: {', '.join(p.name for p in resolved.values() if p != root and p.is_file())}"
         )
 
     for key in required:
