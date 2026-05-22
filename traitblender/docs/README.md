@@ -38,7 +38,7 @@ TraitBlender is a Blender add-on designed for researchers and institutions worki
 - **Table coordinate system** - Consistent positioning relative to museum table
 - **YAML configuration** - Reproducible, serializable scene settings
 - **Transform pipeline** - Chain multiple statistical transformations
-- **Blender compatibility** — **v2.2.0** (current) supports Blender 5.1+; **v2.1.0** and **v2.0.0** support earlier Blender lines ([details](./getting-started/installation.md#blender-version-compatibility))
+- **Supported stack** — **TraitBlender v2.2.0** on **Blender 5.1+** ([details](./getting-started/installation.md#supported-versions))
 
 ### Workflow
 
