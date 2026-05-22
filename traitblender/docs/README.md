@@ -6,7 +6,7 @@
 
 Welcome to the TraitBlender documentation! TraitBlender is a Blender add-on for generating museum-style images for morphological datasets, developed by Caleb Charpentier.
 
-**Latest release: v2.1.0** (Blender 5.1+). Release zips use names like `traitblender-v2.1.0-<platform>.zip`.
+**Latest release: v2.2.0** (Blender 5.1+). Release zips use names like `traitblender-v2.2.0-<platform>.zip`.
 
 ## Documentation Sections
 
@@ -38,7 +38,7 @@ TraitBlender is a Blender add-on designed for researchers and institutions worki
 - **Table coordinate system** - Consistent positioning relative to museum table
 - **YAML configuration** - Reproducible, serializable scene settings
 - **Transform pipeline** - Chain multiple statistical transformations
-- **Blender compatibility** — **v2.1.0** (current) supports Blender 5.1+; **v2.0.0** supports Blender 4.3–5.0 ([details](./getting-started/installation.md#blender-version-compatibility))
+- **Supported stack** — **TraitBlender v2.2.0** on **Blender 5.1+** ([details](./getting-started/installation.md#supported-versions))
 
 ### Workflow
 

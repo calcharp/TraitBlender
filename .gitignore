@@ -1,1 +1,74 @@
 traitblender-*.zip
+PLAN.md
+
+# MkDocs build output (regenerated locally; CI builds for GitHub Pages)
+traitblender/site/
+
+# =============================================================================
+# RELEASE CHECKLIST — TraitBlender version (currently 2.2.0)
+# Search/replace 2.2.0 → X.Y.Z and v2.2.0 → vX.Y.Z unless noted below.
+# =============================================================================
+
+# --- Addon package (extension build version; keep both in sync) ---
+# traitblender/blender_manifest.toml
+#   version = "X.Y.Z"
+# build_zips/blender_manifest.template.toml
+#   version = "X.Y.Z"
+
+# --- CITATION.cff ---
+# CITATION.cff
+#   version: X.Y.Z
+#   date-released: "YYYY-MM-DD"
+#   identifiers → description: "... version X.Y.Z."
+#   identifiers → value: https://github.com/Imageomics/TraitBlender/releases/tag/vX.Y.Z
+#   doi: (update if Zenodo publishes a new record/DOI for this release)
+
+# --- Zenodo (.zenodo.json; validated by .github/workflows/validate-zenodo.yaml) ---
+# .zenodo.json
+#   "version": "X.Y.Z"
+#   "publication_date": "YYYY-MM-DD"
+# Also create/publish the matching version on https://zenodo.org (GitHub–Zenodo integration
+# or manual upload). Keep CITATION.cff doi in sync with the Zenodo record you cite.
+
+# --- Root README ---
+# README.md
+#   Intro line: **vX.Y.Z**
+#   CLI example: traitblender-vX.Y.Z-linux.zip
+#   Zenodo badge/link DOI URLs if the Zenodo record ID changes
+
+# --- Documentation (MkDocs source: traitblender/docs/) ---
+# traitblender/docs/index.md
+#   About section: **TraitBlender vX.Y.Z**
+#   BibTeX block: version = {vX.Y.Z}
+#   BibTeX block: doi = {...}  (if Zenodo DOI changed)
+#
+# traitblender/docs/README.md
+#   **Latest release: vX.Y.Z**
+#   Release zip example: traitblender-vX.Y.Z-<platform>.zip
+#   Supported stack bullet: **TraitBlender vX.Y.Z**
+#
+# traitblender/docs/getting-started/installation.md
+#   Supported versions table: **vX.Y.Z**
+#   CLI install example: traitblender-vX.Y.Z-linux.zip
+#   Download step: latest release (**vX.Y.Z**)
+#   Troubleshooting: **TraitBlender vX.Y.Z**
+#
+# traitblender/docs/getting-started/quick-start.md
+#   Prerequisites: **TraitBlender vX.Y.Z**
+#
+# traitblender/docs/getting-started/quick-start-api.md
+#   Prerequisites: **TraitBlender vX.Y.Z**
+
+# --- GitHub release (not edited in repo; do on publish) ---
+# Create release tag vX.Y.Z on GitHub (triggers .github/workflows/release-zips.yml).
+#   Assets are named: traitblender-vX.Y.Z-windows.zip, ...-mac.zip, ...-linux.zip,
+#   ...-linux-headless.zip
+# .github/workflows/release-zips.yml
+#   Comment example tag (line ~2): vX.Y.Z
+
+# --- Do NOT change for a TraitBlender-only version bump ---
+# traitblender/blender_manifest.toml → blender_version_min (Blender floor, e.g. 5.1.0)
+# requirements-wheels.txt, requirements-wheels-headless.txt
+# traitblender/wheels/*.whl
+# CITATION.cff → cff-version (Citation File Format spec, not TraitBlender)
+# blender_manifest.toml → schema_version

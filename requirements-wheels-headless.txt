@@ -1,8 +1,14 @@
 # Same as requirements-wheels.txt but without dearpygui (headless / no GUI CSV editor).
-# CPython 3.13 wheels — use with: py -3.13 -m pip download --only-binary=:all: -r requirements-wheels-headless.txt -d <dir>
+# Regenerate: py -3.13 build_zips/download_wheels.py linux-headless
+vtk==9.4.2
 numpy==2.2.6
 scipy==1.16.0
 pandas==2.2.3
 openpyxl==3.1.5
 pillow==11.2.1
 PyYAML==6.0.2
+python-dateutil==2.9.0.post0
+pytz==2026.1.post1
+tzdata==2026.1
+six==1.17.0
+et_xmlfile==2.0.0

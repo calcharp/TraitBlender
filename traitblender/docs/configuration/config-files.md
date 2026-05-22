@@ -68,7 +68,7 @@ TraitBlender config files are **YAML** files that store the settings you see in 
 
 <p><strong>render</strong></p>
 <ul>
-  <li><code>engine</code>: <code>CYCLES</code> | <code>BLENDER_EEVEE_NEXT</code> | <code>BLENDER_WORKBENCH</code></li>
+  <li><code>engine</code>: <code>CYCLES</code> | Eevee (<code>BLENDER_EEVEE_NEXT</code> or <code>BLENDER_EEVEE</code>, depending on Blender version; YAML values are normalized on load) | <code>BLENDER_WORKBENCH</code></li>
   <li><code>eevee_use_raytracing</code>: boolean</li>
 </ul>
 
@@ -183,7 +183,7 @@ mat:
   roughness: 1.0
 
 render:
-  engine: BLENDER_EEVEE_NEXT
+  engine: BLENDER_EEVEE_NEXT  # or BLENDER_EEVEE on Blender 5.1+; both accepted in YAML
   eevee_use_raytracing: false
 
 output:

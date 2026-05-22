@@ -47,6 +47,7 @@ mat:
   scale: [0.15, 0.15, 1.0]
 render:
   eevee_use_raytracing: false
+  # Eevee id is version-specific (BLENDER_EEVEE_NEXT vs BLENDER_EEVEE); normalized on load.
   engine: BLENDER_EEVEE_NEXT
 output:
   image_format: PNG

@@ -9,7 +9,7 @@ Learn how to use TraitBlender programmatically through Python scripts in Blender
 
 Before starting, ensure you have:
 
-- ✅ A [compatible Blender version](./installation.md#blender-version-compatibility) for your TraitBlender release (**v2.1.0**: Blender 5.1+; **v2.0.0**: Blender 4.3–5.0)
+- ✅ **Blender 5.1+** and **TraitBlender v2.2.0** ([supported versions](./installation.md#supported-versions))
 - ✅ TraitBlender add-on installed and enabled ([Installation Guide](./installation.md))
 - ✅ Basic Python knowledge (helpful but not required)
 
@@ -227,7 +227,7 @@ Run it headless from the command line:
 blender --background --python "testrun.py"
 ```
 
-On your cluster, you’ll likely need to `module load` your cluster’s Blender version. `CYCLES` is typically more cooperative in headless environments than `BLENDER_EEVEE_NEXT` (because it tends to require fewer extra graphics/GUI dependencies).
+On your cluster, you’ll likely need to `module load` your cluster’s Blender version. `CYCLES` is typically more cooperative in headless environments than Eevee (`BLENDER_EEVEE_NEXT` / `BLENDER_EEVEE`, depending on Blender version), because Eevee tends to require more graphics/GUI dependencies.
 
 ## Working with Transform Pipelines
 

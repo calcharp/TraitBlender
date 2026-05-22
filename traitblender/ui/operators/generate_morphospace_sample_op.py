@@ -43,21 +43,38 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
             row_data = dataset.loc(selected_sample_name)
             # Get the argument names for the sample function (excluding 'name')
             sig = inspect.signature(sample_func)
+            accepts_var_keyword = any(
+                p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+            )
             valid_params = set(sig.parameters.keys()) - {'name'}
             
             # Get hyperparameters from config (merged with module defaults)
             hyperparameters = None
-            if hasattr(morphospace_module, 'HYPERPARAMETERS'):
+            module_hp_keys = set(getattr(morphospace_module, 'HYPERPARAMETERS', {}).keys())
+            if module_hp_keys:
                 morphospace_config = context.scene.traitblender_config.morphospace
                 hyperparameters = morphospace_config.get_hyperparams_for(morphospace_identifier)
                 # Remove hyperparameters from valid_params so they don't get mapped from dataset
-                valid_params = valid_params - set(hyperparameters.keys()) - {'hyperparameters'}
+                valid_params = valid_params - module_hp_keys - {'hyperparameters'}
             
+            species_column_names = {
+                'species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids',
+            }
+
+            def _norm_col(s: str) -> str:
+                return str(s).lower().strip().replace(' ', '_')
+
             # Map dataset columns to function parameters (excluding hyperparameters).
             # Case-insensitive match so e.g. dataset column "S" maps to param "S".
+            # Morphospaces with **traits (e.g. ATLAS pc1..pcN) pass all non-species trait columns.
             params = {}
             for column_name, value in row_data.items():
                 param_name = column_name.lower().replace(' ', '_')
+                if _norm_col(column_name) in species_column_names:
+                    continue
+                if accepts_var_keyword:
+                    params[param_name] = value
+                    continue
                 if param_name in valid_params:
                     params[param_name] = value
                 else:
@@ -66,7 +83,7 @@ class TRAITBLENDER_OT_generate_morphospace_sample(Operator):
                         params[matched] = value
 
             # Add hyperparameters as a dict parameter if the function accepts it
-            if hyperparameters is not None and 'hyperparameters' in sig.parameters:
+            if hyperparameters is not None and module_hp_keys and 'hyperparameters' in sig.parameters:
                 params['hyperparameters'] = hyperparameters
             
             # Debug: show what will be passed

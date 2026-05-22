@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import bpy
 from bpy.props import StringProperty, EnumProperty
 import pandas as pd
@@ -8,12 +10,68 @@ import warnings
 from ..morphospaces import (
     get_trait_parameters_with_defaults_for_morphospace,
 )
+from ..morphospaces._module_loader import load_morphospace_module
+
 
 def _normalize_dataset_path(path: str) -> str:
     """Normalize dataset paths so local Windows paths are read as files, not URLs."""
     if not path:
         return path
     return os.path.normpath(path)
+
+
+_SPECIES_COLUMN_NAMES = frozenset(
+    {
+        "species",
+        "label",
+        "tips",
+        "tip",
+        "sample",
+        "samples",
+        "name",
+        "names",
+        "id",
+        "ids",
+    }
+)
+
+
+def _norm_dataset_col(s: str) -> str:
+    return str(s).lower().strip().replace(" ", "_")
+
+
+def _find_species_column(df: pd.DataFrame):
+    """First column whose normalized name is a species id, else first column."""
+    for col in df.columns:
+        if _norm_dataset_col(col) in _SPECIES_COLUMN_NAMES:
+            return col
+    return df.columns[0]
+
+
+def _resync_dataframe_trait_columns(df: pd.DataFrame, traits_expected: dict) -> pd.DataFrame | None:
+    """
+    Rebuild trait columns to match traits_expected (order + names). Preserve values where
+    column names match case-insensitively. Returns None if already aligned.
+    """
+    if df.empty or len(df.columns) == 0:
+        return None
+    species_col = _find_species_column(df)
+    expected_order = list(traits_expected.keys())
+    trait_cols_old = [c for c in df.columns if c != species_col]
+    if [_norm_dataset_col(c) for c in trait_cols_old] == [
+        _norm_dataset_col(c) for c in expected_order
+    ]:
+        return None
+    out = pd.DataFrame()
+    out[species_col] = df[species_col]
+    lookup = {_norm_dataset_col(c): c for c in df.columns}
+    for tname, default in traits_expected.items():
+        nk = _norm_dataset_col(tname)
+        if nk in lookup:
+            out[tname] = df[lookup[nk]]
+        else:
+            out[tname] = default
+    return out[[species_col] + expected_order]
 
 
 def reset_sample_on_csv_change(self, context):
@@ -111,7 +169,9 @@ def update_filepath(self, context):
             return str(s).lower().strip().replace(" ", "_")
 
         species_column_names = {'species', 'label', 'tips', 'tip', 'sample', 'samples', 'name', 'names', 'id', 'ids'}
-        trait_defaults = get_trait_parameters_with_defaults_for_morphospace(morphospace_name)
+        trait_defaults = get_trait_parameters_with_defaults_for_morphospace(
+            morphospace_name, context=bpy.context
+        )
         allowed_traits = {_norm_col(t) for t in trait_defaults.keys()}
 
         unknown_columns = []
@@ -216,19 +276,58 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
             morphospace_name = bpy.context.scene.traitblender_setup.available_morphospaces
         except Exception:
             morphospace_name = ""
-        traits = get_trait_parameters_with_defaults_for_morphospace(morphospace_name)
+        traits = get_trait_parameters_with_defaults_for_morphospace(
+            morphospace_name, context=bpy.context
+        )
         columns = ["species"] + list(traits.keys())
         default_values = list(traits.values())
         df = pd.DataFrame([["t1"] + default_values], columns=columns)
         return df.set_index("species")
 
+    def _ensure_virtual_dataset_traits_synced(self) -> None:
+        """
+        No filepath: in-memory CSV. Morphospaces with ``get_trait_parameters_with_defaults``
+        (e.g. ATLAS ``n_components``) may change expected trait columns — rewrite CSV to match
+        so the editor and ``loc()`` stay consistent.
+        """
+        if self.filepath:
+            return
+        try:
+            morphospace_name = bpy.context.scene.traitblender_setup.available_morphospaces
+        except Exception:
+            return
+        module = load_morphospace_module(morphospace_name)
+        if module is None or not callable(
+            getattr(module, "get_trait_parameters_with_defaults", None)
+        ):
+            return
+        if not self.csv:
+            return
+        traits = get_trait_parameters_with_defaults_for_morphospace(
+            morphospace_name, context=bpy.context
+        )
+        try:
+            df = pd.read_csv(StringIO(self.csv))
+            new_df = _resync_dataframe_trait_columns(df, traits)
+            if new_df is None:
+                return
+            buf = StringIO()
+            new_df.to_csv(buf, index=False)
+            new_s = buf.getvalue()
+            if new_s != self.csv:
+                self.csv = new_s
+        except Exception as e:
+            print(f"TraitBlender: Could not sync virtual dataset trait columns: {e}")
+
     def get_csv_for_editing(self):
         """Return CSV string for the editor: from csv property, or serialized default when no file imported."""
+        if self.filepath:
+            return self.csv if self.csv else ""
+        self._ensure_virtual_dataset_traits_synced()
         if self.csv:
             return self.csv
         if not self.filepath:
             df = self._get_default_dataframe()
-            # Reset index so species is a column, then export as CSV
             csv_buffer = StringIO()
             df.reset_index().to_csv(csv_buffer, index=False)
             return csv_buffer.getvalue()
@@ -238,6 +337,8 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
         """Get DataFrame from CSV string, or default (one row 't1') when no file imported."""
         if not self.csv and not self.filepath:
             return self._get_default_dataframe()
+        if self.csv and not self.filepath:
+            self._ensure_virtual_dataset_traits_synced()
         if not self.csv:
             return pd.DataFrame()
         try:

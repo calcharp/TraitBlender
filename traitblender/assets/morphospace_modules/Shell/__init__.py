@@ -32,7 +32,10 @@ def sample(name="Shell", b=0.2, d=1.65, z=0, a=1, phi=0, psi=0,
     """
     if hyperparameters is None:
         hyperparameters = {}
-    merged_hyperparams = {**HYPERPARAMETERS, **hyperparameters}
+    merged_hyperparams = {
+        **HYPERPARAMETERS,
+        **{k: v for k, v in hyperparameters.items() if k in HYPERPARAMETERS},
+    }
 
     morphospace = ShellMorphospace()
     return morphospace.generate_sample(
