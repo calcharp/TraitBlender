@@ -9,7 +9,7 @@ Learn how to use TraitBlender programmatically through Python scripts in Blender
 
 Before starting, ensure you have:
 
-- ✅ **Blender 5.1+** and **TraitBlender v2.2.0** ([supported versions](./installation.md#supported-versions))
+- ✅ **Blender 5.1+** and **TraitBlender v2.3.0** ([supported versions](./installation.md#supported-versions))
 - ✅ TraitBlender add-on installed and enabled ([Installation Guide](./installation.md))
 - ✅ Basic Python knowledge (helpful but not required)
 

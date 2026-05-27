@@ -36,6 +36,7 @@ if is_dearpygui_available():
 
 classes = [
     setup_scene_op.TRAITBLENDER_OT_setup_scene,
+    setup_scene_op.TRAITBLENDER_OT_add_ruler,
     clear_scene_op.TRAITBLENDER_OT_clear_scene,
     config_ops.TRAITBLENDER_OT_configure_scene,
     config_ops.TRAITBLENDER_OT_show_configuration,

@@ -24,8 +24,8 @@ date-released: "2026-05-22"
 doi: 10.5281/zenodo.14804133
 identifiers:
   - type: url
-    description: "The GitHub release URL for version 2.2.0."
-    value: "https://github.com/Imageomics/TraitBlender/releases/tag/v2.2.0"
+    description: "The GitHub release URL for version 2.3.0."
+    value: "https://github.com/Imageomics/TraitBlender/releases/tag/v2.3.0"
 keywords:
   - Imageomics
   - Blender
@@ -37,7 +37,7 @@ license: "MIT"
 message: "If you find this software helpful in your research, please cite this software release."
 repository-code: "https://github.com/Imageomics/TraitBlender"
 title: "TraitBlender"
-version: 2.2.0
+version: 2.3.0
 type: software
 contact:
   - family-names: Charpentier

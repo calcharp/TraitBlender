@@ -41,6 +41,8 @@ class TRAITBLENDER_PT_main_panel(Panel):
         row = layout.row(align=True)
         row.operator("traitblender.setup_scene", text="Import Museum")
         row.operator("traitblender.clear_scene", text="Clear Scene", icon='TRASH')
+        row = layout.row(align=True)
+        row.operator("traitblender.add_ruler", text="Add Ruler", icon='EMPTY_AXIS')
         layout.separator()
         # Config file path row
         row = layout.row(align=True)
@@ -157,6 +159,10 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         # Sample selection dropdown
         row = layout.row(align=True)
         row.prop(dataset, "sample", text="Sample")
+
+        # Auto-sync sample with active object by exact name match
+        row = layout.row(align=True)
+        row.prop(dataset, "sync_sample_with_active_object", text="Sync Sample to Active")
         
         # Generate sample button
         row = layout.row(align=True)
