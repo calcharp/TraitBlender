@@ -48,9 +48,10 @@ class ShellMorphospace:
     def _C(self, t, theta, sin_t, cos_t, sin_theta, cos_theta, b, a, d, z, phi, psi, c_n, c_depth, n, n_depth):
         """Aperture shape terms: (axial_ribs * spiral_ribs), aperture_size, aperture_shape."""
         aperture_size = np.exp(b * t) - (1 / (t + 1))
-        # Offset sin so valleys sit at the unribbed outer profile (factor = 1).
-        axial_ribs = 1 + c_depth * (1 + np.sin(c_n * t))
-        spiral_ribs = 1 + n_depth * (1 + np.sin(n * theta))
+
+        # these are the lines I need to adjust when I get back
+        axial_ribs = c_depth + 1 + c_depth * np.sin(c_n * t)
+        spiral_ribs = n_depth + 1 + n_depth * np.sin(n * theta)
 
         normal = self._N(t, sin_t, cos_t, b)
         binormal = self._B(t, sin_t, cos_t, b, d, z)
