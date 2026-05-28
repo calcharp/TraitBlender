@@ -149,6 +149,7 @@ class ShellMorphospace:
             aperture = outer_surface[-1]
 
         # Optional size scaling retained from your version.
+        # TODO: Add optional k parameter from Contreras-Figueroa & Aragón (2023) (see .gitignore).
         if S is not None and np.isfinite(S):
             g_tf = np.exp(b * t) - 1 / (t + 1)
             B_amplitude = np.sqrt((a * np.sin(phi)) ** 2 + (np.cos(phi)) ** 2)

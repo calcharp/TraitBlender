@@ -66,6 +66,12 @@ traitblender/site/
 # .github/workflows/release-zips.yml
 #   Comment example tag (line ~2): vX.Y.Z
 
+# =============================================================================
+# TODO — Shell morphospace (Contreras-Figueroa & Aragón 2023)
+# Tomorrow: add the optional k parameter from the Contreras paper as a trait/API
+# option (see TODO in traitblender/assets/morphospace_modules/Shell/morphospace/shell_morphospace.py).
+# =============================================================================
+
 # --- Do NOT change for a TraitBlender-only version bump ---
 # traitblender/blender_manifest.toml → blender_version_min (Blender floor, e.g. 5.1.0)
 # requirements-wheels.txt, requirements-wheels-headless.txt
