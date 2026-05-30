@@ -25,7 +25,7 @@
 
 TraitBlender is a powerful Blender add-on designed for researchers and institutions working with morphological datasets. It enables the generation of high-quality, standardized images for scientific analysis and museum documentation.
 
-**TraitBlender v2.2.0** · **Blender 5.1+**. See the [installation guide](getting-started/installation.md#supported-versions).
+**TraitBlender v2.3.0** · **Blender 5.1+**. See the [installation guide](getting-started/installation.md#supported-versions).
 
 ---
 
@@ -71,7 +71,7 @@ If you use TraitBlender in your research, please cite my work:
           month        = may,
           year         = 2026,
           publisher    = {Zenodo},
-          version      = {v2.2.0},
+          version      = {v2.3.0},
           doi          = {10.5281/zenodo.14804133},
           url          = {https://github.com/Imageomics/TraitBlender},
         }

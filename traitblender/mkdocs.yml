@@ -78,6 +78,7 @@ nav:
     - Shell (Default): morphospaces/shell.md
     - Circle Grid: morphospaces/circle-grid.md
     - ATLAS: morphospaces/atlas.md
+  - Tutorials: tutorials.md
 
 extra:
   social:

@@ -5,8 +5,8 @@ PLAN.md
 traitblender/site/
 
 # =============================================================================
-# RELEASE CHECKLIST — TraitBlender version (currently 2.2.0)
-# Search/replace 2.2.0 → X.Y.Z and v2.2.0 → vX.Y.Z unless noted below.
+# RELEASE CHECKLIST — TraitBlender version (currently 2.3.0)
+# Search/replace 2.3.0 → X.Y.Z and v2.3.0 → vX.Y.Z unless noted below.
 # =============================================================================
 
 # --- Addon package (extension build version; keep both in sync) ---
@@ -65,6 +65,12 @@ traitblender/site/
 #   ...-linux-headless.zip
 # .github/workflows/release-zips.yml
 #   Comment example tag (line ~2): vX.Y.Z
+
+# =============================================================================
+# TODO — Shell morphospace (Contreras-Figueroa & Aragón 2023)
+# Tomorrow: add the optional k parameter from the Contreras paper as a trait/API
+# option (see TODO in traitblender/assets/morphospace_modules/Shell/morphospace/shell_morphospace.py).
+# =============================================================================
 
 # --- Do NOT change for a TraitBlender-only version bump ---
 # traitblender/blender_manifest.toml → blender_version_min (Blender floor, e.g. 5.1.0)

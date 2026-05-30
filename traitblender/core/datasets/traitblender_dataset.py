@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import bpy
-from bpy.props import StringProperty, EnumProperty
+from bpy.props import StringProperty, EnumProperty, BoolProperty
 import pandas as pd
 import os
 from io import StringIO
@@ -11,6 +11,36 @@ from ..morphospaces import (
     get_trait_parameters_with_defaults_for_morphospace,
 )
 from ..morphospaces._module_loader import load_morphospace_module
+
+
+def sync_sample_to_active_object(context=None):
+    """
+    If enabled, sync dataset.sample to the active object name when it exactly matches a row name.
+    Returns True if sample changed, else False.
+    """
+    try:
+        ctx = context or bpy.context
+        scene = ctx.scene
+        dataset = getattr(scene, "traitblender_dataset", None)
+        if dataset is None:
+            return False
+        if not getattr(dataset, "sync_sample_with_active_object", True):
+            return False
+
+        view_layer = getattr(ctx, "view_layer", None) or bpy.context.view_layer
+        active_obj = getattr(view_layer.objects, "active", None) if view_layer else None
+        if active_obj is None:
+            return False
+
+        obj_name = active_obj.name
+        rownames = dataset.rownames
+        if obj_name in rownames and dataset.sample != obj_name:
+            dataset.sample = obj_name
+            return True
+    except Exception:
+        # Never break UI interaction if sync fails.
+        return False
+    return False
 
 
 def _normalize_dataset_path(path: str) -> str:
@@ -251,6 +281,12 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
         description="Select a sample from the dataset",
         items=lambda self, context: self._get_sample_items(),
         default=0
+    )
+
+    sync_sample_with_active_object: BoolProperty(
+        name="Sync Sample to Active Object",
+        description="Automatically set Sample when active object name matches a specimen name",
+        default=True,
     )
     
     def _get_sample_items(self):
