@@ -19,8 +19,11 @@ Welcome to the TraitBlender documentation! TraitBlender is a Blender add-on for 
 ### [Configuration](./configuration/)
 - [Configuration Files](./configuration/config-files.md) - YAML configuration structure
 
-### [Tutorials](./tutorials/)
-- [Basic Specimen Imaging](./tutorials/basic-imaging.md) - Create your first images
+### [Morphospaces](./morphospaces/)
+- [Overview](./morphospaces/overview.md) - Built-in morphospace models and trait columns
+
+### [Tutorials](./tutorials.md)
+- Step-by-step workflow guides (in progress)
 
 ### [API Reference](./api/)
 - [Scene Assets](./api/scene-assets.md) - Object positioning and management

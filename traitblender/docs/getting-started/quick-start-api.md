@@ -26,6 +26,8 @@ bpy.ops.traitblender.setup_scene()
 
 This loads the pre-configured museum scene with table, lighting, and camera.
 
+To append a ruler (for example after one was deleted), call `bpy.ops.traitblender.add_ruler()`. Each call adds another ruler with configuration applied from `traitblender_config.ruler`.
+
 ### 2. Work with Datasets
 
 ```python
@@ -44,6 +46,8 @@ print(f"Dataset shape: {dataset.shape}")
 print(f"Columns: {dataset.colnames}")
 print(f"Rows: {dataset.rownames}")
 ```
+
+With `dataset.sync_sample_with_active_object = True` (the default), selecting an object whose name matches a dataset row updates `dataset.sample` automatically.
 
 ### 3. Generate Morphospace Samples
 
@@ -353,7 +357,7 @@ print(config_yaml)
 ### Explore More:
 - **[Configuration Files](../configuration/config-files.md)**: Understanding YAML config structure
 - **[API Reference](../api/)**: Complete API documentation (coming soon)
-- **[Tutorials](../tutorials/)**: Advanced techniques and workflows
+- **[Tutorials](../tutorials.md)**: Step-by-step guides (in progress)
 
 ### Tips for API Usage:
 - Always run `setup_scene()` before using other features
