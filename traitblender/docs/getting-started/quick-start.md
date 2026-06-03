@@ -97,7 +97,7 @@ Before starting, ensure you have:
     - **First column**: Species/specimen names (automatically detected)
     - **Remaining columns**: Morphological traits that map to morphospace parameters
 
-    For Shell (Default), dataset trait columns include: `b`, `d`, `z`, `a`, `phi`, `psi`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `eps`, `h_0`, `S`. Mesh resolution and inner-surface options (`n_vertices_aperture`, `time_step`, `use_inner_surface`) are hyperparameters in the config file, not dataset columns—see the [Shell morphospace reference](../morphospaces/shell.md).
+    For Shell (Default), dataset trait columns include: `b`, `d`, `z`, `a`, `phi`, `psi`, `k`, `c_depth`, `c_n`, `n_depth`, `n`, `t`, `eps`, `h_0`, `S`. Mesh resolution and inner-surface options (`n_vertices_aperture`, `time_step`, `use_inner_surface`) are hyperparameters in the config file, not dataset columns—see the [Shell morphospace reference](../morphospaces/shell.md).
 
     ### Generate a Specimen
 
