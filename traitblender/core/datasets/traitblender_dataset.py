@@ -355,6 +355,12 @@ class TRAITBLENDER_PG_dataset(bpy.types.PropertyGroup):
         except Exception as e:
             print(f"TraitBlender: Could not sync virtual dataset trait columns: {e}")
 
+    def reset_to_morphospace_default(self):
+        """Clear imported/edited dataset and regenerate the default single-row CSV for the active morphospace."""
+        self.filepath = ""
+        self.csv = ""
+        self.csv = self.get_csv_for_editing()
+
     def get_csv_for_editing(self):
         """Return CSV string for the editor: from csv property, or serialized default when no file imported."""
         if self.filepath:

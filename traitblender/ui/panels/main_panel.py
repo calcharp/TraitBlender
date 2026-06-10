@@ -155,6 +155,7 @@ class TRAITBLENDER_PT_datasets_panel(Panel):
         if is_dearpygui_available():
             row.operator("traitblender.edit_dataset", text="Edit Dataset")
         row.operator("traitblender.export_dataset", text="Export Dataset")
+        row.operator("traitblender.clear_dataset", text="Clear")
         
         # Sample selection dropdown
         row = layout.row(align=True)
