@@ -91,6 +91,5 @@ extra:
 
 extra_javascript:
   - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
-
+  - https://unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js
 copyright: Copyright &copy; 2025 Caleb Charpentier 
